@@ -60,7 +60,7 @@ libs <- c('dplyr', 'stringr', 'forcats',     # wrangling
           'ggplot2','alluvial','ggalluvial')                     # data
 invisible(lapply(libs, library, character.only = TRUE))
 
-one_drive_path <- dirname(getwd())
+root_dir <- dirname(getwd())
 
 # 2. GOAL
 # In this section we are importing all the data sets used in the modeling exercise. All data feeds are in one place in the model. 
