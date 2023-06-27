@@ -1,11 +1,11 @@
-name: Build
+name: R Pipeline
 on: [push]
 
 jobs:
   test:
     environment: build
     runs-on: ubuntu-latest
-    name: Build
+    name: R Pipeline
     steps:
       - name: Load R
         uses: r-lib/actions/setup-r@v2
