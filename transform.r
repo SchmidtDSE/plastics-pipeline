@@ -410,8 +410,6 @@ F05<-rbind(F01.2,F02.2,F03.2, F04.2)
 # Joing all trade information 
 F05<-F05 %>% select(Year, Region, Major_Market_Sector, MT_Trade)
 
-str(G7)
-str(F05)
 G7$Region<-as.factor(G7$Region)
 F05$Major_Market_Sector<- factor(F05$Major_Market_Sector, levels = 
                                   c("Transportation", 
@@ -469,7 +467,6 @@ H0 <- expand.grid(
 
 # Just making sure I leave C6.2 intact 
 H.1<-G9 %>% select(Year, Region, Major_Market_Sector, PC_Sector)
-str(G9)
 H.1$Major_Market_Sector<- factor(H.1$Major_Market_Sector, levels = 
                                   c("Transportation", 
                                     "Packaging", 
@@ -479,7 +476,6 @@ H.1$Major_Market_Sector<- factor(H.1$Major_Market_Sector, levels =
                                     "Agriculture",
                                     "Textiles",
                                     "Others"))
-str(H.1)
 levels(H.1$Region)
 H.1$Region<-as.factor(H.1$Region)
 
@@ -490,7 +486,6 @@ H2<-H.1 %>%
   ungroup %>%
   select(Region, Major_Market_Sector, PC_Sector)%>% 
   mutate_at(3, round, 2)
-str(H2)
 
 # Stitch it together with HO so that I have a data frame 
 H3<-H2%>% inner_join(H0, 
@@ -553,13 +548,10 @@ HH8<-H0.1%>% right_join(HH7,
 HH8<-as.data.frame(HH8)
 # Making sure H5 goes untouched!
 H6<-H5
-str(H6)
-str(HH8)
 HH8$Region<-as.factor(HH8$Region)
 
 HH9.2<-H4 %>% full_join(HH8,
                        by=c("Year"="Year","Region"="Region","Major_Market_Sector"="Major_Market_Sector"))
-str(HH9.2)
 
 #colnames(HH9.2)[colnames(HH9.2) == 'PC'] <- 'PC_Sector'
 
@@ -604,9 +596,6 @@ IA2<-IA1 %>% select(-Total_MT_Plastic)
 #colnames(IA2)[colnames(IA2) == 'PC_Sector'] <- 'PC'
 
 IA3<-rbind(IA2,H7)
-
-str(IA2)
-str(H6)
 
 ################################################################################
 ################################################################################
@@ -810,7 +799,6 @@ print("== 4f / 6: Transform (Dimensions) ==")
 # for forgot to import it, so for now just do it without textiles but add it in later 
 
 KA1<-IA3 %>% filter(Major_Market_Sector!="Textile")
-str(KA1)
 
 ################################################################################
 ################################################################################
@@ -829,7 +817,6 @@ KA2 <- expand.grid(
 KA2
 
 KA3<-bind_rows(KA1,KA2)
-str(KA3)
 ################################################################################
 ################################################################################
 #
@@ -1150,10 +1137,16 @@ ggsave(glue("output/china_other.png"))
 # 6. **Export**
 
 print("== 6 / 6: Export ==")
+write.csv(F05, file=glue("output/F05.csv"))
+write.csv(G7, file=glue("output/G7.csv"))
 write.csv(G9, file=glue("output/G9.csv"))
+write.csv(H.1, file=glue("output/H.1.csv"))
 write.csv(H2, file=glue("output/H2.csv"))
 write.csv(H5, file=glue("output/H5.csv"))
 write.csv(H6, file=glue("output/H6.csv"))
+write.csv(HH8, file=glue("output/HH8.csv"))
+write.csv(HH9.2, file=glue("output/HH9.2.csv"))
+write.csv(IA2, file=glue("output/IA2.csv"))
 write.csv(IA3, file=glue("output/IA3.csv"))
 write.csv(KA3, file=glue("output/KA3.csv"))
 write.csv(KD, file=glue("output/KD.csv"))
