@@ -1,0 +1,15 @@
+name: SQL Pipeline
+on: [push]
+
+jobs:
+  test:
+    environment: build
+    runs-on: ubuntu-latest
+    name: SQL Pipeline
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Get data
+        run: wget --user ${{ secrets.DOWNLOADUSER }} --password ${{ secrets.DOWNLOADPASS }} ${{ secrets.DOWNLOADURL }}
+      - name: Extract data
+        run: unzip 02_Data_Raw.zip
