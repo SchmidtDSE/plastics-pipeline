@@ -612,7 +612,7 @@ str(H6)
 
 ################################################################################
 ################################################################################
- # IA3 is now the most important data frame 
+ # IA3 is now the most important data frame KD_6_2050
 ################################################################################
 ################################################################################
 
@@ -1000,6 +1000,7 @@ geom_line(data=KD_1, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Transportation")+
 ggtitle("China Transportation Plastic Waste")
+ggsave(glue("{root_path}/output/china_transport.png"))
 
 # Ciera and Sam - it is very obvious now that its the same code chunk repeated for each Region and each market sector. 
 # Is there a way to loop this? Perhaps using apply mapply lapply functions? 
@@ -1025,6 +1026,7 @@ geom_line(data=KD_2, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Packaging")+
 ggtitle("China Packaging Plastic Waste")
+ggsave(glue("{root_path}/output/china_packaging.png"))
 
 # China + Building & Construction
 
@@ -1048,6 +1050,7 @@ geom_line(data=KD_3, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Building & Construction")+
 ggtitle("China Building & Construction Plastic Waste")
+ggsave(glue("{root_path}/output/china_building.png"))
 
 # China + Electrical & Electric
 
@@ -1071,6 +1074,7 @@ geom_line(data=KD_4, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Electric & Electrical")+
 ggtitle("China Electric & Electronic Plastic Waste")
+ggsave(glue("{root_path}/output/china_electrical.png"))
 
 KD_5<-KD %>% 
   filter(Region=="China" & Major_Market_Sector=="Household_Leisure_Sports") %>% 
@@ -1090,6 +1094,7 @@ geom_line(data=KD_5, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Household")+
 ggtitle("China Houseshold Leisure & Sport Plastic Waste")
+ggsave(glue("{root_path}/output/china_sport_leisure.png"))
 
 # China Agriculture Plastic Waste
 
@@ -1111,6 +1116,7 @@ geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Agriculture")+
 ggtitle("China Agriculture Plastic Waste")
+ggsave(glue("{root_path}/output/china_agriculture.png"))
 
 # China Others Plastic Waste
 
@@ -1132,6 +1138,7 @@ geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Others")+
 ggtitle("China Others Plastic Waste")
+ggsave(glue("{root_path}/output/china_other.png"))
 
 # 11. GOAL 
 # Extending the curve by sector and region to 2050 
@@ -1145,3 +1152,17 @@ ggtitle("China Others Plastic Waste")
 # 6. **Export**
 
 print("== 6 / 6: Export ==")
+saveRDS(G9, file=glue("{root_path}/output/G9.csv"))
+saveRDS(H2, file=glue("{root_path}/output/H2.csv"))
+saveRDS(H5, file=glue("{root_path}/output/H5.csv"))
+saveRDS(H6, file=glue("{root_path}/output/H6.csv"))
+saveRDS(IA3, file=glue("{root_path}/output/IA3.csv"))
+saveRDS(KA3, file=glue("{root_path}/output/KA3.csv"))
+saveRDS(KD, file=glue("{root_path}/output/KD.csv"))
+saveRDS(KD_1_2050, file=glue("{root_path}/output/KD_1_2050.csv"))
+saveRDS(KD_2_2050, file=glue("{root_path}/output/KD_2_2050.csv"))
+saveRDS(KD_3_2050, file=glue("{root_path}/output/KD_3_2050.csv"))
+saveRDS(KD_4_2050, file=glue("{root_path}/output/KD_4_2050.csv"))
+saveRDS(KD_5_2050, file=glue("{root_path}/output/KD_5_2050.csv"))
+saveRDS(KD_6_2050, file=glue("{root_path}/output/KD_6_2050.csv"))
+saveRDS(KD_7_2050, file=glue("{root_path}/output/KD_7_2050.csv"))
