@@ -985,7 +985,7 @@ geom_line(data=KD_1, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Transportation")+
 ggtitle("China Transportation Plastic Waste")
-ggsave(glue("output/china_transport.png"))
+ggsave(glue("output_r/china_transport.png"))
 
 # Ciera and Sam - it is very obvious now that its the same code chunk repeated for each Region and each market sector. 
 # Is there a way to loop this? Perhaps using apply mapply lapply functions? 
@@ -1011,7 +1011,7 @@ geom_line(data=KD_2, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Packaging")+
 ggtitle("China Packaging Plastic Waste")
-ggsave(glue("output/china_packaging.png"))
+ggsave(glue("output_r/china_packaging.png"))
 
 # China + Building & Construction
 
@@ -1035,7 +1035,7 @@ geom_line(data=KD_3, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Building & Construction")+
 ggtitle("China Building & Construction Plastic Waste")
-ggsave(glue("output/china_building.png"))
+ggsave(glue("output_r/china_building.png"))
 
 # China + Electrical & Electric
 
@@ -1059,7 +1059,7 @@ geom_line(data=KD_4, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Electric & Electrical")+
 ggtitle("China Electric & Electronic Plastic Waste")
-ggsave(glue("output/china_electrical.png"))
+ggsave(glue("output_r/china_electrical.png"))
 
 KD_5<-KD %>% 
   filter(Region=="China" & Major_Market_Sector=="Household_Leisure_Sports") %>% 
@@ -1079,7 +1079,7 @@ geom_line(data=KD_5, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Household")+
 ggtitle("China Houseshold Leisure & Sport Plastic Waste")
-ggsave(glue("output/china_sport_leisure.png"))
+ggsave(glue("output_r/china_sport_leisure.png"))
 
 # China Agriculture Plastic Waste
 
@@ -1101,7 +1101,7 @@ geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Agriculture")+
 ggtitle("China Agriculture Plastic Waste")
-ggsave(glue("output/china_agriculture.png"))
+ggsave(glue("output_r/china_agriculture.png"))
 
 # China Others Plastic Waste
 
@@ -1123,7 +1123,7 @@ geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Others")+
 ggtitle("China Others Plastic Waste")
-ggsave(glue("output/china_other.png"))
+ggsave(glue("output_r/china_other.png"))
 
 # 11. GOAL 
 # Extending the curve by sector and region to 2050 
@@ -1137,23 +1137,23 @@ ggsave(glue("output/china_other.png"))
 # 6. **Export**
 
 print("== 6 / 6: Export ==")
-write.csv(F05, file=glue("output/F05.csv"))
-write.csv(G7, file=glue("output/G7.csv"))
-write.csv(G9, file=glue("output/G9.csv"))
-write.csv(H.1, file=glue("output/H.1.csv"))
-write.csv(H2, file=glue("output/H2.csv"))
-write.csv(H5, file=glue("output/H5.csv"))
-write.csv(H6, file=glue("output/H6.csv"))
-write.csv(HH8, file=glue("output/HH8.csv"))
-write.csv(HH9.2, file=glue("output/HH9.2.csv"))
-write.csv(IA2, file=glue("output/IA2.csv"))
-write.csv(IA3, file=glue("output/IA3.csv"))
-write.csv(KA3, file=glue("output/KA3.csv"))
-write.csv(KD, file=glue("output/KD.csv"))
-write.csv(KD_1_2050, file=glue("output/KD_1_2050.csv"))
-write.csv(KD_2_2050, file=glue("output/KD_2_2050.csv"))
-write.csv(KD_3_2050, file=glue("output/KD_3_2050.csv"))
-write.csv(KD_4_2050, file=glue("output/KD_4_2050.csv"))
-write.csv(KD_5_2050, file=glue("output/KD_5_2050.csv"))
-write.csv(KD_6_2050, file=glue("output/KD_6_2050.csv"))
-write.csv(KD_7_2050, file=glue("output/KD_7_2050.csv"))
+write.csv(F05, file=glue("output_r/F05.csv"))
+write.csv(G7, file=glue("output_r/G7.csv"))
+write.csv(G9, file=glue("output_r/G9.csv"))
+write.csv(H.1, file=glue("output_r/H.1.csv"))
+write.csv(H2, file=glue("output_r/H2.csv"))
+write.csv(H5, file=glue("output_r/H5.csv"))
+write.csv(H6, file=glue("output_r/H6.csv"))
+write.csv(HH8, file=glue("output_r/HH8.csv"))
+write.csv(HH9.2, file=glue("output_r/HH9.2.csv"))
+write.csv(IA2, file=glue("output_r/IA2.csv"))
+write.csv(IA3, file=glue("output_r/IA3.csv"))
+write.csv(KA3, file=glue("output_r/KA3.csv"))
+write.csv(KD, file=glue("output_r/KD.csv"))
+write.csv(KD_1_2050, file=glue("output_r/KD_1_2050.csv"))
+write.csv(KD_2_2050, file=glue("output_r/KD_2_2050.csv"))
+write.csv(KD_3_2050, file=glue("output_r/KD_3_2050.csv"))
+write.csv(KD_4_2050, file=glue("output_r/KD_4_2050.csv"))
+write.csv(KD_5_2050, file=glue("output_r/KD_5_2050.csv"))
+write.csv(KD_6_2050, file=glue("output_r/KD_6_2050.csv"))
+write.csv(KD_7_2050, file=glue("output_r/KD_7_2050.csv"))

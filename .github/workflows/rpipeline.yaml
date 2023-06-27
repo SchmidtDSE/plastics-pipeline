@@ -20,8 +20,8 @@ jobs:
       - name: Build
         run: Rscript transform.r
       - name: Zip results
-        run: zip -r output.zip output
+        run: zip -r output_r.zip output_r
       - uses: actions/upload-artifact@v3
         with:
-          name: result
-          path: output.zip
+          name: R Pipeline Result
+          path: output_r.zip
