@@ -73,44 +73,42 @@ invisible(lapply(libs, library, character.only = TRUE))
 
 print("== 2 / 6: Import ==")
 
-root_path <- "."
-
 # Base Inputs of Production
 options(digits = 8)
-A_01_Resin<-read.csv(glue("{root_path}/02_Data_Raw/01_Production_of_Resin_(no_fiber).csv"))
-A_02_Fiber<-read.csv(glue("{root_path}/02_Data_Raw/02_Production_Fiber.csv"))
-A_03_Add<-read.csv(glue("{root_path}/02_Data_Raw/03_Production_Additives.csv"))
+A_01_Resin<-read.csv(glue("02_Data_Raw/01_Production_of_Resin_(no_fiber).csv"))
+A_02_Fiber<-read.csv(glue("02_Data_Raw/02_Production_Fiber.csv"))
+A_03_Add<-read.csv(glue("02_Data_Raw/03_Production_Additives.csv"))
 
 # Base Inputs of Imports 
-A_04_Net_Import_Resin<-read.csv(glue("{root_path}/02_Data_Raw/04_Net_Import_Resin_no_fiber_copy.csv"))
-A_05_Net_Import_Fiber<-read.csv(glue("{root_path}/02_Data_Raw/05_Net_Import_Fiber_copy.csv"))
-A_06_Net_Import_Plastic_Articles<-read.csv(glue("{root_path}/02_Data_Raw/06_Net_import_plastic_articles copy.csv"))
-A_07_Net_Import_Finished_Goods<-read.csv(glue("{root_path}/02_Data_Raw/07_Net_Import_plastic_in_finished_goods_no_fiber copy.csv"))
+A_04_Net_Import_Resin<-read.csv(glue("02_Data_Raw/04_Net_Import_Resin_no_fiber_copy.csv"))
+A_05_Net_Import_Fiber<-read.csv(glue("02_Data_Raw/05_Net_Import_Fiber_copy.csv"))
+A_06_Net_Import_Plastic_Articles<-read.csv(glue("02_Data_Raw/06_Net_import_plastic_articles copy.csv"))
+A_07_Net_Import_Finished_Goods<-read.csv(glue("02_Data_Raw/07_Net_Import_plastic_in_finished_goods_no_fiber copy.csv"))
 
 # Trade New versions 12 
-AB_01_Trade_China<-read.csv(glue("{root_path}/02_Data_Raw/18_Net_Trade_China.csv"))
-AB_02_Trade_NAFTA<-read.csv(glue("{root_path}/02_Data_Raw/19_Net_Trade_NAFTA.csv"))
-AB_03_Trade_EU<-read.csv(glue("{root_path}/02_Data_Raw/20_Net_Trade_EU.csv"))
-AB_04_Trade_Row<-read.csv(glue("{root_path}/02_Data_Raw/21_Net_Trade_Row.csv"))
+AB_01_Trade_China<-read.csv(glue("02_Data_Raw/18_Net_Trade_China.csv"))
+AB_02_Trade_NAFTA<-read.csv(glue("02_Data_Raw/19_Net_Trade_NAFTA.csv"))
+AB_03_Trade_EU<-read.csv(glue("02_Data_Raw/20_Net_Trade_EU.csv"))
+AB_04_Trade_Row<-read.csv(glue("02_Data_Raw/21_Net_Trade_Row.csv"))
 
 # Polymer breakdown by Sector and Region (Sector Polymer Matrices)
 # These ones need to be fed in with 5 decimal places to get same values as excel sheet 
-AC_01_China<-read.csv(glue("{root_path}/02_Data_Raw/08_China_End_Use_and_Type.csv"))
-AC_02_NAFTA<-read.csv(glue("{root_path}/02_Data_Raw/09_NAFTA_End_Use_and_Type.csv"))
-AC_03_Europe<-read.csv(glue("{root_path}/02_Data_Raw/10_Europe_End_Use_and_Type.csv"))
-AC_04_Row<-read.csv(glue("{root_path}/02_Data_Raw/11_RoW_End_Use_and_Type.csv"))
+AC_01_China<-read.csv(glue("02_Data_Raw/08_China_End_Use_and_Type.csv"))
+AC_02_NAFTA<-read.csv(glue("02_Data_Raw/09_NAFTA_End_Use_and_Type.csv"))
+AC_03_Europe<-read.csv(glue("02_Data_Raw/10_Europe_End_Use_and_Type.csv"))
+AC_04_Row<-read.csv(glue("02_Data_Raw/11_RoW_End_Use_and_Type.csv"))
 
 # Lifetime distributions 
-AI_02<-read.csv(glue("{root_path}/02_Data_Raw/12_Lifetime copy.csv"))
+AI_02<-read.csv(glue("02_Data_Raw/12_Lifetime copy.csv"))
 
 # 1950 ~ 2004 History Curve Fitting
-AHH1<-read.csv(glue("{root_path}/02_Data_Raw/13_1950-2004 copy.csv"))
+AHH1<-read.csv(glue("02_Data_Raw/13_1950-2004 copy.csv"))
 
 # End of Life Breakdowns 
-AKE_Eol_China<-read.csv(glue("{root_path}/02_Data_Raw/14_Eol_China copy.csv"))
-AKE_Eol_EU<-read.csv(glue("{root_path}/02_Data_Raw/15_Eol_EU copy.csv"))
-AKE_Eol_NAFTA<-read.csv(glue("{root_path}/02_Data_Raw/16_Eol_NAFTA copy.csv"))
-AKE_Eol_Row<-read.csv(glue("{root_path}/02_Data_Raw/17_Eol_RoW copy.csv"))
+AKE_Eol_China<-read.csv(glue("02_Data_Raw/14_Eol_China copy.csv"))
+AKE_Eol_EU<-read.csv(glue("02_Data_Raw/15_Eol_EU copy.csv"))
+AKE_Eol_NAFTA<-read.csv(glue("02_Data_Raw/16_Eol_NAFTA copy.csv"))
+AKE_Eol_Row<-read.csv(glue("02_Data_Raw/17_Eol_RoW copy.csv"))
 
 # 3. GOAL 
 # In this section we are making all the data long form, even data that we use later in the model. 
@@ -1000,7 +998,7 @@ geom_line(data=KD_1, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Transportation")+
 ggtitle("China Transportation Plastic Waste")
-ggsave(glue("{root_path}/output/china_transport.png"))
+ggsave(glue("output/china_transport.png"))
 
 # Ciera and Sam - it is very obvious now that its the same code chunk repeated for each Region and each market sector. 
 # Is there a way to loop this? Perhaps using apply mapply lapply functions? 
@@ -1026,7 +1024,7 @@ geom_line(data=KD_2, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Packaging")+
 ggtitle("China Packaging Plastic Waste")
-ggsave(glue("{root_path}/output/china_packaging.png"))
+ggsave(glue("output/china_packaging.png"))
 
 # China + Building & Construction
 
@@ -1050,7 +1048,7 @@ geom_line(data=KD_3, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Building & Construction")+
 ggtitle("China Building & Construction Plastic Waste")
-ggsave(glue("{root_path}/output/china_building.png"))
+ggsave(glue("output/china_building.png"))
 
 # China + Electrical & Electric
 
@@ -1074,7 +1072,7 @@ geom_line(data=KD_4, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Electric & Electrical")+
 ggtitle("China Electric & Electronic Plastic Waste")
-ggsave(glue("{root_path}/output/china_electrical.png"))
+ggsave(glue("output/china_electrical.png"))
 
 KD_5<-KD %>% 
   filter(Region=="China" & Major_Market_Sector=="Household_Leisure_Sports") %>% 
@@ -1094,7 +1092,7 @@ geom_line(data=KD_5, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Household")+
 ggtitle("China Houseshold Leisure & Sport Plastic Waste")
-ggsave(glue("{root_path}/output/china_sport_leisure.png"))
+ggsave(glue("output/china_sport_leisure.png"))
 
 # China Agriculture Plastic Waste
 
@@ -1116,7 +1114,7 @@ geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Agriculture")+
 ggtitle("China Agriculture Plastic Waste")
-ggsave(glue("{root_path}/output/china_agriculture.png"))
+ggsave(glue("output/china_agriculture.png"))
 
 # China Others Plastic Waste
 
@@ -1138,7 +1136,7 @@ geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
 xlab("Year")+
 ylab("Plastic Waste Generation in China Others")+
 ggtitle("China Others Plastic Waste")
-ggsave(glue("{root_path}/output/china_other.png"))
+ggsave(glue("output/china_other.png"))
 
 # 11. GOAL 
 # Extending the curve by sector and region to 2050 
@@ -1152,17 +1150,17 @@ ggsave(glue("{root_path}/output/china_other.png"))
 # 6. **Export**
 
 print("== 6 / 6: Export ==")
-saveRDS(G9, file=glue("{root_path}/output/G9.csv"))
-saveRDS(H2, file=glue("{root_path}/output/H2.csv"))
-saveRDS(H5, file=glue("{root_path}/output/H5.csv"))
-saveRDS(H6, file=glue("{root_path}/output/H6.csv"))
-saveRDS(IA3, file=glue("{root_path}/output/IA3.csv"))
-saveRDS(KA3, file=glue("{root_path}/output/KA3.csv"))
-saveRDS(KD, file=glue("{root_path}/output/KD.csv"))
-saveRDS(KD_1_2050, file=glue("{root_path}/output/KD_1_2050.csv"))
-saveRDS(KD_2_2050, file=glue("{root_path}/output/KD_2_2050.csv"))
-saveRDS(KD_3_2050, file=glue("{root_path}/output/KD_3_2050.csv"))
-saveRDS(KD_4_2050, file=glue("{root_path}/output/KD_4_2050.csv"))
-saveRDS(KD_5_2050, file=glue("{root_path}/output/KD_5_2050.csv"))
-saveRDS(KD_6_2050, file=glue("{root_path}/output/KD_6_2050.csv"))
-saveRDS(KD_7_2050, file=glue("{root_path}/output/KD_7_2050.csv"))
+saveRDS(G9, file=glue("output/G9.csv"))
+saveRDS(H2, file=glue("output/H2.csv"))
+saveRDS(H5, file=glue("output/H5.csv"))
+saveRDS(H6, file=glue("output/H6.csv"))
+saveRDS(IA3, file=glue("output/IA3.csv"))
+saveRDS(KA3, file=glue("output/KA3.csv"))
+saveRDS(KD, file=glue("output/KD.csv"))
+saveRDS(KD_1_2050, file=glue("output/KD_1_2050.csv"))
+saveRDS(KD_2_2050, file=glue("output/KD_2_2050.csv"))
+saveRDS(KD_3_2050, file=glue("output/KD_3_2050.csv"))
+saveRDS(KD_4_2050, file=glue("output/KD_4_2050.csv"))
+saveRDS(KD_5_2050, file=glue("output/KD_5_2050.csv"))
+saveRDS(KD_6_2050, file=glue("output/KD_6_2050.csv"))
+saveRDS(KD_7_2050, file=glue("output/KD_7_2050.csv"))
