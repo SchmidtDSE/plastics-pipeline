@@ -73,7 +73,7 @@ invisible(lapply(libs, library, character.only = TRUE))
 
 print("== 2 / 6: Import ==")
 
-root_path <- getwd()
+root_path <- "."
 
 # Base Inputs of Production
 options(digits = 8)
