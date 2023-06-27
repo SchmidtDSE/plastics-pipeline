@@ -13,15 +13,3 @@ jobs:
         uses: actions/checkout@v3
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
-      - name: Get data
-        run: wget --user ${{ secrets.DOWNLOADUSER }} --password ${{ secrets.DOWNLOADPASS }} ${{ secrets.DOWNLOADURL }}
-      - name: Extract data
-        run: unzip 02_Data_Raw.zip
-      - name: Build
-        run: Rscript transform.r
-      - name: Zip results
-        run: zip -r output.zip output
-      - uses: actions/upload-artifact@v3
-        with:
-          name: result
-          path: output.zip
