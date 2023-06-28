@@ -9,7 +9,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Get data
+      - name: Get main data
         run: wget --user ${{ secrets.DOWNLOADUSER }} --password ${{ secrets.DOWNLOADPASS }} ${{ secrets.DOWNLOADURL }}
       - name: Extract data
         run: unzip 02_Data_Raw.zip
+      - name: Install Sqlite
+        run: sudo apt install sqlite3
+      - name: Build database
+        run: cd sql; bash make.sh
