@@ -60,7 +60,7 @@ libs <- c('dplyr', 'stringr', 'forcats',     # wrangling
           'ggplot2','alluvial','ggalluvial')                     # data
 invisible(lapply(libs, library, character.only = TRUE))
 
-root_dir <- dirname(getwd())
+root_dir <- file.path(dirname(getwd()), "data")
 
 # 2. GOAL
 # In this section we are importing all the data sets used in the modeling exercise. All data feeds are in one place in the model. 
@@ -77,40 +77,40 @@ print("== 2 / 6: Import ==")
 
 # Base Inputs of Production
 options(digits = 8)
-A_01_Resin<-read.csv(glue("{root_dir}/02_Data_Raw/01_Production_of_Resin_(no_fiber).csv"))
-A_02_Fiber<-read.csv(glue("{root_dir}/02_Data_Raw/02_Production_Fiber.csv"))
-A_03_Add<-read.csv(glue("{root_dir}/02_Data_Raw/03_Production_Additives.csv"))
+A_01_Resin<-read.csv(glue("{root_dir}/01_Production_of_Resin_(no_fiber).csv"))
+A_02_Fiber<-read.csv(glue("{root_dir}/02_Production_Fiber.csv"))
+A_03_Add<-read.csv(glue("{root_dir}/03_Production_Additives.csv"))
 
 # Base Inputs of Imports 
-A_04_Net_Import_Resin<-read.csv(glue("{root_dir}/02_Data_Raw/04_Net_Import_Resin_no_fiber_copy.csv"))
-A_05_Net_Import_Fiber<-read.csv(glue("{root_dir}/02_Data_Raw/05_Net_Import_Fiber_copy.csv"))
-A_06_Net_Import_Plastic_Articles<-read.csv(glue("{root_dir}/02_Data_Raw/06_Net_import_plastic_articles copy.csv"))
-A_07_Net_Import_Finished_Goods<-read.csv(glue("{root_dir}/02_Data_Raw/07_Net_Import_plastic_in_finished_goods_no_fiber copy.csv"))
+A_04_Net_Import_Resin<-read.csv(glue("{root_dir}/04_Net_Import_Resin_no_fiber_copy.csv"))
+A_05_Net_Import_Fiber<-read.csv(glue("{root_dir}/05_Net_Import_Fiber_copy.csv"))
+A_06_Net_Import_Plastic_Articles<-read.csv(glue("{root_dir}/06_Net_import_plastic_articles copy.csv"))
+A_07_Net_Import_Finished_Goods<-read.csv(glue("{root_dir}/07_Net_Import_plastic_in_finished_goods_no_fiber copy.csv"))
 
 # Trade New versions 12 
-AB_01_Trade_China<-read.csv(glue("{root_dir}/02_Data_Raw/18_Net_Trade_China.csv"))
-AB_02_Trade_NAFTA<-read.csv(glue("{root_dir}/02_Data_Raw/19_Net_Trade_NAFTA.csv"))
-AB_03_Trade_EU<-read.csv(glue("{root_dir}/02_Data_Raw/20_Net_Trade_EU.csv"))
-AB_04_Trade_Row<-read.csv(glue("{root_dir}/02_Data_Raw/21_Net_Trade_Row.csv"))
+AB_01_Trade_China<-read.csv(glue("{root_dir}/18_Net_Trade_China.csv"))
+AB_02_Trade_NAFTA<-read.csv(glue("{root_dir}/19_Net_Trade_NAFTA.csv"))
+AB_03_Trade_EU<-read.csv(glue("{root_dir}/20_Net_Trade_EU.csv"))
+AB_04_Trade_Row<-read.csv(glue("{root_dir}/21_Net_Trade_Row.csv"))
 
 # Polymer breakdown by Sector and Region (Sector Polymer Matrices)
 # These ones need to be fed in with 5 decimal places to get same values as excel sheet 
-AC_01_China<-read.csv(glue("{root_dir}/02_Data_Raw/08_China_End_Use_and_Type.csv"))
-AC_02_NAFTA<-read.csv(glue("{root_dir}/02_Data_Raw/09_NAFTA_End_Use_and_Type.csv"))
-AC_03_Europe<-read.csv(glue("{root_dir}/02_Data_Raw/10_Europe_End_Use_and_Type.csv"))
-AC_04_Row<-read.csv(glue("{root_dir}/02_Data_Raw/11_RoW_End_Use_and_Type.csv"))
+AC_01_China<-read.csv(glue("{root_dir}/08_China_End_Use_and_Type.csv"))
+AC_02_NAFTA<-read.csv(glue("{root_dir}/09_NAFTA_End_Use_and_Type.csv"))
+AC_03_Europe<-read.csv(glue("{root_dir}/10_Europe_End_Use_and_Type.csv"))
+AC_04_Row<-read.csv(glue("{root_dir}/11_RoW_End_Use_and_Type.csv"))
 
 # Lifetime distributions 
-AI_02<-read.csv(glue("{root_dir}/02_Data_Raw/12_Lifetime copy.csv"))
+AI_02<-read.csv(glue("{root_dir}/12_Lifetime copy.csv"))
 
 # 1950 ~ 2004 History Curve Fitting
-AHH1<-read.csv(glue("{root_dir}/02_Data_Raw/13_1950-2004 copy.csv"))
+AHH1<-read.csv(glue("{root_dir}/13_1950-2004 copy.csv"))
 
 # End of Life Breakdowns 
-AKE_Eol_China<-read.csv(glue("{root_dir}/02_Data_Raw/14_Eol_China copy.csv"))
-AKE_Eol_EU<-read.csv(glue("{root_dir}/02_Data_Raw/15_EoL_EU copy.csv"))
-AKE_Eol_NAFTA<-read.csv(glue("{root_dir}/02_Data_Raw/16_Eol_NAFTA copy.csv"))
-AKE_Eol_Row<-read.csv(glue("{root_dir}/02_Data_Raw/17_Eol_RoW copy.csv"))
+AKE_Eol_China<-read.csv(glue("{root_dir}/14_Eol_China copy.csv"))
+AKE_Eol_EU<-read.csv(glue("{root_dir}/15_EoL_EU copy.csv"))
+AKE_Eol_NAFTA<-read.csv(glue("{root_dir}/16_Eol_NAFTA copy.csv"))
+AKE_Eol_Row<-read.csv(glue("{root_dir}/17_Eol_RoW copy.csv"))
 
 # 3. GOAL 
 # In this section we are making all the data long form, even data that we use later in the model. 

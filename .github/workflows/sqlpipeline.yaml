@@ -9,16 +9,14 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Get main data
-        run: wget --user ${{ secrets.DOWNLOADUSER }} --password ${{ secrets.DOWNLOADPASS }} ${{ secrets.DOWNLOADURL }}
-      - name: Extract data
-        run: unzip 02_Data_Raw.zip
       - name: Install Sqlite
         run: sudo apt install sqlite3
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11' 
+      - name: Install other dependencies
+        run: pip install -r requirements.txt
       - name: Build database
         run: cd sql; bash make.sh
       - uses: actions/upload-artifact@v3
