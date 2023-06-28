@@ -15,6 +15,10 @@ jobs:
         run: unzip 02_Data_Raw.zip
       - name: Install Sqlite
         run: sudo apt install sqlite3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11' 
       - name: Build database
         run: cd sql; bash make.sh
       - uses: actions/upload-artifact@v3
