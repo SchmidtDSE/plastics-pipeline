@@ -1,7 +1,7 @@
 import csv
 import sys
 
-USAGE_STR = 'python check_summary.py [file]'
+USAGE_STR = 'python check_summary_percents.py [file]'
 NUM_ARGS = 1
 
 

@@ -1,0 +1,5 @@
+{
+    "kernel": "gaussian",
+    "degree": 2,
+    "radius": 0.75
+}
