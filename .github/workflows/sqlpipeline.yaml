@@ -17,3 +17,7 @@ jobs:
         run: sudo apt install sqlite3
       - name: Build database
         run: cd sql; bash make.sh
+      - uses: actions/upload-artifact@v3
+        with:
+          name: SQL Pipeline Result
+          path: output_sql

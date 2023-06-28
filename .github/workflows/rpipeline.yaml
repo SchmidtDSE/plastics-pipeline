@@ -19,9 +19,7 @@ jobs:
         run: unzip 02_Data_Raw.zip
       - name: Build
         run: cd r; Rscript transform.r
-      - name: Zip results
-        run: zip -r output_r.zip output_r
       - uses: actions/upload-artifact@v3
         with:
           name: R Pipeline Result
-          path: output_r.zip
+          path: output_r
