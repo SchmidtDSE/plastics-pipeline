@@ -4,3 +4,4 @@ output_sql/*.csv
 output_sql/*.db
 output_r/*.csv
 output_r/*.db
+data_workspace/
