@@ -34,6 +34,7 @@ cat ../sql/03_views/input_additives.sql | sqlite3 combined.db
 cat ../sql/03_views/input_import.sql | sqlite3 combined.db
 cat ../sql/03_views/input_production.sql | sqlite3 combined.db
 cat ../sql/03_views/inputs.sql | sqlite3 combined.db
+cat ../sql/03_views/net_imports.sql | sqlite3 combined.db
 cat ../sql/03_views/overview_consumption.sql | sqlite3 combined.db
 cat ../sql/03_views/overview_end_use.sql | sqlite3 combined.db
 cat ../sql/03_views/overview_eol.sql | sqlite3 combined.db
