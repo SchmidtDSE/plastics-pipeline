@@ -1139,6 +1139,7 @@ ggsave(glue("{root_dir}/output_r/china_other.png"))
 
 print("== 6 / 6: Export ==")
 write.csv(F05, file=glue("{root_dir}/output_r/F05.csv"))
+write.csv(G4, file=glue("{root_dir}/output_r/G4.csv"))
 write.csv(G7, file=glue("{root_dir}/output_r/G7.csv"))
 write.csv(G9, file=glue("{root_dir}/output_r/G9.csv"))
 write.csv(H.1, file=glue("{root_dir}/output_r/H.1.csv"))
