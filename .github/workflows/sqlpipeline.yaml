@@ -3,7 +3,6 @@ on: [push]
 
 jobs:
   test:
-    environment: build
     runs-on: ubuntu-latest
     name: SQL Pipeline
     steps:
