@@ -8,8 +8,8 @@ SELECT
     CAST(PVC AS REAL) AS pvc,
     CAST(PET AS REAL) AS pet,
     CAST(PUR AS REAL) AS pur,
-    CAST('Other Thermoplastics' AS REAL) AS otherThermoplastics,
-    CAST('Other Thermosets' AS REAL) AS otherThermosets,
-    CAST('Sum' AS REAL) AS total
+    CAST("Other Thermoplastics" AS REAL) AS otherThermoplastics,
+    CAST("Other Thermosets" AS REAL) AS otherThermosets,
+    CAST("Sum" AS REAL) AS total
 FROM
     file_11rowenduseandtype
