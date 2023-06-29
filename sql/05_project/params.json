@@ -1,5 +1,58 @@
 {
     "kernel": "gaussian",
     "degree": 2,
-    "radius": 0.75
+    "radius": null,
+    "frac": 1,
+    "partition": "region",
+    "input": "year",
+    "ignore": [],
+    "minInput": 2005,
+    "maxInput": 2050,
+    "minZero": [
+        "inputProduceFiberMT",
+        "inputProduceResinMT",
+        "inputImportResinMT",
+        "inputImportArticlesMT",
+        "inputImportGoodsMT",
+        "inputImportFiberMT",
+        "inputAdditivesMT",
+        "consumptionAgricultureMT",
+        "consumptionConstructionMT",
+        "consumptionElectronicMT",
+        "consumptionHouseholdLeisureSportsMT",
+        "consumptionPackagingMT",
+        "consumptionTransporationMT",
+        "consumptionTextitleMT",
+        "consumptionOtherMT",
+        "eolRecyclingPercent",
+        "eolIncinerationPercent",
+        "eolLandfillPercent",
+        "eolMismanagedPercent",
+        "consumptionAgriculturePercent",
+        "consumptionConstructionPercent",
+        "consumptionElectronicPercent",
+        "consumptionHouseholdLeisureSportsPercent",
+        "consumptionPackagingPercent",
+        "consumptionTransporationPercent",
+        "consumptionTextitlePercent",
+        "consumptionOtherPercent"
+    ],
+    "percentGroups": [
+        [
+            "consumptionAgriculturePercent",
+            "consumptionConstructionPercent",
+            "consumptionElectronicPercent",
+            "consumptionHouseholdLeisureSportsPercent",
+            "consumptionPackagingPercent",
+            "consumptionTransporationPercent",
+            "consumptionTextitlePercent",
+            "consumptionOtherPercent"
+        ],
+        [
+            "eolRecyclingPercent",
+            "eolIncinerationPercent",
+            "eolLandfillPercent",
+            "eolMismanagedPercent"
+        ]
+    ]
 }
