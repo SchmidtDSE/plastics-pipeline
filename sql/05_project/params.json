@@ -1,4 +1,5 @@
 {
+    "strategy": "linear",
     "kernel": "gaussian",
     "degree": 2,
     "radius": null,

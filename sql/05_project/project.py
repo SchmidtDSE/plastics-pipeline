@@ -5,6 +5,7 @@ import sys
 
 import localreg
 import numpy
+import sklearn.linear_model
 
 USAGE_STR = 'python project.py [input] [output] [params]'
 NUM_ARGS = 3
@@ -13,10 +14,12 @@ NUM_ARGS = 3
 class Params:
 
     def __init__(self, params_raw):
-        self._kernel = params_raw['kernel']
-        self._degree = params_raw['degree']
-        self._radius = params_raw['radius']
-        self._frac = params_raw['frac']
+        self._strategy = params_raw['strategy']
+
+        self._kernel = params_raw.get('kernel', None)
+        self._degree = params_raw.get('degree', None)
+        self._radius = params_raw.get('radius', None)
+        self._frac = params_raw.get('frac', None)
         
         self._partition_attr = params_raw['partition']
         self._input_attr = params_raw['input']
@@ -31,6 +34,9 @@ class Params:
         self._min_zero_attrs = params_raw['minZero']
         self._percent_groups = params_raw['percentGroups']
     
+    def get_strategy(self):
+        return self._strategy
+
     def get_kernel(self):
         return self._kernel
     
@@ -67,6 +73,31 @@ class Params:
 
 class ModelBuilder:
 
+    def fit(self, x, y, targets):
+        raise NotImplementedError('Use implementor.')
+
+
+class LinearModelBuilder:
+
+    def __init__(self, params):
+        pass
+
+    def fit(self, x, y, targets):
+        x_nested = self._nest(x)
+        targets_nested = self._nest(targets)
+
+        model = sklearn.linear_model.LinearRegression()
+        model.fit(x_nested, y)
+
+        return model.predict(targets_nested)
+
+    def _nest(self, target):
+        return [[d] for d in target]
+
+
+
+class LoessModelBuilder:
+
     def __init__(self, params):
         kernel_name = params.get_kernel()
         self._degree = params.get_degree()
@@ -97,6 +128,15 @@ class ModelBuilder:
             radius=self._radius,
             frac=self._frac
         )
+
+
+def build_model_builder(params):
+    strategy = params.get_strategy()
+    builder_builder = {
+        'linear': lambda x: LinearModelBuilder(x),
+        'loess': lambda x: LoessModelBuilder(x)
+    }[strategy]
+    return builder_builder(params)
 
 
 def is_valid_num(target):
@@ -268,7 +308,7 @@ def main():
 
     with open(params_loc) as f:
         params = Params(json.load(f))
-        model_builder = ModelBuilder(params)
+        model_builder = build_model_builder(params)
 
     with open(input_loc) as f:
         input_rows_raw = csv.DictReader(f)
