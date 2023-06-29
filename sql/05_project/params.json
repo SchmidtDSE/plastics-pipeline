@@ -11,10 +11,6 @@
     "minZero": [
         "inputProduceFiberMT",
         "inputProduceResinMT",
-        "inputImportResinMT",
-        "inputImportArticlesMT",
-        "inputImportGoodsMT",
-        "inputImportFiberMT",
         "inputAdditivesMT",
         "consumptionAgricultureMT",
         "consumptionConstructionMT",
