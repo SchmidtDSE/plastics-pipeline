@@ -1,6 +1,7 @@
 echo "== Import files (1/5) =="
-python3 01_import_files/clean_filenames.py ../data
-cd ../data
+cp -r ../data ../data_workspace
+python3 01_import_files/clean_filenames.py ../data_workspace
+cd ../data_workspace
 cat ../sql/01_import_files/import_files.sql | sqlite3 combined.db
 
 echo "== Clean inputs (2/5) =="
@@ -44,7 +45,15 @@ mv combined.db ../output_sql
 echo "== Build frame (4/5) =="
 cd ../output_sql
 cat ../sql/04_frame/export.sql | sqlite3 combined.db
-python3 ../sql/04_frame/check_summary_percents.py ./summary_percents.csv || exit 1;
+cat ../sql/04_frame/export_percents.sql | sqlite3 combined.db
+python3 ../sql/check_summary_percents.py ./summary_percents.csv || exit 1;
 
 echo "== Projections (5/5) =="
-
+python3 ../sql/05_project/project.py ../output_sql/summary.csv ../output_sql/extrapolate.csv ../sql/05_project/params.json
+python3 ../sql/05_project/project.py ../output_sql/summary_percents.csv ../output_sql/extrapolate_percents.csv ../sql/05_project/params.json
+python3 ../sql/check_summary_percents.py ../output_sql/extrapolate_percents.csv || exit 1;
+cat ../sql/05_project/add_files.sql | sqlite3 combined.db
+cat ../sql/05_project/extrapolate.sql | sqlite3 combined.db
+cat ../sql/05_project/extrapolate_percents.sql | sqlite3 combined.db
+cat ../sql/05_project/export_final.sql | sqlite3 combined.db
+python3 ../sql/check_summary_percents.py ../output_sql/web.csv || exit 1;
