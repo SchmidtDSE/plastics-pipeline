@@ -61,7 +61,7 @@ libs <- c('dplyr', 'stringr', 'forcats',     # wrangling
 invisible(lapply(libs, library, character.only = TRUE))
 
 root_dir <- dirname(getwd())
-data_dir <- file.path(data_dir, "data")
+data_dir <- file.path(root_dir, "data")
 
 # 2. GOAL
 # In this section we are importing all the data sets used in the modeling exercise. All data feeds are in one place in the model. 
