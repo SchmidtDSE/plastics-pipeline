@@ -110,6 +110,8 @@ class LinearModelBuilder:
 class LoessModelBuilder:
 
     def __init__(self, params):
+        self._print_r2 = params.get_print_r2()
+
         kernel_name = params.get_kernel()
         self._degree = params.get_degree()
         self._radius = params.get_radius()
@@ -130,6 +132,19 @@ class LoessModelBuilder:
         }[kernel_name]
 
     def fit(self, name, x, y, targets):
+        if self._print_r2:
+            y_pred = localreg.localreg(
+                numpy.array(x),
+                numpy.array(y),
+                x0=numpy.array(x),
+                degree=self._degree,
+                kernel=self._kernel,
+                radius=self._radius,
+                frac=self._frac
+            )
+            r2 = sklearn.metrics.r2_score(y, y_pred)
+            print('%s R2: %f' % (name, r2))
+
         return localreg.localreg(
             numpy.array(x),
             numpy.array(y),
@@ -145,7 +160,7 @@ def build_model_builder(params):
     strategy = params.get_strategy()
     builder_builder = {
         'linear': lambda x: LinearModelBuilder(x),
-        'loess': lambda x: LoessModelBuilder(x)
+        'localreg': lambda x: LoessModelBuilder(x)
     }[strategy]
     return builder_builder(params)
 
