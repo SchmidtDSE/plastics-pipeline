@@ -1,4 +1,6 @@
 {
+    "strategy": "linear",
+    "printR2": false,
     "kernel": "gaussian",
     "degree": 2,
     "radius": null,
