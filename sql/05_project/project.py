@@ -6,6 +6,7 @@ import sys
 import localreg
 import numpy
 import sklearn.linear_model
+import sklearn.metrics
 
 USAGE_STR = 'python project.py [input] [output] [params]'
 NUM_ARGS = 3
@@ -15,6 +16,8 @@ class Params:
 
     def __init__(self, params_raw):
         self._strategy = params_raw['strategy']
+
+        self._print_r2 = params_raw['printR2']
 
         self._kernel = params_raw.get('kernel', None)
         self._degree = params_raw.get('degree', None)
@@ -36,6 +39,9 @@ class Params:
     
     def get_strategy(self):
         return self._strategy
+
+    def get_print_r2(self):
+        return self._print_r2
 
     def get_kernel(self):
         return self._kernel
@@ -73,21 +79,26 @@ class Params:
 
 class ModelBuilder:
 
-    def fit(self, x, y, targets):
+    def fit(self, name, x, y, targets):
         raise NotImplementedError('Use implementor.')
 
 
 class LinearModelBuilder:
 
     def __init__(self, params):
-        pass
+        self._print_r2 = params.get_print_r2()
 
-    def fit(self, x, y, targets):
+    def fit(self, name, x, y, targets):
         x_nested = self._nest(x)
         targets_nested = self._nest(targets)
 
         model = sklearn.linear_model.LinearRegression()
         model.fit(x_nested, y)
+
+        if self._print_r2:
+            y_pred = model.predict(x_nested)
+            r2 = sklearn.metrics.r2_score(y, y_pred)
+            print('%s R2: %f' % (name, r2))
 
         return model.predict(targets_nested)
 
@@ -118,7 +129,7 @@ class LoessModelBuilder:
             'silverman': localreg.rbf.silverman
         }[kernel_name]
 
-    def fit(self, x, y, targets):
+    def fit(self, name, x, y, targets):
         return localreg.localreg(
             numpy.array(x),
             numpy.array(y),
@@ -257,7 +268,8 @@ def predict(input_rows, model_builder, params):
             inputs_outputs_incomplete = filter(not_complete, inputs_outputs)
             inputs_incomplete = [x['input'] for x in inputs_outputs_incomplete]
 
-            missing_outputs = model_builder.fit(inputs, responses, inputs_incomplete)
+            name = partition_key + ' ' + response
+            missing_outputs = model_builder.fit(name, inputs, responses, inputs_incomplete)
             missing_outputs_by_input = dict(zip(inputs_incomplete, missing_outputs))
 
             partition_rows_incomplete = filter(
