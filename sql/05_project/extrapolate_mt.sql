@@ -1,5 +1,7 @@
 CREATE VIEW extrapolate_mt AS
 SELECT
+    region AS region,
+    year AS year,
     inputProduceFiberMT AS inputProduceFiberMT,
     inputProduceResinMT AS inputProduceResinMT,
     inputImportResinMT AS inputImportResinMT,
@@ -22,6 +24,8 @@ SELECT
 FROM
     (
         SELECT
+            region AS region,
+            year AS year,
             inputProduceFiberMT AS inputProduceFiberMT,
             inputProduceResinMT AS inputProduceResinMT,
             inputImportResinMT AS inputImportResinMT,
