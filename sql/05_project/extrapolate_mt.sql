@@ -37,7 +37,7 @@ FROM
                 inputImportGoodsMT + 
                 inputImportFiberMT + 
                 inputAdditivesMT
-            ) AS inputTotal
+            ) AS inputTotal,
             consumptionAgriculturePercent AS consumptionAgriculturePercent,
             consumptionConstructionPercent AS consumptionConstructionPercent,
             consumptionElectronicPercent AS consumptionElectronicPercent,
