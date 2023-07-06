@@ -59,4 +59,4 @@ cat ../sql/05_project/extrapolate.sql | sqlite3 combined.db
 cat ../sql/05_project/extrapolate_percents.sql | sqlite3 combined.db
 cat ../sql/05_project/extrapolate_mt.sql | sqlite3 combined.db
 cat ../sql/05_project/export_final.sql | sqlite3 combined.db
-python3 ../sql/check_summary_percents.py ../output_sql/web.csv || exit 1;
+python3 ../sql/check_summary_percents.py ../output_sql/extrapolate_percents.csv || exit 1;
