@@ -1,27 +1,30 @@
-# title: "Global Plastic Treaty Model 01_A1_14"
-# author: "Nivedita Biyani"
-# date: "2023-06-26"
-# 
+---
+title: "Global Plastic Treaty Model 01_A1_14"
+author: "Nivedita Biyani"
+date: "2023-07-05"
+output: html_document
+---
+
 # DESCRIPTION
-# This code chunk is made using the excel sheet that Dr. Roland Geyer on June 20th 2023 titled 2023227 Global Treatment v12 Plus Additives & Textiles. 
-# 
-# 1. GOAL
-# 
-# We want to get the following: 
-# 1. Production by region year for fiber 
-# 2. Production by region and by year for resin 
-# 3. Production by region and year for additives (B26) 
+This code chunk is made using the excel sheet that Dr. Roland Geyer on June 20th 2023 titled 2023227 Global Treatment v12 Plus Additives & Textiles. 
 
-print("== 1 / 6: Set Up ==")
+## 1. GOAL
+We want to get the following: 
+1. Production by region year for fiber 
+2. Production by region and by year for resin 
+3. Production by region and year for additives (B26) 
 
-# PROCESS FLOW 
-# 1. **Set Up**
-# 2. Import
-# 3. Tidy
-# 4. Transform 
-# 5. Visualize
-# 6. Export
+### PROCESS FLOW 
+ 1. **Set Up**
+ 2. Import
+ 3. Tidy
+ 4. Transform 
+ 5. Visualize 
+ 6. Model 
+ 7. Communicate 
 
+```{r, R SET UP}
+knitr::opts_chunk$set(echo = TRUE, warning=FALSE) 
 library(RcppRoll)
 library(corrplot)
 library(psych)
@@ -41,16 +44,16 @@ library(data.table)
 library(heplots)
 library(candisc)
 library(car)
-library(alluvial)
-library(ggalluvial)
-library(zoo)
-library(magrittr)
-library(forecast)
-library(imputeTS)
-library(zoo)
-library(fpp2)
-library(fpp)
-library(readxl)
+library("alluvial")
+library("ggalluvial")
+library("zoo")
+library("magrittr")
+library("forecast")
+library("imputeTS")
+library("zoo")
+library("fpp2")
+library("fpp")
+library("readxl")
 library(reprex)
 library(purrr)
 library(glue)
@@ -60,74 +63,80 @@ libs <- c('dplyr', 'stringr', 'forcats',     # wrangling
           'ggplot2','alluvial','ggalluvial')                     # data
 invisible(lapply(libs, library, character.only = TRUE))
 
-root_dir <- dirname(getwd())
-data_dir <- file.path(root_dir, "data")
+```
 
-# 2. GOAL
-# In this section we are importing all the data sets used in the modeling exercise. All data feeds are in one place in the model. 
-#
-# PROCESS FLOW 
-# 1. Set Up
-# 2. **Import**
-# 3. Tidy
-# 4. Transform 
-# 5. Visualize
-# 6. Export
+## 2. GOAL
+In this section we are importing all the data sets used in the modeling exercise. All data feeds are in one place in the model. 
 
-print("== 2 / 6: Import ==")
+### PROCESS FLOW 
+ 1. Set Up
+ 2. **Import**
+ 3. Tidy
+ 4. Transform 
+ 5. Visualize 
+ 6. Model 
+ 7. Communicate 
+ 
+```{r, Reading Data}
+one_drive_path <- "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code"
 
 # Base Inputs of Production
 options(digits = 8)
-A_01_Resin<-read.csv(glue("{data_dir}/01_Production_of_Resin_(no_fiber).csv"))
-A_02_Fiber<-read.csv(glue("{data_dir}/02_Production_Fiber.csv"))
-A_03_Add<-read.csv(glue("{data_dir}/03_Production_Additives.csv"))
+A_01_Resin<-read.csv(glue("{one_drive_path}/02_Data_Raw/01_Production_of_Resin_(no_fiber).csv"))
+A_02_Fiber<-read.csv(glue("{one_drive_path}/02_Data_Raw/02_Production_Fiber.csv"))
+A_03_Add<-read.csv(glue("{one_drive_path}/02_Data_Raw/03_Production_Additives.csv"))
 
 # Base Inputs of Imports 
-A_04_Net_Import_Resin<-read.csv(glue("{data_dir}/04_Net_Import_Resin_no_fiber_copy.csv"))
-A_05_Net_Import_Fiber<-read.csv(glue("{data_dir}/05_Net_Import_Fiber_copy.csv"))
-A_06_Net_Import_Plastic_Articles<-read.csv(glue("{data_dir}/06_Net_import_plastic_articles copy.csv"))
-A_07_Net_Import_Finished_Goods<-read.csv(glue("{data_dir}/07_Net_Import_plastic_in_finished_goods_no_fiber copy.csv"))
+A_04_Net_Import_Resin<-read.csv(glue("{one_drive_path}/02_Data_Raw/04_Net_Import_Resin_no_fiber_copy.csv"))
+A_05_Net_Import_Fiber<-read.csv(glue("{one_drive_path}/02_Data_Raw/05_Net_Import_Fiber_copy.csv"))
+A_06_Net_Import_Plastic_Articles<-read.csv(glue("{one_drive_path}/02_Data_Raw/06_Net_import_plastic_articles copy.csv"))
+A_07_Net_Import_Finished_Goods<-read.csv(glue("{one_drive_path}/02_Data_Raw/07_Net_Import_plastic_in_finished_goods_no_fiber copy.csv"))
 
 # Trade New versions 12 
-AB_01_Trade_China<-read.csv(glue("{data_dir}/18_Net_Trade_China.csv"))
-AB_02_Trade_NAFTA<-read.csv(glue("{data_dir}/19_Net_Trade_NAFTA.csv"))
-AB_03_Trade_EU<-read.csv(glue("{data_dir}/20_Net_Trade_EU.csv"))
-AB_04_Trade_Row<-read.csv(glue("{data_dir}/21_Net_Trade_Row.csv"))
+AB_01_Trade_China<-read.csv(glue("{one_drive_path}/02_Data_Raw/18_Net_Trade_China.csv"))
+AB_02_Trade_NAFTA<-read.csv(glue("{one_drive_path}/02_Data_Raw/19_Net_Trade_NAFTA.csv"))
+AB_03_Trade_EU<-read.csv(glue("{one_drive_path}/02_Data_Raw/20_Net_Trade_EU.csv"))
+AB_04_Trade_Row<-read.csv(glue("{one_drive_path}/02_Data_Raw/21_Net_Trade_Row.csv"))
 
 # Polymer breakdown by Sector and Region (Sector Polymer Matrices)
 # These ones need to be fed in with 5 decimal places to get same values as excel sheet 
-AC_01_China<-read.csv(glue("{data_dir}/08_China_End_Use_and_Type.csv"))
-AC_02_NAFTA<-read.csv(glue("{data_dir}/09_NAFTA_End_Use_and_Type.csv"))
-AC_03_Europe<-read.csv(glue("{data_dir}/10_Europe_End_Use_and_Type.csv"))
-AC_04_Row<-read.csv(glue("{data_dir}/11_RoW_End_Use_and_Type.csv"))
+AC_01_China<-read.csv(glue("{one_drive_path}/02_Data_Raw/08.1_China_End_Use_and_Type.csv"))
+AC_02_NAFTA<-read.csv(glue("{one_drive_path}/02_Data_Raw/09.1_NAFTA_End_Use_and_Type.csv"))
+AC_03_Europe<-read.csv(glue("{one_drive_path}/02_Data_Raw/10.1_Europe_End_Use_and_Type.csv"))
+AC_04_Row<-read.csv(glue("{one_drive_path}/02_Data_Raw/11.1_RoW_End_Use_and_Type.csv"))
+
+# Textiles as it is its own thing 1950-2003
+AD<-read.csv(glue("{one_drive_path}/06_Output/06_Output\\KA5.csv"))
 
 # Lifetime distributions 
-AI_02<-read.csv(glue("{data_dir}/12_Lifetime copy.csv"))
+AI_02<-read.csv(glue("{one_drive_path}/02_Data_Raw/12_Lifetime copy.csv"))
 
 # 1950 ~ 2004 History Curve Fitting
-AHH1<-read.csv(glue("{data_dir}/13_1950-2004 copy.csv"))
+AHH1<-read.csv(glue("{one_drive_path}/02_Data_Raw/13_1950-2004 copy.csv"))
 
 # End of Life Breakdowns 
-AKE_Eol_China<-read.csv(glue("{data_dir}/14_Eol_China copy.csv"))
-AKE_Eol_EU<-read.csv(glue("{data_dir}/15_EoL_EU copy.csv"))
-AKE_Eol_NAFTA<-read.csv(glue("{data_dir}/16_Eol_NAFTA copy.csv"))
-AKE_Eol_Row<-read.csv(glue("{data_dir}/17_Eol_RoW copy.csv"))
+AKE_Eol_China<-read.csv(glue("{one_drive_path}/02_Data_Raw/14_Eol_China copy.csv"))
+AKE_Eol_EU<-read.csv(glue("{one_drive_path}/02_Data_Raw/15_Eol_EU copy.csv"))
+AKE_Eol_NAFTA<-read.csv(glue("{one_drive_path}/02_Data_Raw/16_Eol_NAFTA copy.csv"))
+AKE_Eol_Row<-read.csv(glue("{one_drive_path}/02_Data_Raw/17_Eol_RoW copy.csv"))
 
-# 3. GOAL 
-# In this section we are making all the data long form, even data that we use later in the model. 
-#
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. **Tidy**
-# 4. Transform 
-# 5. Visualize
-# 6. Export
-# 
-# EXTRAS: 
-# - I tried using lapply to repeat the same function over multiple data frames, but it did not work. Would be good to make this code shorter.
+```
 
-print("== 3a / 6: Tidy (Long Form) ==")
+## 3. GOAL 
+In this section we are making all the data long form, even data that we use later in the model. 
+
+### PROCESS FLOW 
+ 1. Import
+ 2. **Tidy**
+ 3. Transform 
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+ 
+## EXTRAS: 
+ - I tried using lapply to repeat the same function over multiple data frames, but it did not work. Would be good to make this code shorter.
+
+```{r, Making it Long Form }
 
 B_01_Resin<-A_01_Resin %>% pivot_longer(cols=c('China',"NAFTA","EU30","RoW"),
                                           names_to='Region',
@@ -246,34 +255,36 @@ C_04_RoW_Long<-C_04_RoW_Long %>%
 
 C_04_RoW_Long<-C_04_RoW_Long[c("Region","Major_Market_Sector","Type","Percentage")]
 
-# 4. GOAL 
-# Combining columns for percentage of each type of plastic. This data frame is actually not used for a while. 
-#
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. **Tidy**
-# 4. Transform 
-# 5. Visualize
-# 6. Export
+```
 
-print("== 3b / 6: Tidy (Combine) ==")
+## 4. GOAL 
+Combining columns for percentage of each type of plastic. This data frame is actually not used for a while. 
 
+### PROCESS FLOW 
+ 1. Import
+ 2. **Tidy**
+ 3. Transform 
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+
+```{r, Combining all Columns from above }
 D1<-rbind(C_01_China_Long,C_02_NAFTA_Long,C_03_EU30_Long,C_04_RoW_Long)
+```
 
-# 5. GOAL 
-# Calculating Apparent Consumption 1: Calculations to get it by Year, Region and Sector (Accounting for Trade)
-# This data set has now been updated (on June 19th 2023) by Roland, and the "new model" that will be the iteration after this, will have a different set of data sets and calculations here. Here, I am referring to line 22 of the EoL tab of the spreadsheet. 
-# 
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. **Transform**
-# 5. Visualize
-# 6. Export
+## 5. GOAL 
+Calculating Apparent Consumption 1: Calculations to get it by Year, Region and Sector (Accounting for Trade)
+This data set has now been updated (on June 19th 2023) by Roland, and the "new model" that will be the iteration after this, will have a different set of data sets and calculations here. Here, I am referring to line 22 of the EoL tab of the spreadsheet. 
 
-print("== 4a / 6: Transform (Consumption 1) ==")
+### PROCESS FLOW 
+ 1. Import
+ 2. Tidy
+ 3. **Transform**
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+
+```{r, Apparent Consumption 1}
 
 #############################################################
 #############################################################
@@ -344,14 +355,18 @@ G7$Major_Market_Sector<- factor(G7$Major_Market_Sector, levels =
 # correct factor leveling 
 levels(G7$Major_Market_Sector)
 
-# G7 is the mother data set now 
-# Up until here we have all the variables and all the converter consumption, 
-# as portraryed in v12 (version 12) of the 20230227 of Global EoL treatment excel
-# sheet. 
-# 
-# For the new version I am adding Trade in the chunk below. Making it long form and then 
-# subtracting it from G7. 
+### G7 is the mother data set now 
 
+```
+
+Up until here we have all the variables and all the converter consumption, 
+as portraryed in v12 (version 12) of the 20230227 of Global EoL treatment excel
+sheet. 
+
+For the new version I am adding Trade in the chunk below. Making it long form and then 
+subtracting it from G7. 
+
+```{r}
 ####
 # CHINA TRADE 
 
@@ -413,6 +428,8 @@ F05<-rbind(F01.2,F02.2,F03.2, F04.2)
 # Joing all trade information 
 F05<-F05 %>% select(Year, Region, Major_Market_Sector, MT_Trade)
 
+str(G7)
+str(F05)
 G7$Region<-as.factor(G7$Region)
 F05$Major_Market_Sector<- factor(F05$Major_Market_Sector, levels = 
                                   c("Transportation", 
@@ -429,26 +446,31 @@ G8<-G7 %>% inner_join(F05,
         by=c("Year"="Year", "Region"="Region","Major_Market_Sector"="Major_Market_Sector"))
 
 
-# We are now at Line 25 B of Eol Spreadsheet V12 
-# Apparent consumption from year 2005 to 2020 
+```
+
+
+We ar e now at Line 25 B of Eol Spreadsheet V12 
+Apparent consumption from year 2005 to 2020 
+
+```{r}
 
 G9<-G8 %>% mutate(PC_Sector=Converter_Consump_2+MT_Trade)%>%
   mutate_at(5:6, round,3)
 
+```
+
 ## 6. GOAL 
-# Calculating Apparent Consumption 2: Linear Regression of 2004 value. 
-#
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. **Transform**
-# 5. Visualize
-# 6. Export
+Calculating Apparent Consumption 2: Linear Regression of 2004 value. 
 
-print("== 4b / 6: Transform (Consumption 2) ==")
+### PROCESS FLOW 
+ 1. Import
+ 2. Tidy
+ 3. **Transform**
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
 
-
+```{r, Apparent Consumption 2}
 # Make a long form data set 
 #############################################################
 #############################################################
@@ -464,12 +486,13 @@ H0 <- expand.grid(
   Year = c(2004),
   Region = c("China","NAFTA","EU30","RoW"),
   Major_Market_Sector = c("Transportation","Packaging","Building_Construction","Electrical_Electronic",
-                          "Household_Leisure_Sports","Textile","Agriculture","Others")
+                          "Household_Leisure_Sports","Textiles","Agriculture","Others")
 )
 
 
 # Just making sure I leave C6.2 intact 
 H.1<-G9 %>% select(Year, Region, Major_Market_Sector, PC_Sector)
+str(G9)
 H.1$Major_Market_Sector<- factor(H.1$Major_Market_Sector, levels = 
                                   c("Transportation", 
                                     "Packaging", 
@@ -479,6 +502,7 @@ H.1$Major_Market_Sector<- factor(H.1$Major_Market_Sector, levels =
                                     "Agriculture",
                                     "Textiles",
                                     "Others"))
+str(H.1)
 levels(H.1$Region)
 H.1$Region<-as.factor(H.1$Region)
 
@@ -489,6 +513,7 @@ H2<-H.1 %>%
   ungroup %>%
   select(Region, Major_Market_Sector, PC_Sector)%>% 
   mutate_at(3, round, 2)
+str(H2)
 
 # Stitch it together with HO so that I have a data frame 
 H3<-H2%>% inner_join(H0, 
@@ -501,18 +526,20 @@ H5<-rbind(H4,H.1)
 
 # H5 is now the master data set 
 
-## 7. GOAL 
-# Now we are doing imputations for China and NAFTA to be able to apply back wards on to H5 to get what the waste was since 1950. In the spread sheet this section is 1950~2004. Question for Roland has bee answered as to additives - they have already been included above. 
-# 
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. **Transform**
-# 5. Visualize
-# 6. Export
+```
 
-print("== 4c / 6: Transform (Imputation) ==")
+## 7. GOAL 
+Now we are doing imputations for China and NAFTA to be able to apply back wards on to H5 to get what the waste was since 1950. In the spread sheet this section is 1950~2004. Question for Roland has bee answered as to additives - they have already been included above. 
+
+### PROCESS FLOW 
+ 1. Import
+ 2. Tidy
+ 3. **Transform**
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+
+```{r, Apparent Consumption: Calculating Values from 1950-2004}
 
 # 1950~2004 in Eol Spreadsheet 
 #HH1<-read.csv("01_Data_Raw/14_1950-2004.csv") already fed in above. 
@@ -551,28 +578,33 @@ HH8<-H0.1%>% right_join(HH7,
 HH8<-as.data.frame(HH8)
 # Making sure H5 goes untouched!
 H6<-H5
+str(H6)
+str(HH8)
 HH8$Region<-as.factor(HH8$Region)
 
 HH9.2<-H4 %>% full_join(HH8,
                        by=c("Year"="Year","Region"="Region","Major_Market_Sector"="Major_Market_Sector"))
+str(HH9.2)
 
 #colnames(HH9.2)[colnames(HH9.2) == 'PC'] <- 'PC_Sector'
 
 #write.csv(HH9.2, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\HH9.2.csv")
 
+```
 
-# 8. GOAL 
-# Getting historic values for all regions and all sectors and all years.
-# 
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. **Transform**
-# 5. Visualize
-# 6. Export
+## 8. GOAL 
+Getting historic values for all regions and all sectors and all years.
 
-print("== 4d / 6: Transform (Historic) ==")
+### PROCESS FLOW 
+ 1. Import
+ 2. Tidy
+ 3. **Transform**
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+ 
+ 
+```{r, Apparent Consumption for all years}
 
 # Removing textiles 
 
@@ -600,30 +632,121 @@ IA2<-IA1 %>% select(-Total_MT_Plastic)
 
 IA3<-rbind(IA2,H7)
 
+str(IA2)
+str(H6)
+
 ################################################################################
 ################################################################################
- # IA3 is now the most important data frame KD_6_2050
+ # IA3 is now the most important data frame 
 ################################################################################
 ################################################################################
 
-# Textiles was tricky. This will be separately added from V12. 
+```
 
+
+Textiles was tricky. This will be separately added from V12. 
+
+```{r}
 # this is textiles which will be separately added 
-IA3.1<-HH9.2 %>% filter(Major_Market_Sector=="Textiles")
+#IA3.1<-HH9.2 %>% filter(Major_Market_Sector=="Textiles") # not correct so leave this alone. 
+
 IA3.2<-H6%>% filter(Major_Market_Sector=="Textiles")
 
-# 9. GOAL 
-# Life time distribution section starts here. Since we do not have direct waste generation data, we use the LTD for each sector to know when plastic become waste. For Packageing the LTD is short - just 3 years. For Transportation the LTD is long - meaning that plastic used in the construction sector stays in the use phase for an average or 11 years. This is essentially calculating when something becomes waste.  
-#
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. **Transform**
-# 5. Visualize
-# 6. Export
+IA3.4<-rbind(IA3.2, AD)
+# Let check this out and see if it fits 
 
-print("== 4e / 6: Transform (Waste) ==")
+```
+
+
+## VERSION JULY 7th 2023!
+In this version we add textiles to the main data frame which is IA3. 
+So IA3 + IA3.5 
+
+Let's also make it smaller by summarizing by region 
+
+```{r}
+
+# join textiles to main data frame 
+
+J_01<-rbind(IA3,IA3.4)
+
+levels(J_01$Major_Market_Sector)
+levels(IA3$Major_Market_Sector)
+levels(IA3$Year)
+
+```
+
+## FUTURE PROJECTING PRODUCTION 
+
+```{r}
+
+KA2 <- expand.grid(
+  Year = c(2021:2049),
+  Region = c("China","NAFTA","EU30","RoW"),
+  Major_Market_Sector = c("Transportation","Packaging","Building_Construction","Electrical_Electronic",
+                          "Household_Leisure_Sports","Textiles","Agriculture","Others"),
+  PC_Sector=c(0)
+)
+KA2
+
+# Predicting future plastic waste - lm function in stead of loess function
+
+J_02<-J_01 %>%
+  group_by(Region, Major_Market_Sector) %>%
+  nest() %>%
+  inner_join(KA2 %>% select(-PC_Sector) %>% group_by(Region, Major_Market_Sector) %>% nest(),
+             by = c("Region", "Major_Market_Sector")) %>%
+  mutate(model = data.x %>% map(~lm(PC_Sector ~ poly(Year,2), data=.)),
+         PC_Sector = map2(model, data.y, predict)) %>%
+  select(-data.x, -model) %>%
+  unnest(cols= c(data.y, PC_Sector)) %>%
+  bind_rows(J_01, .)
+
+```
+
+## SHOW THIS PART TO ROLAND!! 
+
+This is just checking the curve. Eu30 plastic packaging is going down and so is Textiles, anyways moving on! 
+
+```{r}
+
+J_03<-J_02 %>% filter(Region=="EU30") %>% 
+  filter(Major_Market_Sector=="Packaging")
+
+ggplot() + 
+geom_line(data=J_03, aes(x=Year, y=PC_Sector), color='blue') + 
+xlab("Year")+
+ylab("Plastic Waste Generation in China lm ")+
+ggtitle("China lm poly")
+
+### cut and past this into a normal script and see what happens ### 
+
+J_04<-ggplot() + 
+  geom_line(data=J_02, aes(x=Year, y=PC_Sector), color='blue') + 
+  xlab("Year")+
+  ylab("Plastic Waste Generation in China lm ")+
+  ggtitle("China lm poly")
+
+J_04+
+  facet_wrap(Region ~ Major_Market_Sector)
+
+###.  ####             ####          ###.            ###    ########
+
+```
+
+
+## 9. GOAL 
+Life time distribution section starts here. Since we do not have direct waste generation data, we use the LTD for each sector to know when plastic become waste. For Packageing the LTD is short - just 3 years. For Transportation the LTD is long - meaning that plastic used in the construction sector stays in the use phase for an average or 11 years. This is essentially calculating when something becomes waste.  
+
+### PROCESS FLOW 
+ 1. Import
+ 2. Tidy
+ 3. **Transform**
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+
+```{r, LifeTime Distribution Model Set up}
 
 ##   Make the Lifetime Distributions set up:  
 
@@ -778,19 +901,21 @@ J_H_Texti<-data.frame(I_04_Year,I_12_Textiles) %>%
 
 G8Textiles<-J_H_Texti[[3]][2:72]
 
-# 10. GOAL 
-# Applying LTD to apparent consumption to get waste generation, by year, by sector, by region. 
-#
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. **Transform**
-# 5. Visualize
-# 6. Export
+```
 
-print("== 4f / 6: Transform (Dimensions) ==")
 
+## 10. GOAL 
+Applying LTD to apparent consumption to get waste generation, by year, by sector, by region. 
+
+### PROCESS FLOW 
+ 1. Import
+ 2. Tidy
+ 3. **Transform**
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+
+```{r, Calculating Waste Gen}
 ################################################################################
 ################################################################################
 #
@@ -801,7 +926,8 @@ print("== 4f / 6: Transform (Dimensions) ==")
 # you need to add textile from 2004 - 2020 
 # for forgot to import it, so for now just do it without textiles but add it in later 
 
-KA1<-IA3 %>% filter(Major_Market_Sector!="Textile")
+#KA1<-IA3 %>% filter(Major_Market_Sector!="Textile")
+#str(KA1)
 
 ################################################################################
 ################################################################################
@@ -819,7 +945,8 @@ KA2 <- expand.grid(
 )
 KA2
 
-KA3<-bind_rows(KA1,KA2)
+KA3<-bind_rows(J_02,KA2)
+str(KA3)
 ################################################################################
 ################################################################################
 #
@@ -870,6 +997,13 @@ KB_6Agri<-KA3%>%
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G6Agri, align="left", 
                                             na.rm = TRUE, normalize = FALSE, fill=NA))
 
+KB_8Textiles<-KA3%>% 
+  arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
+  group_by(Region) %>%
+  filter(Major_Market_Sector=="Textiles") %>% 
+  mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G8Textiles, align="left", 
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+
 KB_7Other<-KA3%>% 
   arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
   group_by(Region) %>%
@@ -877,20 +1011,22 @@ KB_7Other<-KA3%>%
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G7Others, align="left", 
                                             na.rm = TRUE, normalize = FALSE, fill=NA))
 
-# 11. GOAL 
-# Preparing Waste Generation data-frame for End-of-Life (EOL). 
-# Ignore the warnings here. 
-#
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. **Transform**
-# 5. Visualize
-# 6. Export
+```
 
-print("== 4g / 6: Transform (EOL) ==")
 
+## 11. GOAL 
+Preparing Waste Generation data-frame for End-of-Life (EOL). 
+Ignore the warnings here. 
+
+### PROCESS FLOW 
+ 1. Import
+ 2. Tidy
+ 3. **Transform**
+ 4. Visualize 
+ 5. Model 
+ 6. Communicate 
+
+```{r, Waste Generation to End-of_Life}
 ################################################################################
 ################################################################################
 #
@@ -902,261 +1038,258 @@ print("== 4g / 6: Transform (EOL) ==")
 
 KC_1Transport<-KB_1Transport %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2021:1900)) %>% 
+  mutate(Year_2=c(2050:1900)) %>% 
   select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
   group_by(Region) %>% 
-  filter(Year_2==(2021:1970))
-
+  filter(Year_2==(2050:1970))
 
 KC_2Packaging<-KB_2Packaging %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2021:1900)) %>% 
+  mutate(Year_2=c(2050:1900)) %>% 
   select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
   group_by(Region) %>% 
-  filter(Year_2==(2021:1970))
+  filter(Year_2==(2050:1970))
 
 KC_3Building<-KB_3Building %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2021:1900)) %>% 
+  mutate(Year_2=c(2050:1900)) %>% 
   select(Year_2, Region, Major_Market_Sector, WasteGen) %>% 
   group_by(Region) %>% 
-  filter(Year_2==(2021:1970))
+  filter(Year_2==(2050:1970))
 
 KC_4Electric<-KB_4Electric %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2021:1900)) %>% 
+  mutate(Year_2=c(2050:1900)) %>% 
   select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
   group_by(Region) %>% 
-  filter(Year_2==(2021:1970))
+  filter(Year_2==(2050:1970))
 
 KC_5House<-KB_5House %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2021:1900)) %>% 
+  mutate(Year_2=c(2050:1900)) %>% 
   select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
   group_by(Region) %>% 
-  filter(Year_2==(2021:1970))
+  filter(Year_2==(2050:1970))
 
 KC_6Agri<-KB_6Agri%>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2021:1900)) %>% 
+  mutate(Year_2=c(2050:1900)) %>% 
   select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
   group_by(Region) %>% 
-  filter(Year_2==(2021:1970))
+  filter(Year_2==(2050:1970))
 
 KC_7Other<-KB_7Other%>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2021:1900)) %>% 
+  mutate(Year_2=c(2050:1900)) %>% 
   select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
   group_by(Region) %>% 
-  filter(Year_2==(2021:1970))
+  filter(Year_2==(2050:1970))
+
+#KC_8Textiles<-KB_8Textiles%>%
+  #group_by(Region) %>% 
+  #mutate(Year_2=c(2021:1900)) %>% 
+  #select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
+  #group_by(Region) %>% 
+  #filter(Year_2==(2021:1970))
 
 KD<-rbind(KC_1Transport,KC_2Packaging,KC_3Building,
-          KC_4Electric,KC_5House,KC_6Agri,KC_6Agri,KC_7Other)
+          KC_4Electric,KC_5House,KC_6Agri,KC_7Other)
 
-# 11. GOAL 
-# Extending the curve by sector and region to 2050 
-# 
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. Transform
-# 5. **Visualize**
-# 6. Export
+```
 
-print("== 5 / 6: Visualization ==")
+## Visualizing Waste Gen 
+
+```{r}
+K_04<-ggplot() + 
+  geom_line(data=KD, aes(x=Year_2, y=WasteGen), color='blue') + 
+  xlab("Year")+
+  ylab("Plastic Waste Generation in China lm ")+
+  ggtitle("China lm poly")
+
+K_04+
+  facet_wrap(Region ~ Major_Market_Sector)
+
+```
+
+## Adding polymer Data into the mix
+
  
-### WASTE GENERATION FORCASTED TO 2050 
+```{r}
+#D1<-D1 %>% filter(Type!="Sum")
 
-# So, I modeled this just for CHINA and the TRANSPORTATION SECTOR:
+KD1<- KD %>% inner_join(D1, 
+           by=c('Region','Major_Market_Sector'))
 
-KD_1<-KD %>% 
-  filter(Region=="China"& Major_Market_Sector=="Transportation") %>% 
-  select(Year_2, WasteGen)
+KD2<-KD1 %>% mutate(WasteGen_2=WasteGen*Percentage) %>% 
+  filter(Type!="Sum")
 
-KD_1_Model<- loess(WasteGen ~ Year_2, 
-                     data = KD_1, 
-                     control = loess.control(surface = "direct"))
+KD3<-KD2 %>% select(-Percentage) %>% 
+  pivot_wider(names_from=Type, 
+              values_from=c(WasteGen_2)) 
 
-KD_1_2050 <- data.frame(Year_2 = 1970:2050)
-KD_1_2050$WasteGen <- predict(KD_1_Model, KD_1_2050, se = TRUE)$fit
-KD_1_2050
-
-ggplot() + 
-geom_line(data=KD_1_2050, aes(x=Year_2, y=WasteGen), color='blue') + 
-geom_line(data=KD_1, aes(x=Year_2, y=WasteGen), color='red')+
-xlab("Year")+
-ylab("Plastic Waste Generation in China Transportation")+
-ggtitle("China Transportation Plastic Waste")
-ggsave(glue("{data_dir}/output_r/china_transport.png"))
-
-# Ciera and Sam - it is very obvious now that its the same code chunk repeated for each Region and each market sector. 
-# Is there a way to loop this? Perhaps using apply mapply lapply functions? 
+#write.csv(KD3, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\KD3.csv")
 
 
-# China + Packaging
+```
 
-KD_2<-KD %>% 
-  filter(Region=="China"& Major_Market_Sector=="Packaging") %>% 
-  select(Year_2, WasteGen)
 
-KD_2_Model<- loess(WasteGen ~ Year_2, 
-                     data = KD_2, 
-                     control = loess.control(surface = "direct"))
+## DEALINg with the EOL DATA 
 
-KD_2_2050 <- data.frame(Year_2 = 1970:2050)
-KD_2_2050$WasteGen <- predict(KD_2_Model, KD_1_2050, se = TRUE)$fit
-KD_2_2050
 
-ggplot() + 
-geom_line(data=KD_2_2050, aes(x=Year_2, y=WasteGen), color='blue') + 
-geom_line(data=KD_2, aes(x=Year_2, y=WasteGen), color='red')+
-xlab("Year")+
-ylab("Plastic Waste Generation in China Packaging")+
-ggtitle("China Packaging Plastic Waste")
-ggsave(glue("{data_dir}/output_r/china_packaging.png"))
 
-# China + Building & Construction
+```{r}
 
-KD_3<-KD %>% 
-  filter(Region=="China" & Major_Market_Sector=="Building_Construction") %>% 
-  select(Year_2, WasteGen)
+#Get Rid of Percentage Sign 
+(AKE_Eol_China <- data.frame(sapply(AKE_Eol_China, function(x) as.numeric(gsub("%", "", x)))))
+(AKE_Eol_EU <- data.frame(sapply(AKE_Eol_EU, function(x) as.numeric(gsub("%", "", x)))))
+(AKE_Eol_NAFTA <- data.frame(sapply(AKE_Eol_NAFTA, function(x) as.numeric(gsub("%", "", x)))))
+(AKE_Eol_Row <- data.frame(sapply(AKE_Eol_Row, function(x) as.numeric(gsub("%", "", x)))))
 
-levels(KD$Major_Market_Sector)
+# Add Region 
+AKE_Eol_China <- AKE_Eol_China %>% mutate(Region=c("China"))
+AKE_Eol_EU <-AKE_Eol_EU %>% mutate(Region=c("EU30"))
+AKE_Eol_NAFTA<-AKE_Eol_NAFTA %>% mutate(Region=c("NAFTA"))
+AKE_Eol_Row<-AKE_Eol_Row %>% mutate(Region=c("RoW"))
 
-KD_3_Model<- loess(WasteGen ~ Year_2, 
-                     data = KD_3, 
-                     control = loess.control(surface = "direct"))
+#Make long form 
+LA1<-AKE_Eol_China %>% pivot_longer(cols=c('Recycling',"Incineration","Landfill","Mismanaged"),
+                                          names_to='EOL',
+                                          values_to='Percentage')
 
-KD_3_2050 <- data.frame(Year_2 = 1970:2050)
-KD_3_2050$WasteGen <- predict(KD_3_Model, KD_3_2050, se = TRUE)$fit
-KD_3_2050
+LA2<-AKE_Eol_EU %>% pivot_longer(cols=c('Recycling',"Incineration","Landfill","Mismanaged"),
+                                          names_to='EOL',
+                                          values_to='Percentage')
 
-ggplot() + 
-geom_line(data=KD_3_2050, aes(x=Year_2, y=WasteGen), color='blue') + 
-geom_line(data=KD_3, aes(x=Year_2, y=WasteGen), color='red')+
-xlab("Year")+
-ylab("Plastic Waste Generation in China Building & Construction")+
-ggtitle("China Building & Construction Plastic Waste")
-ggsave(glue("{data_dir}/output_r/china_building.png"))
+LA3<-AKE_Eol_NAFTA %>% pivot_longer(cols=c('Recycling',"Incineration","Landfill","Mismanaged"),
+                                          names_to='EOL',
+                                          values_to='Percentage')
 
-# China + Electrical & Electric
+LA4<-AKE_Eol_Row %>% pivot_longer(cols=c('Recycling',"Incineration","Landfill","Mismanaged"),
+                                          names_to='EOL',
+                                          values_to='Percentage')
 
-KD_4<-KD %>% 
-  filter(Region=="China" & Major_Market_Sector=="Electrical_Electronic") %>% 
-  select(Year_2, WasteGen)
+# Joining Long form 
+LA5<-rbind(LA1,LA2,LA3,LA4)
 
-levels(KD$Major_Market_Sector)
+```
 
-KD_4_Model<- loess(WasteGen ~ Year_2, 
-                     data = KD_4, 
-                     control = loess.control(surface = "direct"))
 
-KD_4_2050 <- data.frame(Year_2 = 1970:2050)
-KD_4_2050$WasteGen <- predict(KD_4_Model, KD_4_2050, se = TRUE)$fit
-KD_4_2050
 
-ggplot() + 
-geom_line(data=KD_4_2050, aes(x=Year_2, y=WasteGen), color='blue') + 
-geom_line(data=KD_4, aes(x=Year_2, y=WasteGen), color='red')+
-xlab("Year")+
-ylab("Plastic Waste Generation in China Electric & Electrical")+
-ggtitle("China Electric & Electronic Plastic Waste")
-ggsave(glue("{data_dir}/output_r/china_electrical.png"))
+## EOL 
 
-KD_5<-KD %>% 
-  filter(Region=="China" & Major_Market_Sector=="Household_Leisure_Sports") %>% 
-  select(Year_2, WasteGen)
+Doing as Sam said - (total waste * EOL percent in a region ~ year)
 
-KD_5_Model<- loess(WasteGen ~ Year_2, 
-                     data = KD_5, 
-                     control = loess.control(surface = "direct"))
 
-KD_5_2050 <- data.frame(Year_2 = 1970:2050)
-KD_5_2050$WasteGen <- predict(KD_5_Model, KD_5_2050, se = TRUE)$fit
-KD_5_2050
+```{r}
 
-ggplot() + 
-geom_line(data=KD_5_2050, aes(x=Year_2, y=WasteGen), color='blue') + 
-geom_line(data=KD_5, aes(x=Year_2, y=WasteGen), color='red')+
-xlab("Year")+
-ylab("Plastic Waste Generation in China Household")+
-ggtitle("China Houseshold Leisure & Sport Plastic Waste")
-ggsave(glue("{data_dir}/output_r/china_sport_leisure.png"))
+# Getting KD into the right format to apply end of life 
 
-# China Agriculture Plastic Waste
+LB5<-KD %>% group_by(Year_2, Region) %>% summarize(Waste_3=sum(WasteGen))
 
-KD_6<-KD %>% 
-  filter(Region=="China" & Major_Market_Sector=="Agriculture") %>% 
-  select(Year_2, WasteGen)
+LB6<-LB5 %>% inner_join(LA5, 
+        by=c('Year_2'="Year_2","Region"="Region")) 
 
-KD_6_Model<- loess(WasteGen ~ Year_2, 
-                     data = KD_6, 
-                     control = loess.control(surface = "direct"))
+LB6<-LB6%>% 
+  mutate(EOL_2=Waste_3*(Percentage/100))
 
-KD_6_2050 <- data.frame(Year_2 = 1970:2050)
-KD_6_2050$WasteGen <- predict(KD_6_Model, KD_6_2050, se = TRUE)$fit
+##
 
-ggplot() + 
-geom_line(data=KD_6_2050, aes(x=Year_2, y=WasteGen), color='blue') + 
-geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
-xlab("Year")+
-ylab("Plastic Waste Generation in China Agriculture")+
-ggtitle("China Agriculture Plastic Waste")
-ggsave(glue("{data_dir}/output_r/china_agriculture.png"))
+LA6 <- expand.grid(
+  Year_2 = c(2022:2050),
+  Region = c("China","NAFTA","EU30","RoW"),
+  EOL = c("Recycling", "Incineration","Landfill","Mismanaged"),
+  EOL_2=c(0)
+)
+LA5$Region<-as.factor(LA5$Region)
+LA5$EOL<-as.factor(LA5$EOL)
+LA6$Region<-as.factor(LA6$Region)
+LA6$EOL<-as.factor(LA6$EOL)
+levels(LA5$Region)
+str(LA5)
 
-# China Others Plastic Waste
+# Predicting future EOL percentages by first calculating mass in Metric tons. 
+# still does not work 
 
-KD_7<-KD %>% 
-  filter(Region=="China" & Major_Market_Sector=="Others") %>% 
-  select(Year_2, WasteGen)
+LB7<-LB6 %>%
+  group_by(Region, EOL) %>%
+  nest() %>%
+  inner_join(LA6 %>% select(-EOL_2) %>% 
+               group_by(Region, EOL) %>% nest(),
+             by = c("Region", "EOL")) %>%
+  mutate(model = data.x %>% map(~lm(EOL_2 ~ Year_2, data=.)),
+         EOL_2 = map2(model, data.y, predict)) %>%
+  select(-data.x, -model) %>%
+  unnest() %>%
+  bind_rows(LA6, .)
 
-KD_7_Model<- loess(WasteGen ~ Year_2, 
-                     data = KD_7, 
-                     control = loess.control(surface = "direct"))
+```
 
-KD_7_2050 <- data.frame(Year_2 = 1970:2050)
-KD_7_2050$WasteGen <- predict(KD_7_Model, KD_7_2050, se = TRUE)$fit
-KD_7_2050
+This still does not work for predicting EOL. 
+So I am going to go with my original idea of keeping all 2006 values for anything pre - 2006 
+and keeping all 2021 values for anything after 2021 to 2050. See below. 
 
-ggplot() + 
-geom_line(data=KD_6_2050, aes(x=Year_2, y=WasteGen), color='blue') + 
-geom_line(data=KD_6, aes(x=Year_2, y=WasteGen), color='red')+
-xlab("Year")+
-ylab("Plastic Waste Generation in China Others")+
-ggtitle("China Others Plastic Waste")
-ggsave(glue("{data_dir}/output_r/china_other.png"))
 
-# 11. GOAL 
-# Extending the curve by sector and region to 2050 
-# 
-# PROCESS FLOW 
-# 1. Set Up
-# 2. Import
-# 3. Tidy
-# 4. Transform
-# 5. Visualize
-# 6. **Export**
+```{r}
 
-print("== 6 / 6: Export ==")
-write.csv(F05, file=glue("{root_dir}/output_r/F05.csv"))
-write.csv(G4, file=glue("{root_dir}/output_r/G4.csv"))
-write.csv(G7, file=glue("{root_dir}/output_r/G7.csv"))
-write.csv(G9, file=glue("{root_dir}/output_r/G9.csv"))
-write.csv(H.1, file=glue("{root_dir}/output_r/H.1.csv"))
-write.csv(H2, file=glue("{root_dir}/output_r/H2.csv"))
-write.csv(H5, file=glue("{root_dir}/output_r/H5.csv"))
-write.csv(H6, file=glue("{root_dir}/output_r/H6.csv"))
-write.csv(HH8, file=glue("{root_dir}/output_r/HH8.csv"))
-write.csv(HH9.2, file=glue("{root_dir}/output_r/HH9.2.csv"))
-write.csv(IA2, file=glue("{root_dir}/output_r/IA2.csv"))
-write.csv(IA3, file=glue("{root_dir}/output_r/IA3.csv"))
-write.csv(KA3, file=glue("{root_dir}/output_r/KA3.csv"))
-write.csv(KD, file=glue("{root_dir}/output_r/KD.csv"))
-write.csv(KD_1_2050, file=glue("{root_dir}/output_r/KD_1_2050.csv"))
-write.csv(KD_2_2050, file=glue("{root_dir}/output_r/KD_2_2050.csv"))
-write.csv(KD_3_2050, file=glue("{root_dir}/output_r/KD_3_2050.csv"))
-write.csv(KD_4_2050, file=glue("{root_dir}/output_r/KD_4_2050.csv"))
-write.csv(KD_5_2050, file=glue("{root_dir}/output_r/KD_5_2050.csv"))
-write.csv(KD_6_2050, file=glue("{root_dir}/output_r/KD_6_2050.csv"))
-write.csv(KD_7_2050, file=glue("{root_dir}/output_r/KD_7_2050.csv"))
+MA1<- expand.grid(
+  Year_2 = c(2022:2050),
+  Region = c("China","NAFTA","EU30","RoW"),
+  EOL = c("Recycling", "Incineration","Landfill","Mismanaged"),
+  Percentage=c(NA)
+)
+
+MA2<-expand.grid(
+  Year_2 = c(1970:2005),
+  Region = c("China","NAFTA","EU30","RoW"),
+  EOL = c("Recycling", "Incineration","Landfill","Mismanaged"),
+  Percentage=c(NA)
+)
+
+MA3<-rbind(LA5, MA1)
+
+
+MA4<-MA3 %>% arrange(desc(Year_2)) %>%
+  group_by(Region, EOL) %>% 
+  fill(Percentage, .direction = 'up')
+
+MA5<-rbind(MA4,MA2)
+
+MA5<-MA5 %>% arrange(desc(Year_2)) %>%
+  group_by(Region, EOL) %>% 
+  fill(Percentage, .direction = 'down')
+
+
+MA6<-LB5 %>% inner_join(MA5, 
+        by=c('Year_2'="Year_2","Region"="Region")) %>% 
+  mutate(EOL_Waste_5=Waste_3*(Percentage/100))
+
+
+# Sam's ask 1 = Waste Gen - year, region, market_sector, polymer type
+# Waste_Gen_2 is waste for each polymer type 
+KD2 
+ 
+# Sam's ask 2 = Consumption - year, region, market_sector
+# PC_sector is consumption 
+KA3
+ 
+# Sam's ask 3 = Waste Gen - year, region, EOL type
+# EOL_Waste_5 is waste for each EOL fate 
+MA6 
+ 
+#Sam's ask 4 = Consumption - year, region, market_sector, polymer_type
+# PC_type is plastic consumption by type of polymer 
+MA7<-KA3 %>% inner_join(D1, 
+        by=c('Major_Market_Sector'="Major_Market_Sector","Region"="Region")) %>% 
+  filter(Type!="Sum") %>% 
+  mutate(PC_Type=PC_Sector*Percentage)
+
+```
+
+
+
+
+
+
+
+
+

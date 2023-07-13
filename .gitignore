@@ -1,8 +1,9 @@
 data/.lock.*
 data/.~lock.*
-output_sql/*.csv
-output_sql/*.db
-output_r/*.csv
-output_r/*.db
+output/*.csv
+output/*.db
+output/*.csv
+output/*.db
 data_workspace/
 .gitpod.yml
+r/pipeline.R
