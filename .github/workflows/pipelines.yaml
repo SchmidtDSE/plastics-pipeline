@@ -12,8 +12,10 @@ jobs:
         uses: actions/checkout@v3
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
-      - name: Build
+      - name: Prepare script
         run: cd r; bash transform.sh
+      - name: Run script
+        run: cd r; Rscript pipeline.R
       - uses: actions/upload-artifact@v3
         with:
           name: Pipeline Result
