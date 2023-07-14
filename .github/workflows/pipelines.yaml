@@ -18,10 +18,14 @@ jobs:
         uses: actions/checkout@v3
       - name: Install dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
-      - name: Prepare script
+      - name: Prepare R pipeline
         run: cd r; bash transform.sh
-      - name: Run script
+      - name: Run R pipeline
         run: cd r; Rscript pipeline.R
+      - name: Run SQL pipeline
+        run: cd sql; bash make.sh
+      - name: Run output checks
+        run: python python/check_output.py output/overview.csv
       - uses: actions/upload-artifact@v3
         with:
           name: Pipeline Result
