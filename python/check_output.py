@@ -23,7 +23,8 @@ REGIONS_EXPECTED = [
     'china',
     'eu30',
     'nafta',
-    'row'
+    'row',
+    'global'
 ]
 
 YEARS_EXPECTED = set(range(2000, 2050))
