@@ -1408,17 +1408,7 @@ MA9
 
 
 
-```{r}
-# Niviedita's ask 1 
 
-#MA8<-KD %>% arrange(desc(Year_2)) %>% 
-  filter(Major_Market_Sector=="Electrical_Electronic")
-
-#MA9<-MA8[c(109:204),]
-
-#write.csv(MA9, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\MA9.csv")
-
-```
 
 
 
