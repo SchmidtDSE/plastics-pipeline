@@ -29,7 +29,7 @@ REGIONS_EXPECTED = [
     'row'
 ]
 
-YEARS_REQUIRED = set(range(2010, 2050))
+YEARS_REQUIRED = set(range(2005, 2050))
 
 
 def has_attrs(rows):
