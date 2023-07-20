@@ -1353,7 +1353,7 @@ Target_MB_1<-MA6
 
 # Setup calculations
 get_t_waste <- function (target) { target$Prim_Waste + target$Sec_Waste }
-get_sec_material <- function (target) { target$T_Waste * target$Percentage }
+get_sec_material <- function (target) { target$T_Waste * target$Percentage / 100 }
 
 build_shifted_recycling <- function (target) {
   # Seed
