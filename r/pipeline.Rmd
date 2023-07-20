@@ -1335,6 +1335,15 @@ MA5.1<-MA5 %>% inner_join(KD4,
 
 ```
 
+## VISUALIZING PLOTS 
+
+```{r}
+
+ggplot(data = MA5, aes(x = Year_2, y = Percentage)) +
+  geom_point()
+
+```
+
 # JOIN BOTH = DONE !
 # RECYCLING ONLY 
 
@@ -1343,6 +1352,8 @@ RECYCLING
 ### 
 
 This part ends the first part of the recycling section. Applying Sam's Recycling Help Nivi code to this section of the data! 
+
+##
 
 ```{r}
 
@@ -1353,7 +1364,7 @@ Target_MB_1<-MA6
 
 # Setup calculations
 get_t_waste <- function (target) { target$Prim_Waste + target$Sec_Waste }
-get_sec_material <- function (target) { target$T_Waste * target$Percentage / 100 }
+get_sec_material <- function (target) { target$T_Waste * target$Percentage/100}
 
 build_shifted_recycling <- function (target) {
   # Seed
@@ -1393,8 +1404,8 @@ for (region in list('China', 'NAFTA', 'EU30', 'RoW')) {
 ```{r}
 
 # EOL only Recycling 
-TB<-Target_MB_2 %>% select(Year_2, Region, EOL, T_Waste)
-colnames(TB)[colnames(TB) == 'T_Waste'] <- 'Prim_Waste'
+TB<-Target_MB_2 %>% select(Year_2, Region, EOL, Sec_Waste)
+colnames(TB)[colnames(TB) == 'Sec_Waste'] <- 'Prim_Waste'
 
 # All EOL  excluding recycling 
 TB1<-MA5.1 %>% filter(EOL!="Recycling") %>% 
@@ -1453,19 +1464,12 @@ KA3
 # EOL_Waste_5 is waste for each EOL fate in Million Metric Tons
 TB2
 
+#ggplot(data = TB2, aes(x = Year_2, y = Prim_Waste)) +
+  #geom_point()
+
 # Sam's ask 4 = Consumption - year, region, market_Sector, polymer type
 TB4 
 
 ```
-
-
-
-
-
-
-
-
-
-
 
 
