@@ -23,7 +23,7 @@ FROM
             CAST(Percentage AS REAL) AS polymerPercentage,
             CAST("WastGen_2" AS REAL) AS polymerWaste
         FROM
-            file_kd2
+            file_waste_gen
     );
 
 
@@ -46,7 +46,7 @@ FROM
             lower(Major_Market_Sector) AS majorMarketSector,
             CAST(PC_Sector AS REAL) AS consumptionMT
         FROM
-            file_ka3
+            file_consumption
     );
 
 CREATE VIEW eol_raw AS
@@ -54,9 +54,9 @@ SELECT
     CAST(YEAR_2 AS INTEGER) AS year,
     lower(Region) AS region,
     lower(EOL) AS eol,
-    CAST(EOL_Waste_5 AS REAL) AS eolMT
+    CAST(Prim_Waste AS REAL) AS eolMT
 FROM
-    file_ma6;
+    file_eol;
 
 CREATE VIEW net_imports_abs AS
 SELECT

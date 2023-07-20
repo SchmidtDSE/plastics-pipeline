@@ -29,7 +29,7 @@ REGIONS_EXPECTED = [
     'row'
 ]
 
-YEARS_EXPECTED = set(range(2000, 2050))
+YEARS_REQUIRED = set(range(2010, 2050))
 
 
 def has_attrs(rows):
@@ -48,8 +48,12 @@ def has_regions(rows):
 
 def has_years(rows):
     years_found = set(map(lambda x: int(x['year']), rows))
-    difference = YEARS_EXPECTED.symmetric_difference(years_found)
-    return len(difference) == 0
+    for year in YEARS_REQUIRED:
+        if year not in years_found:
+            print('Missing year %d' % year)
+            return False
+
+    return True
 
 
 def main():
