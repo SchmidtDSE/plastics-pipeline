@@ -107,3 +107,26 @@ WHERE
 GROUP BY
     year,
     region;
+
+CREATE VIEW net_imports_percent AS
+SELECT
+    total_consumption.region,
+    total_consumption.year,
+    net_imports_abs.netImports / total_consumption.totalConsumptionMT AS percentNetImports
+FROM
+    (
+        SELECT
+            region,
+            year AS year,
+            sum(consumptionMT) AS totalConsumptionMT
+        FROM
+            consumption_raw_pre_total
+        GROUP BY
+            region,
+            year
+    ) total_consumption
+INNER JOIN
+    net_imports_abs
+ON
+    total_consumption.region = net_imports_abs.region
+    AND total_consumption.year = net_imports_abs.year;

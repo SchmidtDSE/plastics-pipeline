@@ -57,3 +57,68 @@ SELECT
     CAST(EOL_Waste_5 AS REAL) AS eolMT
 FROM
     file_ma6;
+
+CREATE VIEW net_imports_abs AS
+SELECT
+    (
+        CAST(Transportation AS REAL) +
+        CAST(Packaging AS REAL) +
+        CAST(Building_Construction AS REAL) +
+        CAST(Electrical_Electronic AS REAL) + 
+        CAST(Household_Leisure_Sports AS REAL) +
+        CAST(Agriculture AS REAL) +
+        CAST(Textiles AS REAL) +
+        CAST(Others AS REAL)
+    ) AS netImports,
+    CAST(Year AS INTEGER) AS year,
+    'china' AS region
+FROM
+    file_18_net_trade_china
+UNION ALL
+SELECT
+    (
+        CAST(Transportation AS REAL) +
+        CAST(Packaging AS REAL) +
+        CAST(Building_Construction AS REAL) +
+        CAST(Electrical_Electronic AS REAL) + 
+        CAST(Household_Leisure_Sports AS REAL) +
+        CAST(Agriculture AS REAL) +
+        CAST(Textiles AS REAL) +
+        CAST(Others AS REAL)
+    ) AS netImports,
+    CAST(Year AS INTEGER) AS year,
+    'nafta' AS region
+FROM
+    file_19_net_trade_nafta
+UNION ALL
+SELECT
+    (
+        CAST(Transportation AS REAL) +
+        CAST(Packaging AS REAL) +
+        CAST(Building_Construction AS REAL) +
+        CAST(Electrical_Electronic AS REAL) + 
+        CAST(Household_Leisure_Sports AS REAL) +
+        CAST(Agriculture AS REAL) +
+        CAST(Textiles AS REAL) +
+        CAST(Others AS REAL)
+    ) AS netImports,
+    CAST(Year AS INTEGER) AS year,
+    'eu30' AS region
+FROM
+    file_20_net_trade_eu
+UNION ALL
+SELECT
+    (
+        CAST(Transportation AS REAL) +
+        CAST(Packaging AS REAL) +
+        CAST(Building_Construction AS REAL) +
+        CAST(Electrical_Electronic AS REAL) + 
+        CAST(Household_Leisure_Sports AS REAL) +
+        CAST(Agriculture AS REAL) +
+        CAST(Textiles AS REAL) +
+        CAST(Others AS REAL)
+    ) AS netImports,
+    CAST(Year AS INTEGER) AS year,
+    'row' AS region
+FROM
+    file_21_net_trade_row
