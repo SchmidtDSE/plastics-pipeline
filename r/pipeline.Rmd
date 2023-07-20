@@ -1405,6 +1405,38 @@ TB2<-rbind(TB1,TB)
 
 ```
 
+
+# CONSUMPTION BY POLYMER TYPE 
+
+
+```{r}
+
+# Consumption by Polymertype 
+
+TB3<-KA3 %>% inner_join(D12, 
+        by=c('Region'="Region","Major_Market_Sector"="Major_Market_Sector")) %>% 
+  filter(Type!="Sum")
+
+TB3<-TB3 %>% mutate(PC_Polymer=PC_Sector*Percentage)
+
+TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
+
+```
+
+# CONSUMPTION BY POLYMER TYPE #2 WITHOUT MARKET SECTOR 
+
+```{r}
+#TB5 <-KA3 %>% select(-Major_Market_Sector) %>% 
+  #group_by(Year, Region) %>% summarize(PC_Total=sum(PC_Sector))
+
+#TB5.1<-TB5 %>% inner_join(D12, 
+        #by=c('Region'="Region")) %>% 
+  #filter(Type!="Sum")
+
+```
+
+
+
 # Final Asks 
 
 ```{r}
@@ -1413,16 +1445,26 @@ TB2<-rbind(TB1,TB)
 KD3 
 str(KD3)
 
- 
 # Sam's ask 2 = Consumption - year, region, market_sector
-# PC_sector is consumption in Million Metric Tons # corect with Roland
+# PC_sector is consumption in Million Metric Tons
 KA3
  
 # Sam's ask 3 = Waste Gen - year, region, EOL type
 # EOL_Waste_5 is waste for each EOL fate in Million Metric Tons
 TB2
 
+# Sam's ask 4 = Consumption - year, region, market_Sector, polymer type
+TB4 
+
 ```
+
+
+
+
+
+
+
+
 
 
 
