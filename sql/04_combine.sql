@@ -22,7 +22,7 @@ SELECT
     ) AS netImportsMT,
     (
         CASE
-            WHEN with_trade.netImportsMT < 0 THEN with_trade.netImportsMT
+            WHEN with_trade.netImportsMT < 0 THEN with_trade.netImportsMT * -1
             ELSE 0
         END
     ) AS netExportsMT,
