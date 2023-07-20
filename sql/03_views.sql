@@ -21,10 +21,20 @@ SELECT
             WHEN majorMarketSector = 'agriculture' THEN consumptionMT
             ELSE 0
         END
+    ) / sum(
+        CASE
+            WHEN majorMarketSector = 'agriculture' THEN 1
+            ELSE 0
+        END
     ) AS consumptionAgricultureMT,
     sum(
         CASE
             WHEN majorMarketSector = 'building_construction' THEN consumptionMT
+            ELSE 0
+        END
+    ) / sum(
+        CASE
+            WHEN majorMarketSector = 'building_construction' THEN 1
             ELSE 0
         END
     ) AS consumptionConstructionMT,
@@ -39,10 +49,20 @@ SELECT
             WHEN majorMarketSector = 'household_leisure_sports' THEN consumptionMT
             ELSE 0
         END
+    ) / sum(
+        CASE
+            WHEN majorMarketSector = 'household_leisure_sports' THEN 1
+            ELSE 0
+        END
     ) AS consumptionHouseholdLeisureSportsMT,
     sum(
         CASE
             WHEN majorMarketSector = 'packaging' THEN consumptionMT
+            ELSE 0
+        END
+    ) / sum(
+        CASE
+            WHEN majorMarketSector = 'packaging' THEN 1
             ELSE 0
         END
     ) AS consumptionPackagingMT,
@@ -51,16 +71,31 @@ SELECT
             WHEN majorMarketSector = 'transportation' THEN consumptionMT
             ELSE 0
         END
+    ) / sum(
+        CASE
+            WHEN majorMarketSector = 'transportation' THEN 1
+            ELSE 0
+        END
     ) AS consumptionTransporationMT,
     sum(
         CASE
             WHEN majorMarketSector = 'textile' THEN consumptionMT
             ELSE 0
         END
+    ) / sum(
+        CASE
+            WHEN majorMarketSector = 'textile' THEN 1
+            ELSE 0
+        END
     ) AS consumptionTextitleMT,
     sum(
         CASE
             WHEN majorMarketSector = 'others' THEN consumptionMT
+            ELSE 0
+        END
+    ) / sum(
+        CASE
+            WHEN majorMarketSector = 'others' THEN 1
             ELSE 0
         END
     ) AS consumptionOtherMT
@@ -81,10 +116,20 @@ SELECT
             WHEN eol = 'recycling' THEN eolMT
             ELSE 0
         END
+    ) / sum(
+        CASE
+            WHEN eol = 'recycling' THEN 1
+            ELSE 0
+        END
     ) AS eolRecyclingMT,
     sum(
         CASE
             WHEN eol = 'landfill' THEN eolMT
+            ELSE 0
+        END
+    ) / sum(
+        CASE
+            WHEN eol = 'landfill' THEN 1
             ELSE 0
         END
     ) AS eolLandfillMT,
@@ -93,10 +138,20 @@ SELECT
             WHEN eol = 'incineration' THEN eolMT
             ELSE 0
         END
+    ) / sum(
+        CASE
+            WHEN eol = 'incineration' THEN 1
+            ELSE 0
+        END
     ) AS eolIncinerationMT,
     sum(
         CASE
             WHEN eol = 'mismanaged' THEN eolMT
+            ELSE 0
+        END
+    ) / sum(
+        CASE
+            WHEN eol = 'mismanaged' THEN 1
             ELSE 0
         END
     ) AS eolMismanagedMT
