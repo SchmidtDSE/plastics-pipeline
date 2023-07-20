@@ -45,11 +45,17 @@ FROM
             no_trade.consumptionTextitleMT AS consumptionTextitleMT,
             no_trade.consumptionOtherMT AS consumptionOtherMT,
             no_trade.totalConsumption AS totalConsumption,
-            no_trade.totalConsumption * percentNetImports AS netImportsMT
+            no_trade.totalConsumption * net_imports_percent.percentNetImports AS netImportsMT
         FROM
             (
                 SELECT
                     eol_overview.year AS year,
+                    (
+                        CASE
+                            WHEN eol_overview.year > 2020 THEN 2020
+                            ELSE eol_overview.year
+                        END
+                    ) AS joinYear,
                     eol_overview.region AS region,
                     eol_overview.eolRecyclingMT AS eolRecyclingMT,
                     eol_overview.eolLandfillMT AS eolLandfillMT,
@@ -82,15 +88,8 @@ FROM
                     AND eol_overview.region = consumption_overview.region
             ) no_trade
         INNER JOIN
-            (
-                SELECT
-                    region,
-                    percentNetImports
-                FROM
-                    net_imports_percent
-                WHERE
-                    year = 2020
-            ) final_net_imports
+            net_imports_percent
         ON
-            no_trade.region = final_net_imports.region
+            no_trade.region = net_imports_percent.region
+            AND no_trade.joinYear = net_imports_percent.year
     ) with_trade
