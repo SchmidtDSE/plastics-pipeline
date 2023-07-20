@@ -14,7 +14,18 @@ SELECT
     with_trade.consumptionTransporationMT AS consumptionTransporationMT,
     with_trade.consumptionTextitleMT AS consumptionTextitleMT,
     with_trade.consumptionOtherMT AS consumptionOtherMT,
-    with_trade.netImportsMT AS netImportsMT,
+    (
+        CASE
+            WHEN with_trade.netImportsMT > 0 THEN with_trade.netImportsMT
+            ELSE 0
+        END
+    ) AS netImportsMT,
+    (
+        CASE
+            WHEN with_trade.netImportsMT < 0 THEN with_trade.netImportsMT
+            ELSE 0
+        END
+    ) AS netExportsMT,
     with_trade.totalConsumption + with_trade.netImportsMT AS domesticProductionMT
 FROM
     (
