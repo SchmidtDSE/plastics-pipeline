@@ -1,6 +1,13 @@
 output_dir <- file.path(dirname(getwd()), "output")
 
-write.csv(KD2, file=glue("{output_dir}/KD2.csv"))
-write.csv(KA3, file=glue("{output_dir}/KA3.csv"))
-write.csv(MA6, file=glue("{output_dir}/MA6.csv"))
-write.csv(MA7, file=glue("{output_dir}/MA7.csv"))
+# Sam's ask 1 = Waste Gen - year, region, market_sector, polymer type
+# Waste_Gen_2 is waste for each polymer type in Million Metric Tons
+write.csv(KD3, file=glue("{output_dir}/waste_gen.csv"))
+
+# Sam's ask 2 = Consumption - year, region, market_sector
+# PC_sector is consumption in Million Metric Tons
+write.csv(KA3, file=glue("{output_dir}/consumption.csv"))
+
+# Sam's ask 3 = Waste Gen - year, region, EOL type
+# EOL_Waste_5 is waste for each EOL fate in Million Metric Tons
+write.csv(TB2, file=glue("{output_dir}/eol.csv"))
