@@ -54,7 +54,7 @@ SELECT
     CAST(YEAR_2 AS INTEGER) AS year,
     lower(Region) AS region,
     lower(EOL) AS eol,
-    CAST(EOL_Waste_5 AS REAL) AS eolMT
+    CAST(Prim_Waste AS REAL) AS eolMT
 FROM
     file_eol;
 
