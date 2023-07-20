@@ -53,6 +53,7 @@ FROM
                     (
                         CASE
                             WHEN eol_overview.year > 2020 THEN 2020
+                            WHEN eol_overview.year < 2005 THEN 2005
                             ELSE eol_overview.year
                         END
                     ) AS joinYear,
