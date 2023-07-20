@@ -16,7 +16,10 @@ ATTRS_EXPECTED = [
     'eolRecyclingMT',
     'eolLandfillMT',
     'eolIncinerationMT',
-    'eolMismanagedMT'
+    'eolMismanagedMT',
+    'netImportsMT',
+    'netExportsMT',
+    'domesticProductionMT',
 ]
 
 REGIONS_EXPECTED = [
