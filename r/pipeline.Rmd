@@ -1278,15 +1278,15 @@ levels(KD$Major_Market_Sector)
 ######## Re-check this !!!!! - Roland 18th July 2023 
 
 # Previously LB5
-KD4 <-KD %>% group_by(Year_2, Region) %>% summarize(Prim_Waste=sum(WasteGen))
+#KD4 <-KD %>% group_by(Year_2, Region) %>% summarize(Prim_Waste=sum(WasteGen))
 
-sum(KD4$Prim_Waste) = #25275
+#sum(KD4$Prim_Waste) = #25275
 
-KD4 %>% group_by(Region) %>% 
-  summarise(sum(Prim_Waste))
+#KD4 %>% group_by(Region) %>% 
+  #summarise(sum(Prim_Waste))
 
-ggplot(data = KD4, aes(x = Year_2, y = Prim_Waste)) +
-  geom_point()
+#ggplot(data = KD4, aes(x = Year_2, y = Prim_Waste)) +
+  #geom_point()
 
 ######## 
 ########
