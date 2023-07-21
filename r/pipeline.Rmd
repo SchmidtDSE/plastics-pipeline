@@ -1278,7 +1278,7 @@ levels(KD$Major_Market_Sector)
 ######## Re-check this !!!!! - Roland 18th July 2023 
 
 # Previously LB5
-#KD4 <-KD %>% group_by(Year_2, Region) %>% summarize(Prim_Waste=sum(WasteGen))
+KD4 <-KD %>% group_by(Year_2, Region) %>% summarize(Prim_Waste=sum(WasteGen))
 
 #sum(KD4$Prim_Waste) = #25275
 
