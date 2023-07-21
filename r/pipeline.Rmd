@@ -1279,8 +1279,21 @@ levels(KD$Major_Market_Sector)
 
 # Previously LB5
 KD4 <-KD %>% group_by(Year_2, Region) %>% summarize(Prim_Waste=sum(WasteGen))
+
+#sum(KD4$Prim_Waste) = #25275
+
+#KD4 %>% group_by(Region) %>% 
+  #summarise(sum(Prim_Waste))
+
+#ggplot(data = KD4, aes(x = Year_2, y = Prim_Waste)) +
+  #geom_point()
+
 ######## 
 ########
+
+#### 
+#CORRECT SO FAR! 
+###
 ```
 
 This still does not work for predicting EOL. 
@@ -1311,7 +1324,7 @@ MA4<-MA3 %>% arrange(desc(Year_2)) %>%
 
 
 # DOWNWARD FOR ALL SECTORS - 1970 - 1999 FOR ALL SECTORS 
-
+This needs to be changed in the future for the publication 
 
 ```{r}
 
@@ -1344,15 +1357,20 @@ ggplot(data = MA5, aes(x = Year_2, y = Percentage)) +
 
 ```
 
+
+```{r}
+
+MA5.1<- MA5.1 %>% mutate(Prim_W_EOL=Prim_Waste*(Percentage/100))
+
+```
+
 # JOIN BOTH = DONE !
 # RECYCLING ONLY 
 
 ### 
 RECYCLING 
 ### 
-
 This part ends the first part of the recycling section. Applying Sam's Recycling Help Nivi code to this section of the data! 
-
 ##
 
 ```{r}
@@ -1363,8 +1381,8 @@ MA6<-MA5.1 %>% filter(EOL=="Recycling") %>%
 Target_MB_1<-MA6
 
 # Setup calculations
-get_t_waste <- function (target) { target$Prim_Waste + target$Sec_Waste }
-get_sec_material <- function (target) { target$T_Waste * target$Percentage/100}
+get_t_waste <- function (target) {target$Prim_W_EOL + target$Sec_Waste }
+get_sec_material <- function (target) {target$T_Waste * target$Percentage/100}
 
 build_shifted_recycling <- function (target) {
   # Seed
@@ -1395,7 +1413,8 @@ for (region in list('China', 'NAFTA', 'EU30', 'RoW')) {
   }
 }
 
-#write.csv(Target_MB_2, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\Target_MB_2.csv")
+#write.csv(Target_MB_2, "/Users/dr.nivedita/Library/
+#CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\Target_MB_2.csv")
 
 ```
 
@@ -1405,11 +1424,11 @@ for (region in list('China', 'NAFTA', 'EU30', 'RoW')) {
 
 # EOL only Recycling 
 TB<-Target_MB_2 %>% select(Year_2, Region, EOL, Sec_Waste)
-colnames(TB)[colnames(TB) == 'Sec_Waste'] <- 'Prim_Waste'
+colnames(TB)[colnames(TB) == 'Sec_Waste'] <- 'Prim_W_EOL'
 
 # All EOL  excluding recycling 
 TB1<-MA5.1 %>% filter(EOL!="Recycling") %>% 
-  select(Year_2, Region,EOL,Prim_Waste)
+  select(Year_2, Region,EOL,Prim_W_EOL)
 
 # Join Together
 TB2<-rbind(TB1,TB)
@@ -1443,9 +1462,7 @@ TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
 #TB5.1<-TB5 %>% inner_join(D12, 
         #by=c('Region'="Region")) %>% 
   #filter(Type!="Sum")
-
 ```
-
 
 
 # Final Asks 
@@ -1456,13 +1473,22 @@ TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
 KD3 
 str(KD3)
 
+#ggplot(data = KD3, aes(x = Year_2, y = WasteGen)) +
+  #geom_point()
+
 # Sam's ask 2 = Consumption - year, region, market_sector
 # PC_sector is consumption in Million Metric Tons
 KA3
+
+#ggplot(data = KA3, aes(x = Year, y = PC_Sector)) +
+  #geom_point()
  
 # Sam's ask 3 = Waste Gen - year, region, EOL type
 # EOL_Waste_5 is waste for each EOL fate in Million Metric Tons
 TB2
+
+#ggplot(data = TB2, aes(x = Year_2, y = Prim_W_EOL)) +
+  #geom_point()
 
 #ggplot(data = TB2, aes(x = Year_2, y = Prim_Waste)) +
   #geom_point()
@@ -1471,5 +1497,15 @@ TB2
 TB4 
 
 ```
+
+
+
+
+
+
+
+
+
+
 
 
