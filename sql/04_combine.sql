@@ -26,7 +26,7 @@ SELECT
             ELSE 0
         END
     ) AS netExportsMT,
-    with_trade.totalConsumption + with_trade.netImportsMT AS domesticProductionMT
+    with_trade.totalConsumption - with_trade.netImportsMT AS domesticProductionMT
 FROM
     (
         SELECT
