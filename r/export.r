@@ -6,8 +6,8 @@ write.csv(KD3, file=glue("{output_dir}/waste_gen.csv"))
 
 # Sam's ask 2 = Consumption - year, region, market_sector
 # PC_sector is consumption in Million Metric Tons
-write.csv(KA3, file=glue("{output_dir}/consumption.csv"))
+write.csv(TB4, file=glue("{output_dir}/consumption.csv"))
 
 # Sam's ask 3 = Waste Gen - year, region, EOL type
 # EOL_Waste_5 is waste for each EOL fate in Million Metric Tons
-write.csv(TB2, file=glue("{output_dir}/eol.csv"))
+write.csv(TBA6, file=glue("{output_dir}/eol.csv"))
