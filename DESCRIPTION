@@ -37,4 +37,5 @@ Imports:
     readxl,
     reprex,
     purrr,
-    glue
+    glue,
+    hablar
