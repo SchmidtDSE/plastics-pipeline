@@ -1,12 +1,3 @@
-CREATE ROLE leo NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'bbv7of1v44';
-GRANT SELECT ON TABLE public.label_tillage TO leo;
-GRANT SELECT ON TABLE public.label_vpd TO leo;
-GRANT SELECT ON TABLE public.raw_location TO leo;
-GRANT SELECT ON TABLE public.raw_rci TO leo;
-GRANT SELECT ON TABLE public.raw_tillage TO leo;
-GRANT SELECT ON TABLE public.join_preview TO leo;
-GRANT SELECT ON TABLE public.transform_rci TO leo;
-GRANT SELECT ON TABLE public.transform_tillage TO leo;CREATE VIEW consumption_raw AS
 SELECT
     year AS year,
     region AS region,
