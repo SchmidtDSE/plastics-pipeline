@@ -1,4 +1,3 @@
-CREATE VIEW consumption_raw AS
 SELECT
     year AS year,
     region AS region,
@@ -29,32 +28,44 @@ FROM
 
 CREATE VIEW consumption_raw_pre_total AS
 SELECT
-    year AS year,
-    region AS region,
+    summarized.year AS year,
+    summarized.region AS region,
     (
         CASE
-            WHEN majorMarketSector = 'textiles' THEN 'textile'
-            ELSE majorMarketSector
+            WHEN summarized.majorMarketSector = 'textiles' THEN 'textile'
+            ELSE summarized.majorMarketSector
         END
     ) AS majorMarketSector,
-    consumptionMT AS consumptionMT
+    summarized.consumptionMT AS consumptionMT
 FROM
     (
         SELECT
-            CAST(YEAR AS INTEGER) AS year,
-            lower(Region) AS region,
-            lower(Major_Market_Sector) AS majorMarketSector,
-            CAST(PC_Sector AS REAL) AS consumptionMT
+            interpreted.year AS year,
+            interpreted.region AS region,
+            interpreted.majorMarketSector AS majorMarketSector,
+            sum(consumptionMT) AS consumptionMT
         FROM
-            file_consumption
-    );
+            (
+                SELECT
+                    CAST(YEAR AS INTEGER) AS year,
+                    lower(Region) AS region,
+                    lower(Major_Market_Sector) AS majorMarketSector,
+                    CAST(PC_Polymer AS REAL) AS consumptionMT
+                FROM
+                    file_consumption
+            ) interpreted
+        GROUP BY
+            interpreted.year,
+            interpreted.region,
+            interpreted.majorMarketSector
+    ) summarized ;
 
 CREATE VIEW eol_raw AS
 SELECT
     CAST(YEAR_2 AS INTEGER) AS year,
     lower(Region) AS region,
     lower(EOL) AS eol,
-    CAST(Prim_W_EOL AS REAL) AS eolMT
+    CAST(Real_EOL AS REAL) AS eolMT
 FROM
     file_eol;
 

@@ -60,6 +60,7 @@ library("readxl")
 library(reprex)
 library(purrr)
 library(glue)
+library(hablar)
 
 libs <- c('dplyr', 'stringr', 'forcats',     # wrangling
           'knitr',               # table styling
@@ -455,11 +456,42 @@ F05$Major_Market_Sector<- factor(F05$Major_Market_Sector, levels =
 G8<-G7 %>% inner_join(F05,
         by=c("Year"="Year", "Region"="Region","Major_Market_Sector"="Major_Market_Sector"))
 
+# FORWARD
+```
+
+# Projecting Trade forward 
+
+```{r}
+G8.1<-G8 %>% select(-Converter_Consump_2)
+
+G8.2<- expand.grid(
+  Year = c(2021:2050),
+  Region = c("China","NAFTA","EU30","RoW"),
+  Major_Market_Sector = c("Transportation","Packaging","Building_Construction","Electrical_Electronic",
+                          "Household_Leisure_Sports","Textiles","Agriculture","Others")
+)
+
+# If you want to forward project Trade 
+
+#J_02<-J_01 %>%
+  #group_by(Region, Major_Market_Sector) %>%
+  #nest() %>%
+  #inner_join(KA2 %>% select(-PC_Sector) %>% group_by(Region, Major_Market_Sector) %>% nest(),
+             #by = c("Region", "Major_Market_Sector")) %>%
+  #mutate(model = data.x %>% map(~lm(PC_Sector ~ poly(Year,2), data=.)),
+         #PC_Sector = map2(model, data.y, predict)) %>%
+  #select(-data.x, -model) %>%
+  #unnest(cols= c(data.y, PC_Sector)) %>%
+  #bind_rows(J_01, .)
+
+#write.csv(G8.1,"/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\G8.1.csv")
+
+
 
 ```
 
 
-We ar e now at Line 25 B of Eol Spreadsheet V12 
+We are now at Line 25 B of Eol Spreadsheet V12 
 Apparent consumption from year 2005 to 2020 
 
 ```{r}
@@ -650,7 +682,6 @@ str(H6)
 #write.csv(IA3.4)
 
 #write.csv(IA3, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\IA3.csv")
-
 #write.csv(IA3.4, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\IA3.4.csv")
 
 
@@ -717,7 +748,7 @@ str(J_01)
 ```{r}
 
 KA2 <- expand.grid(
-  Year = c(2021:2049),
+  Year = c(2021:2050),
   Region = c("China","NAFTA","EU30","RoW"),
   Major_Market_Sector = c("Transportation","Packaging","Building_Construction","Electrical_Electronic",
                           "Household_Leisure_Sports","Textiles","Agriculture","Others"),
@@ -998,49 +1029,56 @@ KB_1Transport<-KA3%>%
  group_by(Region) %>%
  filter(Major_Market_Sector=="Transportation") %>% 
  mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G1Trans, align="left", 
-                              na.rm = TRUE, normalize = FALSE, fill=NA))
+                              na.rm = TRUE, normalize = FALSE, fill=NA)) %>% 
+  filter(Year==2050:1970)
 
 KB_2Packaging<-KA3%>% 
   arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
   group_by(Region) %>%
   filter(Major_Market_Sector=="Packaging") %>% 
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G2Packaging, align="left", 
-                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))%>% 
+  filter(Year==2050:1970)
 
 KB_3Building<-KA3%>% 
   arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
   group_by(Region) %>%
   filter(Major_Market_Sector=="Building_Construction") %>% 
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G3Building, align="left", 
-                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))%>% 
+  filter(Year==2050:1970)
 
 KB_4Electric<-KA3%>% 
   arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
   group_by(Region) %>%
   filter(Major_Market_Sector=="Electrical_Electronic") %>% 
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G4Electric, align="left", 
-                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))%>% 
+  filter(Year==2050:1970)
 
 KB_5House<-KA3%>% 
   arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
   group_by(Region) %>%
   filter(Major_Market_Sector=="Household_Leisure_Sports") %>% 
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G5House, align="left", 
-                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))%>% 
+  filter(Year==2050:1970)
 
 KB_6Agri<-KA3%>% 
   arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
   group_by(Region) %>%
   filter(Major_Market_Sector=="Agriculture") %>% 
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G6Agri, align="left", 
-                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))%>% 
+  filter(Year==2050:1970)
 
 KB_7Other<-KA3%>% 
   arrange(desc(Year)) %>% arrange((Region)) %>% arrange(desc(Major_Market_Sector)) %>% 
   group_by(Region) %>%
   filter(Major_Market_Sector=="Others") %>% 
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G7Others, align="left", 
-                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))%>% 
+  filter(Year==2050:1970)
 
 levels(KA3$Major_Market_Sector)
 
@@ -1049,7 +1087,8 @@ KB_8Textiles<-KA3%>%
   group_by(Region) %>%
   filter(Major_Market_Sector=="Textiles") %>% 
   mutate(WasteGen= RcppRoll::roll_sum(PC_Sector, n=50, weights = G8Textiles, align="left", 
-                                            na.rm = TRUE, normalize = FALSE, fill=NA))
+                                            na.rm = TRUE, normalize = FALSE, fill=NA))%>% 
+  filter(Year==2050:1970)
 
 ```
 
@@ -1075,62 +1114,47 @@ Ignore the warnings here.
 ################################################################################
 ################################################################################
 
+#str(KC_1Transport)
 
 KC_1Transport<-KB_1Transport %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector,WasteGen) 
 
 KC_2Packaging<-KB_2Packaging %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector,WasteGen) 
 
 KC_3Building<-KB_3Building %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector, WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector, WasteGen) 
 
 KC_4Electric<-KB_4Electric %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector,WasteGen) 
 
 KC_5House<-KB_5House %>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector,WasteGen) 
 
 KC_6Agri<-KB_6Agri%>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector,WasteGen) 
 
 KC_7Other<-KB_7Other%>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector,WasteGen) 
 
 KC_8Textiles<-KB_8Textiles%>%
   group_by(Region) %>% 
-  mutate(Year_2=c(2050:1901)) %>% 
-  select(Year_2, Region, Major_Market_Sector,WasteGen) %>% 
-  group_by(Region) %>% 
-  filter(Year_2==(2050:1971))
+  mutate(Year_2=c(2051:1971)) %>% 
+  select(Year_2, Region, Major_Market_Sector,WasteGen) 
 
 KD<-rbind(KC_1Transport,KC_2Packaging,KC_3Building,
           KC_4Electric,KC_5House,KC_6Agri,KC_7Other,KC_8Textiles)
@@ -1143,79 +1167,11 @@ KD<-rbind(KC_1Transport,KC_2Packaging,KC_3Building,
 K_04<-ggplot() + 
   geom_line(data=KD, aes(x=Year_2, y=WasteGen), color='blue') + 
   xlab("Year")+
-  ylab("Plastic Waste Generation in China lm ")+
+  ylab("Plastic Waste Generation ")+
   ggtitle("China lm poly")
 
 K_04+
   facet_wrap(Region ~ Major_Market_Sector)
-
-```
-
-## Adding polymer Data into the mix
-
- 
-```{r}
-#D1<-D1 %>% filter(Type!="Sum")
-
-
-#############################################################
-#############################################################
-
-##### CHINA #####
-
-C_01_China_Long2<-AC_01_China2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
-                                             names_to='Type',
-                                             values_to='Percentage')
-C_01_China_Long2<-C_01_China_Long2 %>% 
-  add_column(Region = "China")
-
-C_01_China_Long2<-C_01_China_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
-
-
-##### NAFTA #####
-C_02_NAFTA_Long2<-AC_02_NAFTA2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
-                                             names_to='Type',
-                                             values_to='Percentage')
-C_02_NAFTA_Long2<-C_02_NAFTA_Long2 %>% 
-  add_column(Region = "NAFTA")
-
-C_02_NAFTA_Long2<-C_02_NAFTA_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
-
-
-##### EU30 #####
-
-C_03_EU30_Long2<-AC_03_Europe2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
-                                             names_to='Type',
-                                             values_to='Percentage')
-C_03_EU30_Long2<-C_03_EU30_Long2 %>% 
-  add_column(Region = "EU30")
-
-C_03_EU30_Long2<-C_03_EU30_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
-
-##### RoW #####
-
-C_04_RoW_Long2<-AC_04_Row2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
-                                         names_to='Type',
-                                         values_to='Percentage')
-C_04_RoW_Long2<-C_04_RoW_Long2 %>% 
-  add_column(Region = "RoW")
-
-C_04_RoW_Long2<-C_04_RoW_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
-
-D12<-rbind(C_01_China_Long2,C_02_NAFTA_Long2,C_03_EU30_Long2,C_04_RoW_Long2)
-
-KD1<- KD %>% inner_join(D12, 
-           by=c('Region','Major_Market_Sector'))
-
-KD2<-KD1 %>% mutate(WasteGen_2=WasteGen*Percentage) %>% 
-  filter(Type!="Sum")
-
-KD3<-KD2 %>% select(-Percentage) %>% 
-  pivot_wider(names_from=Type, 
-              values_from=c(WasteGen_2)) 
-
-#write.csv(KD3, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\KD3.csv")
-
 
 ```
 
@@ -1352,14 +1308,15 @@ MA5.1<-MA5 %>% inner_join(KD4,
 
 ```{r}
 
-ggplot(data = MA5, aes(x = Year_2, y = Percentage)) +
-  geom_point()
+#ggplot(data = MA5, aes(x = Year_2, y = Percentage)) +
+ # geom_point()
 
 ```
 
 
 ```{r}
 
+#Prim_W_EOL= Sec_Waste
 MA5.1<- MA5.1 %>% mutate(Prim_W_EOL=Prim_Waste*(Percentage/100))
 
 ```
@@ -1374,10 +1331,16 @@ This part ends the first part of the recycling section. Applying Sam's Recycling
 ##
 
 ```{r}
-
 MA6<-MA5.1 %>% filter(EOL=="Recycling") %>%
   arrange(Year_2) %>% arrange(Region)
 
+options(scipen = 999)
+```
+
+
+
+
+```{r}
 Target_MB_1<-MA6
 
 # Setup calculations
@@ -1418,38 +1381,31 @@ for (region in list('China', 'NAFTA', 'EU30', 'RoW')) {
 
 ```
 
-## ADDING RECYCLING INTO MAIN DATA FRAME WITH ALL EOL FATES 
+## Recaculating Total Waste and Actial EOL 
 
 ```{r}
 
-# EOL only Recycling 
-TB<-Target_MB_2 %>% select(Year_2, Region, EOL, Sec_Waste)
-colnames(TB)[colnames(TB) == 'Sec_Waste'] <- 'Prim_W_EOL'
+TBA1<-Target_MB_2 %>% 
+  select(Year_2, Region, T_Waste)
 
-# All EOL  excluding recycling 
-TB1<-MA5.1 %>% filter(EOL!="Recycling") %>% 
-  select(Year_2, Region,EOL,Prim_W_EOL)
-
-# Join Together
-TB2<-rbind(TB1,TB)
-
-```
+TBA2<-KD4 %>% inner_join(TBA1,
+                   by=c("Region"="Region","Year_2"="Year_2")) %>% 
+  select(-EOL) %>%
+  arrange(desc(Year_2)) %>% 
+  group_by(Region) %>% 
+  mutate(Total_Waste=Prim_Waste+T_Waste)
 
 
-# CONSUMPTION BY POLYMER TYPE 
+TBA3<-TBA2 %>% select(Year_2, Region, Total_Waste)
 
+TBA4<-TBA3 %>% inner_join(MA5.1,
+                   by=c("Region"="Region","Year_2"="Year_2")) %>% 
+  select(-Prim_Waste, -Prim_W_EOL)
 
-```{r}
+TBA5<- TBA4 %>% mutate(Real_EOL=Total_Waste*(Percentage/100))
 
-# Consumption by Polymertype 
-
-TB3<-KA3 %>% inner_join(D12, 
-        by=c('Region'="Region","Major_Market_Sector"="Major_Market_Sector")) %>% 
-  filter(Type!="Sum")
-
-TB3<-TB3 %>% mutate(PC_Polymer=PC_Sector*Percentage)
-
-TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
+TBA6<-TBA5 %>%  select(-Total_Waste, -Percentage)
+  
 
 ```
 
@@ -1464,37 +1420,110 @@ TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
   #filter(Type!="Sum")
 ```
 
+ 
+# WASTE BY SECTOR AND POLYMER TYPE 
+ 
+```{r}
+#D1<-D1 %>% filter(Type!="Sum")
+
+#############################################################
+#############################################################
+
+##### CHINA #####
+
+C_01_China_Long2<-AC_01_China2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
+                                             names_to='Type',
+                                             values_to='Percentage')
+C_01_China_Long2<-C_01_China_Long2 %>% 
+  add_column(Region = "China")
+
+C_01_China_Long2<-C_01_China_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
+
+
+##### NAFTA #####
+C_02_NAFTA_Long2<-AC_02_NAFTA2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
+                                             names_to='Type',
+                                             values_to='Percentage')
+C_02_NAFTA_Long2<-C_02_NAFTA_Long2 %>% 
+  add_column(Region = "NAFTA")
+
+C_02_NAFTA_Long2<-C_02_NAFTA_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
+
+
+##### EU30 #####
+
+C_03_EU30_Long2<-AC_03_Europe2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
+                                             names_to='Type',
+                                             values_to='Percentage')
+C_03_EU30_Long2<-C_03_EU30_Long2 %>% 
+  add_column(Region = "EU30")
+
+C_03_EU30_Long2<-C_03_EU30_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
+
+##### RoW #####
+
+C_04_RoW_Long2<-AC_04_Row2 %>% pivot_longer(cols=c('LLDPE_LDPE',"HDPE","PP","PS","PVC","PET","PUR","Other.Thermoplastics","Other.Thermosets","Sum"),
+                                         names_to='Type',
+                                         values_to='Percentage')
+C_04_RoW_Long2<-C_04_RoW_Long2 %>% 
+  add_column(Region = "RoW")
+
+C_04_RoW_Long2<-C_04_RoW_Long2[c("Region","Major_Market_Sector","Type","Percentage")]
+
+D12<-rbind(C_01_China_Long2,C_02_NAFTA_Long2,C_03_EU30_Long2,C_04_RoW_Long2)
+
+# CONSUMPTION BY POLYMER TYPE 
+
+# Consumption by Polymertype - start cut
+
+TB3<-KA3 %>% inner_join(D12, 
+        by=c('Region'="Region","Major_Market_Sector"="Major_Market_Sector")) %>% 
+  filter(Type!="Sum")
+
+TB3<-TB3 %>% mutate(PC_Polymer=PC_Sector*Percentage)
+
+TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
+
+# Consumption by Polymertype - end cut
+
+KD1<- KD %>% inner_join(D12, 
+           by=c('Region','Major_Market_Sector'))
+
+KD2<-KD1 %>% mutate(WasteGen_2=WasteGen*Percentage) %>% 
+  filter(Type!="Sum")
+
+KD2.1<-KD2 %>% select(-WasteGen, -Percentage)
+
+KD3<-KD2 %>% select(-Percentage) %>% 
+  pivot_wider(names_from=Type, 
+              values_from=c(WasteGen_2)) 
+
+#write.csv(KD3, "/Users/dr.nivedita/Library/CloudStorage/OneDrive-Personal/04_Post-Doc/01.R_Code/06_Output\\KD3.csv")
+
+
+```
+
 
 # Final Asks 
 
 ```{r}
-# Sam's ask 1 = Waste Gen - year, region, market_sector, polymer type
-# Waste_Gen_2 is waste for each polymer type in Million Metric Tons
-KD3 
-str(KD3)
 
-#ggplot(data = KD3, aes(x = Year_2, y = WasteGen)) +
-  #geom_point()
-
+# CONSUMPTION 
 # Sam's ask 2 = Consumption - year, region, market_sector
-# PC_sector is consumption in Million Metric Tons
-KA3
+# PC_sector is consumption in Million Metric Tons #J_02 is the precursor to this. 
+# PC Polymer is Consumption by Polymer 
+TB4
 
-#ggplot(data = KA3, aes(x = Year, y = PC_Sector)) +
-  #geom_point()
- 
+# END OF LIFE 1 - Here we don't know how much is recycled or incinerated etc. 
+# Sam's ask 1 = Waste Gen - year, region, market_sector, polymer type
+# Waste_Gen_2 is waste for each polymer type in Million Metric Tons # KD2.1
+KD3 
+
+# END OF LIFE 2 - Here we do not know how much is from what sector - OR Polymer, but we know how much is recycled etc. 
 # Sam's ask 3 = Waste Gen - year, region, EOL type
-# EOL_Waste_5 is waste for each EOL fate in Million Metric Tons
-TB2
+# Real_EOL_ is waste for each EOL fate in Million Metric Tons
+TBA6
 
-#ggplot(data = TB2, aes(x = Year_2, y = Prim_W_EOL)) +
-  #geom_point()
-
-#ggplot(data = TB2, aes(x = Year_2, y = Prim_Waste)) +
-  #geom_point()
-
-# Sam's ask 4 = Consumption - year, region, market_Sector, polymer type
-TB4 
 
 ```
 
