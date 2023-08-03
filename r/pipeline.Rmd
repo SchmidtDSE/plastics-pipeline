@@ -1516,6 +1516,7 @@ KD3<-KD2 %>% select(-Percentage) %>%
 # CONSUMPTION 
 # Sam's ask 2 = Consumption - year, region, market_sector
 # PC_sector is consumption in Million Metric Tons #J_02 is the precursor to this. 
+# PC Polymer is Consumption by Polymer 
 TB4
 
 # END OF LIFE 1 - Here we don't know how much is recycled or incinerated etc. 
@@ -1530,6 +1531,7 @@ TBA6
 
 
 ```
+
 
 
 
