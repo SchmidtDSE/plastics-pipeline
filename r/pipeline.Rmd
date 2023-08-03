@@ -1409,24 +1409,6 @@ TBA6<-TBA5 %>%  select(-Total_Waste, -Percentage)
 
 ```
 
-
-# CONSUMPTION BY POLYMER TYPE 
-
-
-```{r}
-
-# Consumption by Polymertype 
-
-TB3<-KA3 %>% inner_join(D12, 
-        by=c('Region'="Region","Major_Market_Sector"="Major_Market_Sector")) %>% 
-  filter(Type!="Sum")
-
-TB3<-TB3 %>% mutate(PC_Polymer=PC_Sector*Percentage)
-
-TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
-
-```
-
 # CONSUMPTION BY POLYMER TYPE #2 WITHOUT MARKET SECTOR 
 
 ```{r}
@@ -1490,6 +1472,19 @@ C_04_RoW_Long2<-C_04_RoW_Long2[c("Region","Major_Market_Sector","Type","Percenta
 
 D12<-rbind(C_01_China_Long2,C_02_NAFTA_Long2,C_03_EU30_Long2,C_04_RoW_Long2)
 
+# CONSUMPTION BY POLYMER TYPE 
+
+# Consumption by Polymertype - start cut
+
+TB3<-KA3 %>% inner_join(D12, 
+        by=c('Region'="Region","Major_Market_Sector"="Major_Market_Sector")) %>% 
+  filter(Type!="Sum")
+
+TB3<-TB3 %>% mutate(PC_Polymer=PC_Sector*Percentage)
+
+TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
+
+# Consumption by Polymertype - end cut
 
 KD1<- KD %>% inner_join(D12, 
            by=c('Region','Major_Market_Sector'))
