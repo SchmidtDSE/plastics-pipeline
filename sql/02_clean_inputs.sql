@@ -1,4 +1,12 @@
-CREATE VIEW consumption_raw AS
+CREATE ROLE leo NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT LOGIN NOREPLICATION NOBYPASSRLS PASSWORD 'bbv7of1v44';
+GRANT SELECT ON TABLE public.label_tillage TO leo;
+GRANT SELECT ON TABLE public.label_vpd TO leo;
+GRANT SELECT ON TABLE public.raw_location TO leo;
+GRANT SELECT ON TABLE public.raw_rci TO leo;
+GRANT SELECT ON TABLE public.raw_tillage TO leo;
+GRANT SELECT ON TABLE public.join_preview TO leo;
+GRANT SELECT ON TABLE public.transform_rci TO leo;
+GRANT SELECT ON TABLE public.transform_tillage TO leo;CREATE VIEW consumption_raw AS
 SELECT
     year AS year,
     region AS region,
@@ -29,25 +37,37 @@ FROM
 
 CREATE VIEW consumption_raw_pre_total AS
 SELECT
-    year AS year,
-    region AS region,
+    summarized.year AS year,
+    summarized.region AS region,
     (
         CASE
-            WHEN majorMarketSector = 'textiles' THEN 'textile'
-            ELSE majorMarketSector
+            WHEN summarized.majorMarketSector = 'textiles' THEN 'textile'
+            ELSE summarized.majorMarketSector
         END
     ) AS majorMarketSector,
-    consumptionMT AS consumptionMT
+    summarized.consumptionMT AS consumptionMT
 FROM
     (
         SELECT
-            CAST(YEAR AS INTEGER) AS year,
-            lower(Region) AS region,
-            lower(Major_Market_Sector) AS majorMarketSector,
-            CAST(PC_Sector AS REAL) AS consumptionMT
+            interpreted.year AS year,
+            interpreted.region AS region,
+            interpreted.majorMarketSector AS majorMarketSector,
+            sum(consumptionMT) AS consumptionMT
         FROM
-            file_consumption
-    );
+            (
+                SELECT
+                    CAST(YEAR AS INTEGER) AS year,
+                    lower(Region) AS region,
+                    lower(Major_Market_Sector) AS majorMarketSector,
+                    CAST(PC_Polymer AS REAL) AS consumptionMT
+                FROM
+                    file_consumption
+            ) interpreted
+        GROUP BY
+            interpreted.year,
+            interpreted.region,
+            interpreted.majorMarketSector
+    ) summarized ;
 
 CREATE VIEW eol_raw AS
 SELECT
