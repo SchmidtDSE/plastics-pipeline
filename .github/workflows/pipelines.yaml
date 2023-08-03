@@ -22,10 +22,10 @@ jobs:
         run: cd r; bash transform.sh
       - name: Run R pipeline
         run: cd r; Rscript pipeline.R
-#      - name: Run SQL pipeline
-#        run: cd sql; bash make.sh
-#      - name: Run output checks
-#        run: python python/check_output.py output/overview.csv
+      - name: Run SQL pipeline
+        run: cd sql; bash make.sh
+      - name: Run output checks
+        run: python python/check_output.py output/overview.csv
       - uses: actions/upload-artifact@v3
         with:
           name: Pipeline Result
