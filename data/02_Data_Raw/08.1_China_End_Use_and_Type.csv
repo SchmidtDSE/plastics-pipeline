@@ -1,8 +1,9 @@
-﻿Major_Market_Sector,LLDPE_LDPE,HDPE,PP,PS,PVC,PET,PUR,Other Thermoplastics,Other Thermosets,Sum
-Transportation,0.135,0.104,0.388,0,0,0,0.09,0.17,0.114,1.0
-Packaging,0.167,0.127,0.45,0.025,0,0.212,0,0.004,0.014,1.0
-Building_Construction,0.088,0.067,0.042,0.007,0.624,0,0.071,0.019,0.083,1.0
-Electrical_Electronic,0.077,0.059,0.074,0.106,0.126,0,0.124,0.395,0.041,1.0
-Household_Leisure_Sports,0.052,0.04,0.1,0.032,0.076,0.049,0.396,0.066,0.189,1.0
-Agriculture,0.416,0.318,0,0,0.182,0,0,0,0.086,1.0
-Others,0.047,0.036,0.09,0.028,0.069,0.044,0.124,0.143,0.419,1.0
+﻿Major_Market_Sector,LLDPE_LDPE,HDPE,PP,PS,PVC,PET,PUR,Other Thermoplastics,Other Thermosets,PA,PMMA,Sum
+Transportation,0.135,0.104,0.388,0,0,0,0.09,0.17,0.114,0,0,1
+Packaging,0.167,0.127,0.45,0.025,0,0.212,0,0.004,0.014,0,0,1
+Textiles,0.000,0.000,0.000,0.000,0.000,0.880,0.000,0.000,0.000,0.090,0.030,1
+Building_Construction,0.088,0.067,0.042,0.007,0.624,0,0.071,0.019,0.083,0,0,1
+Electrical_Electronic,0.077,0.059,0.074,0.106,0.126,0,0.124,0.395,0.041,0,0,1
+Household_Leisure_Sports,0.052,0.04,0.1,0.032,0.076,0.049,0.396,0.066,0.189,0,0,1
+Agriculture,0.416,0.318,0,0,0.182,0,0,0,0.086,0,0,1
+Others,0.047,0.036,0.09,0.028,0.069,0.044,0.124,0.143,0.419,0,0,1
