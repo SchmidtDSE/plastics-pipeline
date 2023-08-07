@@ -1,10 +1,10 @@
 ---
 title: "Global Plastic Treaty Model 01_A1_14"
 author: "Nivedita Biyani"
-date: "2023-07-17"
+date: "2023-08-7th" August 7th 
 output: html_document
 
-Final with textiles 
+Final with textiles - as in polymer Data updated 
 ---
 
 # DESCRIPTION
@@ -1409,18 +1409,7 @@ TBA6<-TBA5 %>%  select(-Total_Waste, -Percentage)
 
 ```
 
-# CONSUMPTION BY POLYMER TYPE #2 WITHOUT MARKET SECTOR 
 
-```{r}
-#TB5 <-KA3 %>% select(-Major_Market_Sector) %>% 
-  #group_by(Year, Region) %>% summarize(PC_Total=sum(PC_Sector))
-
-#TB5.1<-TB5 %>% inner_join(D12, 
-        #by=c('Region'="Region")) %>% 
-  #filter(Type!="Sum")
-```
-
- 
 # WASTE BY SECTOR AND POLYMER TYPE 
  
 ```{r}
@@ -1472,19 +1461,6 @@ C_04_RoW_Long2<-C_04_RoW_Long2[c("Region","Major_Market_Sector","Type","Percenta
 
 D12<-rbind(C_01_China_Long2,C_02_NAFTA_Long2,C_03_EU30_Long2,C_04_RoW_Long2)
 
-# CONSUMPTION BY POLYMER TYPE 
-
-# Consumption by Polymertype - start cut
-
-TB3<-KA3 %>% inner_join(D12, 
-        by=c('Region'="Region","Major_Market_Sector"="Major_Market_Sector")) %>% 
-  filter(Type!="Sum")
-
-TB3<-TB3 %>% mutate(PC_Polymer=PC_Sector*Percentage)
-
-TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
-
-# Consumption by Polymertype - end cut
 
 KD1<- KD %>% inner_join(D12, 
            by=c('Region','Major_Market_Sector'))
@@ -1502,6 +1478,39 @@ KD3<-KD2 %>% select(-Percentage) %>%
 
 
 ```
+
+
+# CONSUMPTION BY POLYMER TYPE 
+
+
+```{r}
+
+# Consumption by Polymertype 
+
+TB3<-KA3 %>% inner_join(D12, 
+        by=c('Region'="Region","Major_Market_Sector"="Major_Market_Sector")) %>% 
+  filter(Type!="Sum")
+
+TB3<-TB3 %>% mutate(PC_Polymer=PC_Sector*Percentage)
+
+TB4<-TB3 %>% select(Year, Region, Major_Market_Sector, Type, PC_Polymer)
+levels(TB3$Major_Market_Sector)
+TB3$Major_Market_Sector<-as.factor(TB3$Major_Market_Sector)
+
+```
+
+# CONSUMPTION BY POLYMER TYPE #2 WITHOUT MARKET SECTOR 
+
+```{r}
+#TB5 <-KA3 %>% select(-Major_Market_Sector) %>% 
+  #group_by(Year, Region) %>% summarize(PC_Total=sum(PC_Sector))
+
+#TB5.1<-TB5 %>% inner_join(D12, 
+        #by=c('Region'="Region")) %>% 
+  #filter(Type!="Sum")
+```
+
+ 
 
 
 # Final Asks 
@@ -1526,15 +1535,4 @@ TBA6
 
 
 ```
-
-
-
-
-
-
-
-
-
-
-
 
