@@ -87,7 +87,7 @@ SELECT
             WHEN majorMarketSector = 'textile' THEN 1
             ELSE 0
         END
-    ) AS consumptionTextitleMT,
+    ) AS consumptiontextileMT,
     sum(
         CASE
             WHEN majorMarketSector = 'others' THEN consumptionMT
