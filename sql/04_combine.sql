@@ -12,7 +12,7 @@ SELECT
     with_trade.consumptionHouseholdLeisureSportsMT AS consumptionHouseholdLeisureSportsMT,
     with_trade.consumptionPackagingMT AS consumptionPackagingMT,
     with_trade.consumptionTransporationMT AS consumptionTransporationMT,
-    with_trade.consumptiontextileMT AS consumptiontextileMT,
+    with_trade.consumptionTextileMT AS consumptionTextileMT,
     with_trade.consumptionOtherMT AS consumptionOtherMT,
     (
         CASE
@@ -42,7 +42,7 @@ FROM
             no_trade.consumptionHouseholdLeisureSportsMT AS consumptionHouseholdLeisureSportsMT,
             no_trade.consumptionPackagingMT AS consumptionPackagingMT,
             no_trade.consumptionTransporationMT AS consumptionTransporationMT,
-            no_trade.consumptiontextileMT AS consumptiontextileMT,
+            no_trade.consumptionTextileMT AS consumptionTextileMT,
             no_trade.consumptionOtherMT AS consumptionOtherMT,
             no_trade.totalConsumption AS totalConsumption,
             no_trade.totalConsumption * net_imports_percent.percentNetImports AS netImportsMT
@@ -68,7 +68,7 @@ FROM
                     consumption_overview.consumptionHouseholdLeisureSportsMT AS consumptionHouseholdLeisureSportsMT,
                     consumption_overview.consumptionPackagingMT AS consumptionPackagingMT,
                     consumption_overview.consumptionTransporationMT AS consumptionTransporationMT,
-                    consumption_overview.consumptiontextileMT AS consumptiontextileMT,
+                    consumption_overview.consumptionTextileMT AS consumptionTextileMT,
                     consumption_overview.consumptionOtherMT AS consumptionOtherMT,
                     (
                         consumption_overview.consumptionAgricultureMT + 
@@ -77,7 +77,7 @@ FROM
                         consumption_overview.consumptionHouseholdLeisureSportsMT + 
                         consumption_overview.consumptionPackagingMT + 
                         consumption_overview.consumptionTransporationMT + 
-                        consumption_overview.consumptiontextileMT + 
+                        consumption_overview.consumptionTextileMT + 
                         consumption_overview.consumptionOtherMT
                     ) AS totalConsumption
                 FROM

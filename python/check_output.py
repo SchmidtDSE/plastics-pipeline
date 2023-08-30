@@ -11,7 +11,7 @@ ATTRS_EXPECTED = [
     'consumptionHouseholdLeisureSportsMT',
     'consumptionPackagingMT',
     'consumptionTransporationMT',
-    'consumptiontextileMT',
+    'consumptionTextileMT',
     'consumptionOtherMT',
     'eolRecyclingMT',
     'eolLandfillMT',
