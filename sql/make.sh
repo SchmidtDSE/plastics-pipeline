@@ -41,21 +41,21 @@ cat ../sql/03_views/overview_inputs.sql | sqlite3 combined.db
 cat ../sql/03_views/overview_net_imports.sql | sqlite3 combined.db
 cat ../sql/03_views/summary_percents.sql | sqlite3 combined.db
 cat ../sql/03_views/summary.sql | sqlite3 combined.db
-mv combined.db ../output_sql
+mv combined.db ../output
 
 echo "== Build frame (4/5) =="
-cd ../output_sql
+cd ../output
 cat ../sql/04_frame/export.sql | sqlite3 combined.db
 cat ../sql/04_frame/export_percents.sql | sqlite3 combined.db
 python3 ../sql/check_summary_percents.py ./summary_percents.csv || exit 1;
 
 echo "== Projections (5/5) =="
-python3 ../sql/05_project/project.py ../output_sql/summary.csv ../output_sql/extrapolate.csv ../sql/05_project/params.json
-python3 ../sql/05_project/project.py ../output_sql/summary_percents.csv ../output_sql/extrapolate_percents.csv ../sql/05_project/params.json
-python3 ../sql/check_summary_percents.py ../output_sql/extrapolate_percents.csv || exit 1;
+python3 ../sql/05_project/project.py ../output/summary.csv ../output/extrapolate.csv ../sql/05_project/params.json
+python3 ../sql/05_project/project.py ../output/summary_percents.csv ../output/extrapolate_percents.csv ../sql/05_project/params.json
+python3 ../sql/check_summary_percents.py ../output/extrapolate_percents.csv || exit 1;
 cat ../sql/05_project/add_files.sql | sqlite3 combined.db
 cat ../sql/05_project/extrapolate.sql | sqlite3 combined.db
 cat ../sql/05_project/extrapolate_percents.sql | sqlite3 combined.db
 cat ../sql/05_project/extrapolate_mt.sql | sqlite3 combined.db
 cat ../sql/05_project/export_final.sql | sqlite3 combined.db
-python3 ../sql/check_summary_percents.py ../output_sql/extrapolate_percents.csv || exit 1;
+python3 ../sql/check_summary_percents.py ../output/extrapolate_percents.csv || exit 1;

@@ -3,7 +3,7 @@ SELECT
     with_sector.year AS year,
     with_sector.region AS region,
     with_sector.majorMarketSector AS majorMarketSector,
-    with_sector.consumptionMTNoTrade + with_sector.importGoodsMT * raw_meta_sectors.percentage AS consumptionMT
+    with_sector.consumptionMTNoTrade + with_sector.importGoodsMT AS consumptionMT
 FROM
     (
         SELECT
@@ -30,10 +30,6 @@ FROM
         ON
             overview_end_use.region = with_metrics.region
     ) with_sector
-LEFT OUTER JOIN
-    raw_meta_sectors
-ON
-    raw_meta_sectors.majorMarketSector = with_sector.majorMarketSector
 UNION ALL
 SELECT
     with_metrics.year AS year,
