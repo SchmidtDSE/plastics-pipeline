@@ -1,4 +1,4 @@
-name: R Pipeline
+name: Pipeline
 on: [push]
 
 jobs:
