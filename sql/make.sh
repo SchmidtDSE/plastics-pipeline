@@ -24,7 +24,6 @@ cat ../sql/02_clean_inputs/raw_net_trade_nafta.sql | sqlite3 combined.db
 cat ../sql/02_clean_inputs/raw_net_trade_row.sql | sqlite3 combined.db
 cat ../sql/02_clean_inputs/raw_production_fiber.sql | sqlite3 combined.db
 cat ../sql/02_clean_inputs/raw_production_resin.sql | sqlite3 combined.db
-cat ../sql/02_clean_inputs/raw_meta_sectors.sql | sqlite3 combined.db
 
 echo "== Build views (3/5) =="
 cat ../sql/03_views/consumption.sql | sqlite3 combined.db

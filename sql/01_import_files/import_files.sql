@@ -20,4 +20,3 @@
 .import 19nettradenafta.csv file_19nettradenafta
 .import 20nettradeeu.csv file_20nettradeeu
 .import 21nettraderow.csv file_21nettraderow
-.import rawmetasectors.csv file_rawmetasectors
