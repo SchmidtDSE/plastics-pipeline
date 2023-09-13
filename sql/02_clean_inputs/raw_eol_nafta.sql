@@ -5,6 +5,6 @@ SELECT
     Incineration AS incineration,
     Landfill AS landfill,
     Mismanaged AS mismanaged,
-    Region AS region
+    'NAFTA' AS region
 FROM
     file_16eolnaftacopy

@@ -5,6 +5,6 @@ SELECT
     Incineration AS incineration,
     Landfill AS landfill,
     Mismanaged AS mismanaged,
-    Region AS region
+    'ROW' AS region
 FROM
     file_17eolrowcopy
