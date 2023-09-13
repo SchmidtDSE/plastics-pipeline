@@ -1,0 +1,23 @@
+.mode csv
+.import 01productionofresinnofiber.csv file_01productionofresinnofiber
+.import 02productionfiber.csv file_02productionfiber
+.import 03productionadditives.csv file_03productionadditives
+.import 04netimportresinnofibercopy.csv file_04netimportresinnofibercopy
+.import 05netimportfibercopy.csv file_05netimportfibercopy
+.import 06netimportplasticarticlescopy.csv file_06netimportplasticarticlescopy
+.import 07netimportplasticinfinishedgoodsnofibercopy.csv file_07netimportplasticinfinishedgoodsnofibercopy
+.import 08chinaenduseandtype.csv file_08chinaenduseandtype
+.import 09naftaenduseandtype.csv file_09naftaenduseandtype
+.import 10europeenduseandtype.csv file_10europeenduseandtype
+.import 11rowenduseandtype.csv file_11rowenduseandtype
+.import 12lifetimecopy.csv file_12lifetimecopy
+.import 1319502004copy.csv file_1319502004copy
+.import 14eolchinacopy.csv file_14eolchinacopy
+.import 15eoleucopy.csv file_15eoleucopy
+.import 16eolnaftacopy.csv file_16eolnaftacopy
+.import 17eolrowcopy.csv file_17eolrowcopy
+.import 18nettradechina.csv file_18nettradechina
+.import 19nettradenafta.csv file_19nettradenafta
+.import 20nettradeeu.csv file_20nettradeeu
+.import 21nettraderow.csv file_21nettraderow
+.import rawmetasectors.csv file_rawmetasectors
