@@ -5,6 +5,7 @@ import luigi
 
 import const
 import tasks_auxiliary
+import tasks_ml_prep
 import tasks_preprocess
 
 
@@ -40,6 +41,28 @@ class AuxiliaryTask(luigi.Task):
 
     def run(self):
         with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+
+
+class MlPrepTask(luigi.Task):
+    
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return [
+            tasks_ml_prep.CheckMlConsumptionViewTask(task_dir=self.task_dir),
+            tasks_ml_prep.CheckMlWasteViewTask(task_dir=self.task_dir)
+        ]
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '2_ml_prep.json')
+        return luigi.LocalTarget(out_path)
+
+    def run(self):
+        with self.input()[0].open('r') as f:
             job_info = json.load(f)
 
         with self.output().open('w') as f:

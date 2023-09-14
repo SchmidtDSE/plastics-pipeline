@@ -12,7 +12,7 @@ import tasks_preprocess
 import tasks_sql
 
 
-class CheckPrepTask(luigi.Task):
+class CheckMlPrepTask(luigi.Task):
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
@@ -70,12 +70,12 @@ class CheckPrepTask(luigi.Task):
 
 
 
-class BuildViewsTask(tasks_sql.SqlExecuteTask):
+class BuildMlViewsTask(tasks_sql.SqlExecuteTask):
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return 
+        return CheckMlPrepTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '201_build_views.json')
@@ -83,7 +83,38 @@ class BuildViewsTask(tasks_sql.SqlExecuteTask):
 
     def get_scripts(self):
         return [
-            '07_aux/yearly_instances.sql',
-            '07_aux/displaced_instances.sql'
+            '07_instance/instance_consumption_normal.sql',
+            '07_instance/instance_consumption_displaced.sql',
+            '07_instance/instance_waste_normal.sql',
+            '07_instance/instance_waste_displaced.sql',
         ]
 
+
+class CheckMlConsumptionViewTask(tasks_sql.SqlCheckTask):
+    
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return BuildMlViewsTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '202_check_consumption.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'instance_consumption_displaced'
+
+
+class CheckMlWasteViewTask(tasks_sql.SqlCheckTask):
+    
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return BuildMlViewsTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '203_check_waste.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'instance_waste_displaced'
