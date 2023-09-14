@@ -32,6 +32,19 @@ REGIONS_EXPECTED = [
 YEARS_REQUIRED = set(range(2010, 2050))
 
 
+class CheckResult:
+
+    def __init__(self, successful, message):
+        self._successful = successful
+        self._message = message
+
+    def get_successful(self):
+        return self._successful
+
+    def get_message(self):
+        return self._message
+
+
 def has_attrs(rows):
     row = rows[0]
     missing_attrs = filter(lambda x: x not in row, ATTRS_EXPECTED)
@@ -56,6 +69,22 @@ def has_years(rows):
     return True
 
 
+def check(loc):
+    with open(loc) as f:
+        rows = list(csv.DictReader(f))
+
+    if not has_attrs(rows):
+        return CheckResult(False, 'Columns missing.')
+
+    if not has_regions(rows):
+        return CheckResult(False, 'Unexpected regions.')
+
+    if not has_years(rows):
+        return CheckResult(False, 'Unexpected years.')
+
+    return CheckResult(True, 'Passed checks.')
+
+
 def main():
     if len(sys.argv) != NUM_ARGS + 1:
         print(USAGE_STR)
@@ -63,23 +92,10 @@ def main():
 
     loc = sys.argv[1]
 
-    with open(loc) as f:
-        rows = list(csv.DictReader(f))
-
-    if not has_attrs(rows):
-        print('Columns missing.')
-        sys.exit(1)
-
-    if not has_regions(rows):
-        print('Unexpected regions.')
-        sys.exit(1)
-
-    if not has_years(rows):
-        print('Unexpected years.')
-        sys.exit(1)
-
-    print('Passed checks.')
-    sys.exit(0)
+    result = check(loc)
+    
+    if not result.get_successful():
+        raise RuntimeError('Failed with: ' + result.get_message())
 
 
 if __name__ == '__main__':

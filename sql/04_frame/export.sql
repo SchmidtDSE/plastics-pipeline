@@ -1,4 +1,28 @@
-.headers on
-.mode csv
-.output summary.csv
-SELECT * FROM summary;
+SELECT
+    year,
+    region,
+    inputProduceFiberMT,
+    inputProduceResinMT,
+    inputImportResinMT,
+    inputImportArticlesMT,
+    inputImportGoodsMT,
+    inputImportFiberMT,
+    inputAdditivesMT,
+    netImportArticlesMT,
+    netImportFibersMT,
+    netImportGoodsMT,
+    netImportResinMT,
+    consumptionAgricultureMT,
+    consumptionConstructionMT,
+    consumptionElectronicMT,
+    consumptionHouseholdLeisureSportsMT,
+    consumptionPackagingMT,
+    consumptionTransporationMT,
+    consumptionTextitleMT,
+    consumptionOtherMT,
+    eolRecyclingPercent,
+    eolIncinerationPercent,
+    eolLandfillPercent,
+    eolMismanagedPercent
+FROM
+    summary

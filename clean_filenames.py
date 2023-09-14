@@ -14,13 +14,7 @@ def clean_name(target_path):
     return '/'.join(pieces)
 
 
-def main():
-    if len(sys.argv) != NUM_ARGS + 1:
-        print(USAGE_STR)
-        sys.exit(1)
-
-    directory_path = sys.argv[1]
-    
+def execute(directory_path):
     all_contents = os.listdir(directory_path)
     all_contents_expand = map(
         lambda x: os.path.join(directory_path, x),
@@ -34,6 +28,16 @@ def main():
 
     for (prior, new) in file_paths_rewrite:
         os.rename(prior, new)
+
+
+def main():
+    if len(sys.argv) != NUM_ARGS + 1:
+        print(USAGE_STR)
+        sys.exit(1)
+
+    directory_path = sys.argv[1]
+    
+    execute(directory_path)
 
 
 if __name__ == '__main__':

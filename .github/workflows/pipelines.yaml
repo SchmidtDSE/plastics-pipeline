@@ -16,12 +16,12 @@ jobs:
           python-version: '3.11' 
       - name: Install other dependencies
         run: pip install -r requirements.txt
-      - name: Build database
-        run: cd sql; bash make.sh
-      - uses: actions/upload-artifact@v3
-        with:
-          name: SQL Pipeline Result
-          path: output
+#      - name: Build database
+#        run: cd sql; bash make.sh
+#      - uses: actions/upload-artifact@v3
+#        with:
+#          name: SQL Pipeline Result
+#          path: output
 #  deploy:
 #    runs-on: ubuntu-latest
 #    environment: deploy

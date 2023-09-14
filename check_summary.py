@@ -5,12 +5,8 @@ USAGE_STR = 'python check_summary_percents.py [file]'
 NUM_ARGS = 1
 
 
-def main():
-    if len(sys.argv) != NUM_ARGS + 1:
-        print(USAGE_STR)
-        sys.exit(1)
-
-    with open(sys.argv[1]) as f:
+def check(loc):
+    with open(loc) as f:
         results = list(csv.DictReader(f))
 
     row = results[0]
@@ -23,20 +19,28 @@ def main():
     assert 'inputImportGoodsMT' in row
     assert 'inputImportFiberMT' in row
     assert 'inputAdditivesMT' in row
-    assert 'consumptionAgriculturePercent' in row
-    assert 'consumptionConstructionPercent' in row
-    assert 'consumptionElectronicPercent' in row
-    assert 'consumptionHouseholdLeisureSportsPercent' in row
-    assert 'consumptionPackagingPercent' in row
-    assert 'consumptionTransporationPercent' in row
-    assert 'consumptionTextitlePercent' in row
-    assert 'consumptionOtherPercent' in row
+    assert 'consumptionAgricultureMT' in row
+    assert 'consumptionConstructionMT' in row
+    assert 'consumptionElectronicMT' in row
+    assert 'consumptionHouseholdLeisureSportsMT' in row
+    assert 'consumptionPackagingMT' in row
+    assert 'consumptionTransporationMT' in row
+    assert 'consumptionTextitleMT' in row
+    assert 'consumptionOtherMT' in row
     assert 'eolRecyclingPercent' in row
     assert 'eolIncinerationPercent' in row
     assert 'eolLandfillPercent' in row
     assert 'eolMismanagedPercent' in row
 
     assert len(results) > 50
+
+
+def main():
+    if len(sys.argv) != NUM_ARGS + 1:
+        print(USAGE_STR)
+        sys.exit(1)
+
+    check(sys.argv[1])
 
 
 if __name__ == '__main__':
