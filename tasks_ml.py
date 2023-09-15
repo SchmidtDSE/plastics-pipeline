@@ -18,6 +18,17 @@ import const
 import tasks_ml_prep
 
 
+class DecoratedModel:
+
+    def __init__(self, inner_model, cols):
+        self._inner_model = inner_model
+        self._cols = cols
+
+    def predict(self, targets):
+        targets_linear = [[target[col] for col in self._cols] for target in targets]
+        return self._inner_model.predict(targets_linear)
+
+
 class SweepTask(luigi.Task):
 
     def run(self):
@@ -30,8 +41,19 @@ class SweepTask(luigi.Task):
 
         training_results = self.sweep(instances)
         training_results_standard = self.standardize_results(training_results)
+
+        force_type = job_info.get('force_type', None)
+
+        if force_type:
+            training_results_standard_allowed = filter(
+                lambda x: x['type'] == force_type,
+                training_results_standard
+            )
+        else:
+            training_results_standard_allowed = training_results_standard
+
         selected_option = min(
-            training_results_standard,
+            training_results_standard_allowed,
             key=lambda x: x['validInSampleResponse']
         )
 
@@ -42,7 +64,7 @@ class SweepTask(luigi.Task):
         )
 
         sweep_results_loc = os.path.join(
-            job_info['directories']['workspace'],
+            job_info['directories']['output'],
             self.get_report_filename()
         )
         with open(sweep_results_loc, 'w') as f:
@@ -51,11 +73,15 @@ class SweepTask(luigi.Task):
             writer.writeheader()
             writer.writerows(training_results_standard)
 
-        sweep_results_loc = os.path.join(
-            job_info['directories']['output'],
+        model_loc = os.path.join(
+            job_info['directories']['workspace'],
             self.get_model_filename()
         )
-        with open(sweep_results_loc, 'wb') as f:
+        with open(model_loc, 'wb') as f:
+            final_model['model'] = DecoratedModel(
+                final_model['model'],
+                self.get_input_cols()
+            )
             pickle.dump(final_model, f)
 
         with self.output().open('w') as f:
@@ -81,7 +107,14 @@ class SweepTask(luigi.Task):
     def assign_sets(self, instances):
         for instance in instances:
             out_sample = self.is_out_sample_candidate(instance)
-            instance['setAssignOutSample'] = 'valid' if out_sample else 'train'
+            ignore = self.is_out_sample_ignore(instance)
+
+            if out_sample:
+                out_sample_label = 'ignore' if ignore else 'valid'
+            else:
+                out_sample_label = 'train'
+
+            instance['setAssignOutSample'] = out_sample_label
             instance['setAssignInSample'] = instance['setAssign'] = random.choice(
                 ['test', 'valid', 'train', 'train', 'train', 'train']
             )
@@ -404,7 +437,10 @@ class SweepTask(luigi.Task):
         ))
 
     def is_out_sample_candidate(self, target):
-        return target['beforeYear'] < 2019 and target['afterYear'] < 2019
+        return target['beforeYear'] >= 2019 or target['afterYear'] >= 2019
+
+    def is_out_sample_ignore(self, target):
+        return target['beforeYear'] == 2020 or target['afterYear'] == 2020
 
     def evaluate_target_single(self, predicted, actuals):
         raise NotImplementedError('Use implementor.')
@@ -431,6 +467,53 @@ class SweepTask(luigi.Task):
         raise NotImplementedError('Use implementor.')
 
     def get_svm_enabled(self):
+        raise NotImplementedError('Use implementor.')
+
+
+class CheckSweepTask(luigi.Task):
+
+    def run(self):
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        force_type = job_info.get('force_type', None)
+
+        sweep_results_loc = os.path.join(
+            job_info['directories']['output'],
+            self.get_report_filename()
+        )
+        with open(sweep_results_loc) as f:
+            reader = csv.DictReader(f)
+
+            if force_type:
+                allowed = filter(
+                    lambda x: x['type'] == force_type,
+                    reader
+                )
+            else:
+                allowed = reader
+            
+            parsed_rows = map(lambda row: self.parse_row(row), allowed)
+            best_model = min(parsed_rows, key=lambda x: x['validInSampleResponse'])
+
+        self.check_model(best_model)
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+
+    def parse_row(self, row):
+        return {
+            'validInSampleTarget': float(row['validInSampleTarget']),
+            'validOutSampleTarget': float(row['validOutSampleTarget']),
+            'validInSampleResponse': float(row['validInSampleResponse']),
+            'validOutSampleResponse': float(row['validOutSampleResponse']),
+            'type': row['type']
+        }
+
+    def get_report_filename(self):
+        raise NotImplementedError('Use implementor.')
+
+    def check_model(self, target):
         raise NotImplementedError('Use implementor.')
 
 
@@ -608,7 +691,6 @@ class SweepWasteTask(SweepTask):
             'gdpChange',
             'afterGdp',
             'beforePercent',
-            'percentChange',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -626,10 +708,158 @@ class SweepWasteTask(SweepTask):
         return ['afterPercent']
 
     def get_report_filename(self):
-        return 'consumption_waste.csv'
+        return 'waste_sweep.csv'
 
     def get_model_filename(self):
         return 'waste.pickle'
 
     def get_svm_enabled(self):
         return False
+
+
+class SweepTradeTask(SweepTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '302_sweep_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def evaluate_target_single(self, predicted, actuals):
+        actual_target = actuals[1]
+        predicted_target = (1 + predicted) * actuals[0]
+        return abs(actual_target - predicted_target)
+
+    def get_sql(self):
+        return '''
+            SELECT
+                beforeYear,
+                afterYear,
+                years,
+                popChange,
+                gdpChange,
+                flagChina,
+                flagEU30,
+                flagNafta,
+                flagRow,
+                flagRecycling,
+                flagIncineration,
+                flagLandfill,
+                flagMismanaged,
+                netMTChange,
+                beforeNetMT,
+                afterNetMT
+            FROM
+                instance_trade_displaced
+        '''
+
+    def get_cols(self):
+        return [
+            'beforeYear',
+            'afterYear',
+            'years',
+            'popChange',
+            'gdpChange',
+            'flagChina',
+            'flagEU30',
+            'flagNafta',
+            'flagRow',
+            'flagRecycling',
+            'flagIncineration',
+            'flagLandfill',
+            'flagMismanaged',
+            'netMTChange',
+            'beforeNetMT',
+            'afterNetMT'
+        ]
+    
+    def get_input_cols(self):
+        return [
+            'years',
+            'popChange',
+            'gdpChange',
+            'flagChina',
+            'flagEU30',
+            'flagNafta',
+            'flagRow',
+            'flagRecycling',
+            'flagIncineration',
+            'flagLandfill',
+            'flagMismanaged',
+        ]
+
+    def get_response_col(self):
+        return 'netMTChange'
+
+    def get_output_cols(self):
+        return [
+            'beforeNetMT',
+            'afterNetMT'
+        ]
+
+    def get_report_filename(self):
+        return 'trade_sweep.csv'
+
+    def get_model_filename(self):
+        return 'trade.pickle'
+
+    def get_svm_enabled(self):
+        return True
+
+
+class CheckSweepConsumptionTask(CheckSweepTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return SweepConsumptionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '303_check_consumption.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_report_filename(self):
+        return 'consumption_sweep.csv'
+
+    def check_model(self, target):
+        assert target['validOutSampleTarget'] < 2
+
+
+
+class CheckSweepWasteTask(CheckSweepTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return SweepWasteTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '304_check_waste.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_report_filename(self):
+        return 'waste_sweep.csv'
+
+    def check_model(self, target):
+        assert target['validOutSampleTarget'] < 0.02
+
+
+class CheckSweepTradeTask(CheckSweepTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return SweepTradeTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '305_check_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_report_filename(self):
+        return 'trade_sweep.csv'
+
+    def check_model(self, target):
+        assert target['validOutSampleTarget'] < 3

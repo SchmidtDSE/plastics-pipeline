@@ -1,0 +1,8 @@
+{
+    "directories": {
+        "data": "data",
+        "output": "output",
+        "workspace": "data_workspace"
+    },
+    "database": "output/combined.db"
+}
