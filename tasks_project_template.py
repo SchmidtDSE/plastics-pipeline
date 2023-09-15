@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import pickle
@@ -52,7 +53,10 @@ class ProjectRawTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        for year in range(2021, 2051):
+        years_before = reversed(range(1990, 2005))
+        years_after = range(2021, 2051)
+        years = itertools.chain(years_before, years_after)
+        for year in years:
             for region in ['china', 'eu30', 'nafta', 'row']:
                 self.project(
                     connection,
@@ -139,6 +143,9 @@ class ProjectRawTask(luigi.Task):
         cursor.execute(sql)
         results_flat = cursor.fetchall()
         cursor.close()
+
+        if (len(results_flat) == 0):
+            raise RuntimeError('No results.')
 
         results_keyed = [dict(zip(cols, result)) for result in results_flat]
         return results_keyed
@@ -270,3 +277,223 @@ class ProjectRawTask(luigi.Task):
 
     def transform_trade_prediction(self, instance, prediction):
         raise NotImplementedError('Use implementor.')
+
+
+class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
+
+    def transform_sql(self, sql_contents):
+        return sql_contents.format(table_name=self.get_table_name())
+
+    def get_scripts(self):
+        return [
+            '08_project/normalize_eol.sql',
+            '08_project/normalize_trade.sql'
+        ]
+
+    def get_table_name(self):
+        raise NotImplementedError('Use implementor.')
+
+
+class NormalizeCheckTask(luigi.Task):
+
+    def get_table_name(self):
+        raise NotImplementedError('Must use implementor.')
+
+    def run(self):
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        database_loc = job_info['database']
+        connection = sqlite3.connect(database_loc)
+        cursor = connection.cursor()
+
+        table = self.get_table_name()
+
+        cursor.execute('SELECT count(1) FROM {table}'.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] > 0
+
+        cursor.execute('''
+            SELECT
+                count(1)
+            FROM
+                (
+                    SELECT
+                        year,
+                        sum(netImportArticlesMT) AS totalArticlesMT,
+                        sum(netImportFibersMT) AS totalFibersMT,
+                        sum(netImportGoodsMT) AS totalGoodsMT,
+                        sum(netImportResinMT) AS totalResinMT
+                    FROM
+                        {table}
+                    GROUP BY
+                        year
+                ) global_vals
+            WHERE
+                (
+                    abs(global_vals.totalArticlesMT) > 0.0001
+                    OR abs(global_vals.totalFibersMT) > 0.0001
+                    OR abs(global_vals.totalGoodsMT) > 0.0001
+                    OR abs(global_vals.totalResinMT) > 0.0001
+                )
+                AND global_vals.year > 2020
+        '''.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        cursor.execute('''
+            SELECT
+                count(1)
+            FROM
+                (
+                    SELECT
+                        year,
+                        (
+                            eolRecyclingPercent +
+                            eolIncinerationPercent +
+                            eolLandfillPercent +
+                            eolMismanagedPercent
+                        ) AS totalEolShare
+                    FROM
+                        {table}
+                ) global_vals
+            WHERE
+                abs(totalEolShare - 1) > 0.001
+                AND global_vals.year > 2020
+        '''.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+
+
+class ApplyLifecycleTask(luigi.Task):
+
+    def get_table_name(self):
+        raise NotImplementedError('Must use implementor.')
+
+    def run(self):
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        database_loc = job_info['database']
+        connection = sqlite3.connect(database_loc)
+
+        table = self.get_table_name()
+
+        years = list(range(1990, 2051))
+        regions = ['china', 'eu30', 'nafta', 'row']
+
+        timeseries = dict(map(
+            lambda region: (
+                region,
+                dict(map(lambda year: (year, 0), years))
+            ),
+            regions
+        ))
+
+        for year in years:
+            for region in regions:
+                self.add_to_timeseries(connection, timeseries, region, year)
+
+        self.update_waste_timeseries(connection, timeseries)
+
+        connection.close()
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+
+    def add_to_timeseries(self, connection, timeseries, region, year):
+        sql = '''
+            SELECT
+                consumptionAgricultureMT,
+                consumptionConstructionMT,
+                consumptionElectronicMT,
+                consumptionHouseholdLeisureSportsMT,
+                consumptionPackagingMT,
+                consumptionTransporationMT,
+                consumptionTextileMT,
+                consumptionOtherMT
+            FROM
+                {table_name}
+            WHERE
+                year = {year}
+                AND region = '{region}'
+        '''.format(year=year, region=region, table_name=self.get_table_name())
+
+        sectors = [
+            'consumptionAgricultureMT',
+            'consumptionConstructionMT',
+            'consumptionElectronicMT',
+            'consumptionHouseholdLeisureSportsMT',
+            'consumptionPackagingMT',
+            'consumptionTransporationMT',
+            'consumptionTextileMT',
+            'consumptionOtherMT'
+        ]
+
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        
+        results = cursor.fetchall()
+        assert len(results) == 1
+
+        cursor.close()
+
+        result_flat = results[0]
+        result = dict(zip(sectors, result_flat))
+
+        for sector in sectors:
+            future_waste = result[sector]
+            distribution = const.LIFECYCLE_DISTRIBUTIONS[sector]
+            time_distribution = statistics.NormalDist(
+                mu=distribution['mean'],
+                sigma=distribution['std']
+            )
+
+            total_added = 0
+
+            immediate = time_distribution.cdf(year - 0.5) * future_waste
+            timeseries[region][year] += immediate
+            total_added += immediate
+
+            for future_year in range(year, 2051):
+                percent_prior = time_distribution.cdf(future_year - 0.5)
+                percent_till_year = time_distribution.cdf(future_year + 0.5)
+                percent = percent_till_year - percent_prior
+                amount = future_waste * percent
+                timeseries[region][future_year] += amount
+                total_added += amount
+
+            if year < 2030:
+                assert abs(total_added - future_waste) < 1
+
+    def update_waste_timeseries(self, connection, timeseries):
+        cursor = connection.cursor()
+
+        for region_name, region_timeseries in timeseries.items():
+            for year, year_value in region_timeseries.items():
+                sql = '''
+                    UPDATE
+                        {table_name}
+                    SET
+                        newWasteMT = {value}
+                    WHERE
+                        year = {year}
+                        AND region = '{region}'
+                '''.format(
+                    year=year,
+                    region=region_name,
+                    table_name=self.get_table_name(),
+                    value=year_value
+                )
+                cursor.execute(sql)
+
+        cursor.close()
+        connection.commit()

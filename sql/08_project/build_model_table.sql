@@ -19,7 +19,8 @@ SELECT
     summary.netImportArticlesMT AS netImportArticlesMT,
     summary.netImportFibersMT AS netImportFibersMT,
     summary.netImportGoodsMT AS netImportGoodsMT,
-    summary.netImportResinMT AS netImportResinMT
+    summary.netImportResinMT AS netImportResinMT,
+    NULL AS newWasteMT
 FROM
     auxiliary
 LEFT OUTER JOIN

@@ -120,6 +120,14 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
     def hot_encode(self, candidate, hot_value):
         return 1 if candidate == hot_value else 0
 
+    def get_year_selector(self, year):
+        if year > 2020:
+            selector = '{year} - year <= 5 AND {year} - year > 0'
+        else:
+            selector = 'year - {year} <= 5 AND year - {year} > 0'
+
+        return selector.format(year=year)
+
     def get_consumption_inputs_sql(self, year, region, sector):
         template_vals = {
             'table_name': self.get_table_name(),
@@ -138,6 +146,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagPackaging': self.hot_encode(sector, 'consumptionPackagingMT'),
             'flagTextile': self.hot_encode(sector, 'consumptionTextileMT'),
             'flagTransporation': self.hot_encode(sector, 'consumptionTransporationMT'),
+            'yearSelector': self.get_year_selector(year)
         }
 
         return '''
@@ -180,8 +189,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     FROM
                         {table_name}
                     WHERE
-                        {year} - year <= 5
-                        AND {year} - year > 0
+                        {yearSelector}
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
@@ -199,7 +207,8 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagRecycling': self.hot_encode(type_name, 'eolRecyclingPercent'),
             'flagIncineration': self.hot_encode(type_name, 'eolIncinerationPercent'),
             'flagLandfill': self.hot_encode(type_name, 'eolLandfillPercent'),
-            'flagMismanaged': self.hot_encode(type_name, 'eolMismanagedPercent')
+            'flagMismanaged': self.hot_encode(type_name, 'eolMismanagedPercent'),
+            'yearSelector': self.get_year_selector(year)
         }
 
         return '''
@@ -239,8 +248,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     FROM
                         {table_name}
                     WHERE
-                        {year} - year <= 5
-                        AND {year} - year > 0
+                        {yearSelector}
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
@@ -258,7 +266,8 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagArticles': self.hot_encode(type_name, 'netImportArticlesMT'),
             'flagFibers': self.hot_encode(type_name, 'netImportFibersMT'),
             'flagGoods': self.hot_encode(type_name, 'netImportGoodsMT'),
-            'flagResin': self.hot_encode(type_name, 'netImportResinMT')
+            'flagResin': self.hot_encode(type_name, 'netImportResinMT'),
+            'yearSelector': self.get_year_selector(year)
         }
 
         return '''
@@ -297,8 +306,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     FROM
                         {table_name}
                     WHERE
-                        {year} - year <= 5
-                        AND {year} - year > 0
+                        {yearSelector}
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
@@ -580,7 +588,7 @@ class CheckSeedNaiveProjectionTask(tasks_project_template.CheckSeedProjectionTas
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
-        return 'project_curve'
+        return 'project_naive'
 
 
 class ProjectNaiveRawTask(ProjectCurveRawTask):
@@ -606,3 +614,107 @@ class ProjectNaiveRawTask(ProjectCurveRawTask):
     def get_trade_model_filename(self):
         return 'trade_curve_naive.pickle'
 
+
+class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return ProjectMlRawTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '510_normalize_ml.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_ml'
+
+
+class NormalizeCurveTask(tasks_project_template.NormalizeProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return ProjectCurveRawTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '511_normalize_curve.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return ProjectCurveRawTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '512_normalize_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_naive'
+
+
+class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return NormalizeMlTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '513_check_normalize_ml.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_ml'
+
+
+class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return NormalizeCurveTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '514_check_normalize_curve.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class CheckNormalizeNaiveTask(tasks_project_template.NormalizeCheckTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return NormalizeNaiveTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '515_check_normalize_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_naive'
+
+
+class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return CheckNormalizeMlTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '516_lifecycle_ml.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_ml'

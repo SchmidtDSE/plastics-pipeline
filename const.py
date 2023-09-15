@@ -40,3 +40,14 @@ AUX_FIELD_NAMES = [
     'population',
     'gdp'
 ]
+
+LIFECYCLE_DISTRIBUTIONS = {
+    'consumptionAgricultureMT': {'mean': 2, 'std': 1},
+    'consumptionConstructionMT': {'mean': 35, 'std': 7},
+    'consumptionElectronicMT': {'mean': 8, 'std': 2},
+    'consumptionHouseholdLeisureSportsMT': {'mean': 3, 'std': 1},
+    'consumptionPackagingMT': {'mean': 0.5, 'std': 0.1},
+    'consumptionTransporationMT': {'mean': 13, 'std': 3},
+    'consumptionTextileMT': {'mean': 5, 'std': 1.5},
+    'consumptionOtherMT': {'mean': 5, 'std': 1.5}
+}
