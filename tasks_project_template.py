@@ -13,6 +13,36 @@ import tasks_ml
 import tasks_sql
 
 
+class PreCheckProjectTask(luigi.Task):
+    
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def run(self):
+        with self.input()[0].open('r') as f:
+            job_info = json.load(f)
+
+        models_to_check = self.get_models_to_check()
+
+        def get_model_filename(model_name):
+            return os.path.join(
+                job_info['directories']['workspace'],
+                model_name + '.pickle'
+            )
+
+        filenames_to_check = map(get_model_filename, models_to_check)
+
+        for filename in filenames_to_check:
+            with open(filename, 'rb') as f:
+                target = pickle.load(f)
+                assert 'model' in target
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+
+    def get_models_to_check(self):
+        raise NotImplementedError('Use implementor.')
+
+
 class SeedProjectionTask(tasks_sql.SqlExecuteTask):
 
     def transform_sql(self, sql_contents):
@@ -451,9 +481,13 @@ class ApplyLifecycleTask(luigi.Task):
 
         for sector in sectors:
             future_waste = result[sector]
+            
+            if future_waste < 0:
+                future_waste = 0
+
             distribution = const.LIFECYCLE_DISTRIBUTIONS[sector]
             time_distribution = statistics.NormalDist(
-                mu=distribution['mean'],
+                mu=distribution['mean'] + year,
                 sigma=distribution['std']
             )
 
@@ -467,11 +501,12 @@ class ApplyLifecycleTask(luigi.Task):
                 percent_prior = time_distribution.cdf(future_year - 0.5)
                 percent_till_year = time_distribution.cdf(future_year + 0.5)
                 percent = percent_till_year - percent_prior
+                assert percent >= 0
                 amount = future_waste * percent
                 timeseries[region][future_year] += amount
                 total_added += amount
 
-            if year < 2030:
+            if year < 2030 and sector != 'consumptionConstructionMT':
                 assert abs(total_added - future_waste) < 1
 
     def update_waste_timeseries(self, connection, timeseries):
@@ -497,3 +532,42 @@ class ApplyLifecycleTask(luigi.Task):
 
         cursor.close()
         connection.commit()
+
+
+class LifecycleCheckTask(luigi.Task):
+
+    def get_table_name(self):
+        raise NotImplementedError('Must use implementor.')
+
+    def run(self):
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        database_loc = job_info['database']
+        connection = sqlite3.connect(database_loc)
+        cursor = connection.cursor()
+
+        table = self.get_table_name()
+
+        cursor.execute('SELECT count(1) FROM {table}'.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] > 0
+
+        cursor.execute('''
+            SELECT
+                count(1)
+            FROM
+                {table}
+            WHERE
+                newWasteMT <= 0
+        '''.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)

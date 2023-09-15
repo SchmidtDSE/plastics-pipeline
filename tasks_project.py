@@ -1,6 +1,4 @@
-import json
 import os
-import pickle
 
 import luigi
 
@@ -10,58 +8,73 @@ import tasks_ml
 import tasks_project_template
 
 
-class PreCheckProjectTask(luigi.Task):
+class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
+    
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return [
+            tasks_ml.CheckSweepConsumptionTask(task_dir=self.task_dir),
+            tasks_ml.CheckSweepWasteTask(task_dir=self.task_dir),
+            tasks_ml.CheckSweepTradeTask(task_dir=self.task_dir)
+        ]
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '500_pre_check_ml.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_models_to_check(self):
+        return [
+            'consumption',
+            'waste',
+            'trade'
+        ]
+
+
+class PreCheckCurveProjectTask(tasks_project_template.PreCheckProjectTask):
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
         return [
             tasks_curve.ConsumptionCurveTask(task_dir=self.task_dir),
-            tasks_curve.ConsumptionCurveNaiveTask(task_dir=self.task_dir),
             tasks_curve.WasteCurveTask(task_dir=self.task_dir),
-            tasks_curve.WasteCurveNaiveTask(task_dir=self.task_dir),
-            tasks_curve.TradeCurveTask(task_dir=self.task_dir),
-            tasks_curve.TradeCurveNaiveTask(task_dir=self.task_dir),
-            tasks_ml.CheckSweepConsumptionTask(task_dir=self.task_dir),
-            tasks_ml.CheckSweepWasteTask(task_dir=self.task_dir),
-            tasks_ml.CheckSweepTradeTask(task_dir=self.task_dir)
+            tasks_curve.TradeCurveTask(task_dir=self.task_dir)
         ]
-
-    def run(self):
-        with self.input()[0].open('r') as f:
-            job_info = json.load(f)
-
-        models_to_check = [
-            'consumption_curve',
-            'consumption_curve_naive',
-            'waste_curve',
-            'waste_curve_naive',
-            'trade_curve',
-            'trade_curve_naive',
-            'consumption',
-            'waste',
-            'trade'
-        ]
-
-        def get_model_filename(model_name):
-            return os.path.join(
-                job_info['directories']['workspace'],
-                model_name + '.pickle'
-            )
-
-        filenames_to_check = map(get_model_filename, models_to_check)
-
-        for filename in filenames_to_check:
-            with open(filename, 'rb') as f:
-                target = pickle.load(f)
-                assert 'model' in target
-
-        with self.output().open('w') as f:
-            return json.dump(job_info, f)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '500_pre_check.json')
+        out_path = os.path.join(self.task_dir, '501_pre_check_curve.json')
         return luigi.LocalTarget(out_path)
+
+    def get_models_to_check(self):
+        return [
+            'consumption_curve',
+            'waste_curve',
+            'trade_curve'
+        ]
+
+
+class PreCheckNaiveProjectTask(tasks_project_template.PreCheckProjectTask):
+    
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return [
+            tasks_curve.ConsumptionCurveNaiveTask(task_dir=self.task_dir),
+            tasks_curve.WasteCurveNaiveTask(task_dir=self.task_dir),
+            tasks_curve.TradeCurveNaiveTask(task_dir=self.task_dir)
+        ]
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '502_pre_check_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_models_to_check(self):
+        return [
+            'consumption_curve_naive',
+            'waste_curve_naive',
+            'trade_curve_naive'
+        ]
 
 
 class SeedMlProjectionTask(tasks_project_template.SeedProjectionTask):
@@ -69,7 +82,7 @@ class SeedMlProjectionTask(tasks_project_template.SeedProjectionTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return PreCheckProjectTask(task_dir=self.task_dir)
+        return PreCheckMlProjectTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '501_seed_ml.json')
@@ -379,7 +392,7 @@ class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return PreCheckProjectTask(task_dir=self.task_dir)
+        return PreCheckCurveProjectTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '504_seed_curve.json')
@@ -566,7 +579,7 @@ class SeedNaiveProjectionTask(tasks_project_template.SeedProjectionTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return PreCheckProjectTask(task_dir=self.task_dir)
+        return PreCheckNaiveProjectTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '507_seed_naive.json')
@@ -718,3 +731,78 @@ class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
 
     def get_table_name(self):
         return 'project_ml'
+
+
+class ApplyLifecycleCurveTask(tasks_project_template.ApplyLifecycleTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return CheckNormalizeCurveTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '517_lifecycle_curve.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return CheckNormalizeNaiveTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '518_lifecycle_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_naive'
+
+
+class MlLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return ApplyLifecycleMLTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '519_check_lifecycle_ml.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_ml'
+
+
+class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return ApplyLifecycleCurveTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '520_check_lifecycle_curve.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class NaiveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return ApplyLifecycleNaiveTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '521_check_lifecycle_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_naive'
