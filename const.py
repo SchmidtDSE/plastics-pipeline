@@ -51,3 +51,23 @@ LIFECYCLE_DISTRIBUTIONS = {
     'consumptionTextileMT': {'mean': 5, 'std': 1.5},
     'consumptionOtherMT': {'mean': 5, 'std': 1.5}
 }
+
+EXPORT_FIELD_NAMES = [
+    'year',
+    'region',
+    'eolRecyclingMT',
+    'eolLandfillMT',
+    'eolIncinerationMT',
+    'eolMismanagedMT',
+    'consumptionAgricultureMT',
+    'consumptionConstructionMT',
+    'consumptionElectronicMT',
+    'consumptionHouseholdLeisureSportsMT',
+    'consumptionPackagingMT',
+    'consumptionTransporationMT',
+    'consumptionTextileMT',
+    'consumptionOtherMT',
+    'netImportsMT',
+    'netExportsMT',
+    'domesticProductionMT'
+]

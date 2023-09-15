@@ -21,10 +21,10 @@ SELECT
     ) AS netImportsMT,
     (
         CASE
-            WHEN netExportsMT < 0 THEN -1 * netImport
+            WHEN netImport < 0 THEN -1 * netImport
             ELSE 0
         END
-    ) AS netImportsMT,
+    ) AS netExportsMT,
     totalConsumption - netImport AS domesticProductionMT
 FROM
     (
@@ -60,5 +60,7 @@ FROM
                 consumptionOtherMT
             ) AS totalConsumption
         FROM
-            project_curve
+            {table_name}
+        WHERE
+            year >= 2010
     ) metrics
