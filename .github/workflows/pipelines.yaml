@@ -2,7 +2,7 @@ name: Pipeline
 on: [push]
 
 jobs:
-  sqlpipeline:
+  pipeline:
     runs-on: ubuntu-latest
     name: SQL Pipeline
     steps:
@@ -24,16 +24,16 @@ jobs:
           path: output
       - name: Check output
         run: bash confirm_output.sh
-#  deploy:
-#    runs-on: ubuntu-latest
-#    environment: deploy
-#    name: Deploy
-#    if: github.ref == 'refs/heads/main'
-#    needs: [rpipeline, sqlpipeline]
-#    steps:
-#      - name: Trigger
-#        uses: peter-evans/repository-dispatch@v2
-#        with:
-#          token: ${{ secrets.CROSS_TOKEN }}
-#          repository: SchmidtDSE/plastics-prototype
-#          event-type: data-update
+  deploy:
+    runs-on: ubuntu-latest
+    environment: deploy
+    name: Deploy
+    if: github.ref == 'refs/heads/main'
+    needs: [pipeline]
+    steps:
+      - name: Trigger
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.CROSS_TOKEN }}
+          repository: SchmidtDSE/plastics-prototype
+          event-type: data-update
