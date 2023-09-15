@@ -6,6 +6,7 @@ import luigi
 import const
 import tasks_auxiliary
 import tasks_curve
+import tasks_export
 import tasks_ml
 import tasks_ml_prep
 import tasks_preprocess
@@ -130,7 +131,7 @@ class ProjectTask(luigi.Task):
         return [
             tasks_project.MlLifecycleCheckTask(task_dir=self.task_dir),
             tasks_project.CurveLifecycleCheckTask(task_dir=self.task_dir),
-            tasks_project.NaiveLifecycleCheckTask(task_dir=self.task_dir)
+            tasks_project.ApplyLifecycleNaiveTask(task_dir=self.task_dir)
         ]
 
     def output(self):
@@ -145,3 +146,24 @@ class ProjectTask(luigi.Task):
             return json.dump(job_info, f)
 
 
+class ExportTask(luigi.Task):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return [
+            tasks_export.ExportMlTask(task_dir=self.task_dir),
+            tasks_export.ExportCurveTask(task_dir=self.task_dir),
+            tasks_export.ExportNaiveTask(task_dir=self.task_dir)
+        ]
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '6_export.json')
+        return luigi.LocalTarget(out_path)
+
+    def run(self):
+        with self.input()[0].open('r') as f:
+            job_info = json.load(f)
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)

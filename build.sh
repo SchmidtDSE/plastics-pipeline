@@ -1,0 +1,1 @@
+python -m luigi --module tasks ExportTask --local-scheduler --workers 1

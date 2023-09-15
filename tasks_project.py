@@ -663,7 +663,7 @@ class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return ProjectCurveRawTask(task_dir=self.task_dir)
+        return ProjectNaiveRawTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '512_normalize_naive.json')
@@ -703,21 +703,6 @@ class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
         return 'project_curve'
 
 
-class CheckNormalizeNaiveTask(tasks_project_template.NormalizeCheckTask):
-
-    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
-    def requires(self):
-        return NormalizeNaiveTask(task_dir=self.task_dir)
-
-    def output(self):
-        out_path = os.path.join(self.task_dir, '515_check_normalize_naive.json')
-        return luigi.LocalTarget(out_path)
-
-    def get_table_name(self):
-        return 'project_naive'
-
-
 class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -753,7 +738,7 @@ class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return CheckNormalizeNaiveTask(task_dir=self.task_dir)
+        return NormalizeNaiveTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '518_lifecycle_naive.json')
@@ -791,18 +776,3 @@ class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
 
     def get_table_name(self):
         return 'project_curve'
-
-
-class NaiveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
-
-    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
-    def requires(self):
-        return ApplyLifecycleNaiveTask(task_dir=self.task_dir)
-
-    def output(self):
-        out_path = os.path.join(self.task_dir, '521_check_lifecycle_naive.json')
-        return luigi.LocalTarget(out_path)
-
-    def get_table_name(self):
-        return 'project_naive'

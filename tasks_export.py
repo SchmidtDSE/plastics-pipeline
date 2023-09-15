@@ -23,8 +23,6 @@ class ExportTemplateTask(luigi.Task):
             sql_contents_template = f.read()
             sql_contents = self.transform_sql(sql_contents_template)
 
-        print(sql_contents)
-
         records = map(
             lambda x: self.parse_record(x),
             cursor.execute(sql_contents)
@@ -99,7 +97,7 @@ class ExportNaiveTask(ExportTemplateTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
-        return tasks_project.NaiveLifecycleCheckTask(task_dir=self.task_dir)
+        return tasks_project.ApplyLifecycleNaiveTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '602_export_naive.json')
