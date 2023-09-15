@@ -64,7 +64,7 @@ class PreCheckProjectTask(luigi.Task):
         return luigi.LocalTarget(out_path)
 
 
-class SeedConsumptionProjectionTask(tasks_project_template.SeedProjectionTask):
+class SeedMlProjectionTask(tasks_project_template.SeedProjectionTask):
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -72,41 +72,41 @@ class SeedConsumptionProjectionTask(tasks_project_template.SeedProjectionTask):
         return PreCheckProjectTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '501_seed_consumption.json')
+        out_path = os.path.join(self.task_dir, '501_seed_ml.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
-        return 'project_consumption_ml'
+        return 'project_ml'
 
 
-class CheckSeedConsumptionProjectionTask(tasks_project_template.CheckSeedProjectionTask):
+class CheckSeedMlProjectionTask(tasks_project_template.CheckSeedProjectionTask):
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return SeedConsumptionProjectionTask(task_dir=self.task_dir)
+        return SeedMlProjectionTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '502_check_seed_consumption.json')
+        out_path = os.path.join(self.task_dir, '502_check_seed_ml.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
-        return 'project_consumption_ml'
+        return 'project_ml'
 
 
-class ProjectConsumptionRawTask(tasks_project_template.ProjectRawTask):
+class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
-        return CheckSeedConsumptionProjectionTask(task_dir=self.task_dir)
+        return CheckSeedMlProjectionTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '503_project_consumption_raw.json')
+        out_path = os.path.join(self.task_dir, '503_project_ml_raw.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
-        return 'project_consumption_ml'
+        return 'project_ml'
 
     def get_consumption_model_filename(self):
         return 'consumption.pickle'
@@ -180,8 +180,8 @@ class ProjectConsumptionRawTask(tasks_project_template.ProjectRawTask):
                     FROM
                         {table_name}
                     WHERE
-                        year - {year} <= 5
-                        AND year - {year} > 0
+                        {year} - year <= 5
+                        AND {year} - year > 0
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
@@ -239,8 +239,8 @@ class ProjectConsumptionRawTask(tasks_project_template.ProjectRawTask):
                     FROM
                         {table_name}
                     WHERE
-                        year - {year} <= 5
-                        AND year - {year} > 0
+                        {year} - year <= 5
+                        AND {year} - year > 0
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
@@ -297,8 +297,8 @@ class ProjectConsumptionRawTask(tasks_project_template.ProjectRawTask):
                     FROM
                         {table_name}
                     WHERE
-                        year - {year} <= 5
-                        AND year - {year} > 0
+                        {year} - year <= 5
+                        AND {year} - year > 0
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
@@ -363,4 +363,246 @@ class ProjectConsumptionRawTask(tasks_project_template.ProjectRawTask):
         return prediction
 
     def transform_trade_prediction(self, instance, prediction):
-        raise instance['beforeValue'] * (1 + prediction)
+        return instance['beforeValue'] * (1 + prediction)
+
+
+class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return PreCheckProjectTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '504_seed_curve.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class CheckSeedCurveProjectionTask(tasks_project_template.CheckSeedProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return SeedCurveProjectionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '505_check_seed_curve.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def get_sector_label(self, col):
+        return {
+            'consumptionAgricultureMT': 'Agriculture',
+            'consumptionConstructionMT': 'Building_Construction',
+            'consumptionElectronicMT': 'Electrical_Electronic',
+            'consumptionHouseholdLeisureSportsMT': 'Household_Leisure_Sports',
+            'consumptionOtherMT': 'Others',
+            'consumptionPackagingMT': 'Packaging',
+            'consumptionTextileMT': 'Textile',
+            'consumptionTransporationMT': 'Transportation'
+        }[col]
+
+    def get_eol_label(self, col):
+        return {
+            'eolRecyclingPercent': 'recycling',
+            'eolIncinerationPercent': 'incineration',
+            'eolLandfillPercent': 'landfill',
+            'eolMismanagedPercent': 'mismanaged'
+        }[col]
+
+    def get_trade_label(self, col):
+        return {
+            'netImportArticlesMT': 'articles',
+            'netImportFibersMT': 'fibers',
+            'netImportGoodsMT': 'goods',
+            'netImportResinMT': 'resin'
+        }[col]
+    
+    def requires(self):
+        return CheckSeedCurveProjectionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '506_project_curve_raw.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+    def get_consumption_model_filename(self):
+        return 'consumption_curve.pickle'
+
+    def get_waste_model_filename(self):
+        return 'waste_curve.pickle'
+
+    def get_trade_model_filename(self):
+        return 'trade_curve.pickle'
+
+    def hot_encode(self, candidate, hot_value):
+        return 1 if candidate == hot_value else 0
+
+    def get_consumption_inputs_sql(self, year, region, sector):
+        template_vals = {
+            'table_name': self.get_table_name(),
+            'year': year,
+            'region': region,
+            'label': self.get_sector_label(sector)
+        }
+
+        return '''
+            SELECT
+                year,
+                region,
+                population,
+                gdp,
+                '{label}' AS majorMarketSector
+            FROM
+                {table_name}
+            WHERE
+                year = {year}
+                AND region = '{region}'
+        '''.format(**template_vals)
+
+    def get_waste_inputs_sql(self, year, region, type_name):
+        template_vals = {
+            'table_name': self.get_table_name(),
+            'year': year,
+            'region': region,
+            'label': self.get_eol_label(type_name)
+        }
+
+        return '''
+            SELECT
+                year,
+                region,
+                population,
+                gdp,
+                '{label}' AS type
+            FROM
+                {table_name}
+            WHERE
+                year = {year}
+                AND region = '{region}'
+        '''.format(**template_vals)
+
+    def get_trade_inputs_sql(self, year, region, type_name):
+        template_vals = {
+            'table_name': self.get_table_name(),
+            'year': year,
+            'region': region,
+            'label': self.get_trade_label(type_name)
+        }
+
+        return '''
+            SELECT
+                year,
+                region,
+                population,
+                gdp,
+                '{label}' AS type
+            FROM
+                {table_name}
+            WHERE
+                year = {year}
+                AND region = '{region}'
+        '''.format(**template_vals)
+    
+    def get_consumption_inputs_cols(self):
+        return [
+            'year',
+            'region',
+            'population',
+            'gdp',
+            'majorMarketSector'
+        ]
+    
+    def get_waste_inputs_cols(self):
+        return [
+            'year',
+            'region',
+            'population',
+            'gdp',
+            'type'
+        ]
+    
+    def get_trade_inputs_cols(self):
+        return [
+            'year',
+            'region',
+            'population',
+            'gdp',
+            'type'
+        ]
+
+    def transform_consumption_prediction(self, instance, prediction):
+        return prediction
+
+    def transform_waste_prediction(self, instance, prediction):
+        return prediction
+
+    def transform_trade_prediction(self, instance, prediction):
+        return prediction
+
+
+class SeedNaiveProjectionTask(tasks_project_template.SeedProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return PreCheckProjectTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '507_seed_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_naive'
+
+
+class CheckSeedNaiveProjectionTask(tasks_project_template.CheckSeedProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return SeedNaiveProjectionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '508_check_seed_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class ProjectNaiveRawTask(ProjectCurveRawTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return CheckSeedNaiveProjectionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '509_project_naive_raw.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_naive'
+
+    def get_consumption_model_filename(self):
+        return 'consumption_curve_naive.pickle'
+
+    def get_waste_model_filename(self):
+        return 'waste_curve_naive.pickle'
+
+    def get_trade_model_filename(self):
+        return 'trade_curve_naive.pickle'
+

@@ -102,26 +102,26 @@ class ProjectRawTask(luigi.Task):
             UPDATE
                 {table_name}
             SET
-                consumptionAgricultureMT = {consumptionAgricultureMT}
-                consumptionConstructionMT = {consumptionConstructionMT}
-                consumptionElectronicMT = {consumptionElectronicMT}
-                consumptionHouseholdLeisureSportsMT = {consumptionHouseholdLeisureSportsMT}
-                consumptionOtherMT = {consumptionOtherMT}
-                consumptionPackagingMT = {consumptionPackagingMT}
-                consumptionTextileMT = {consumptionTextileMT}
-                consumptionTransporationMT = {consumptionTransporationMT}
-                eolRecyclingPercent = {eolRecyclingPercent}
-                eolIncinerationPercent = {eolIncinerationPercent}
-                eolLandfillPercent = {eolLandfillPercent}
-                eolMismanagedPercent = {eolMismanagedPercent}
-                netImportArticlesMT = {netImportArticlesMT}
-                netImportFibersMT = {netImportFibersMT}
-                netImportGoodsMT = {netImportGoodsMT}
+                consumptionAgricultureMT = {consumptionAgricultureMT},
+                consumptionConstructionMT = {consumptionConstructionMT},
+                consumptionElectronicMT = {consumptionElectronicMT},
+                consumptionHouseholdLeisureSportsMT = {consumptionHouseholdLeisureSportsMT},
+                consumptionOtherMT = {consumptionOtherMT},
+                consumptionPackagingMT = {consumptionPackagingMT},
+                consumptionTextileMT = {consumptionTextileMT},
+                consumptionTransporationMT = {consumptionTransporationMT},
+                eolRecyclingPercent = {eolRecyclingPercent},
+                eolIncinerationPercent = {eolIncinerationPercent},
+                eolLandfillPercent = {eolLandfillPercent},
+                eolMismanagedPercent = {eolMismanagedPercent},
+                netImportArticlesMT = {netImportArticlesMT},
+                netImportFibersMT = {netImportFibersMT},
+                netImportGoodsMT = {netImportGoodsMT},
                 netImportResinMT = {netImportResinMT}
             WHERE
                 year = {year}
-                AND region = {region}
-        '''.format(updated_output_row))
+                AND region = '{region}'
+        '''.format(**updated_output_row))
 
         connection.commit()
         cursor.close()
@@ -136,12 +136,11 @@ class ProjectRawTask(luigi.Task):
 
     def build_instances(self, connection, sql, cols):
         cursor = connection.cursor()
-        print(sql)
         cursor.execute(sql)
         results_flat = cursor.fetchall()
         cursor.close()
 
-        results_keyed = [dict(zip(cols, results)) for result in results_flat]
+        results_keyed = [dict(zip(cols, result)) for result in results_flat]
         return results_keyed
 
     def get_consumption_projections(self, connection, year, region, consumption_model):
@@ -182,7 +181,7 @@ class ProjectRawTask(luigi.Task):
             ],
             lambda x: self.get_waste_inputs_sql(year, region, x),
             lambda: self.get_waste_inputs_cols(),
-            lambda instance, prediction: self.transform_consumption_prediction(
+            lambda instance, prediction: self.transform_waste_prediction(
                 instance,
                 prediction
             )
@@ -202,7 +201,7 @@ class ProjectRawTask(luigi.Task):
             ],
             lambda x: self.get_trade_inputs_sql(year, region, x),
             lambda: self.get_trade_inputs_cols(),
-            lambda instance, prediction: self.transform_consumption_prediction(
+            lambda instance, prediction: self.transform_trade_prediction(
                 instance,
                 prediction
             )

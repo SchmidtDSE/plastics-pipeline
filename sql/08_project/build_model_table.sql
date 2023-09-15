@@ -1,7 +1,7 @@
 CREATE TABLE {table_name} AS
 SELECT
     auxiliary.year AS year,
-    summary.region AS region,
+    auxiliary.region AS region,
     auxiliary.population AS population,
     auxiliary.gdp AS gdp,
     summary.consumptionAgricultureMT AS consumptionAgricultureMT,
