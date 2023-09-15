@@ -54,7 +54,9 @@ SELECT
             ELSE 0
         END
     ) AS flagMismanaged,
-    unioned.afterPercent AS afterPercent
+    unioned.afterPercent AS afterPercent,
+    unioned.beforeYear AS beforeYear,
+    unioned.afterYear AS afterYear
 FROM
     (
         SELECT
@@ -66,7 +68,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -105,7 +109,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -144,7 +150,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -183,7 +191,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -222,7 +232,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -261,7 +273,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -300,7 +314,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -339,7 +355,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -378,7 +396,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -417,7 +437,9 @@ FROM
             after.type AS type,
             after.afterGdp AS afterGdp,
             before.beforePercent AS beforePercent,
-            after.afterPercent AS afterPercent
+            after.afterPercent AS afterPercent,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT

@@ -75,7 +75,11 @@ SELECT
             ELSE 0
         END
     ) AS flagTransporation,
-    consumptionChange
+    unioned.consumptionChange AS consumptionChange,
+    unioned.beforeConsumptionMT AS beforeConsumptionMT,
+    unioned.afterConsumptionMT AS afterConsumptionMT,
+    unioned.beforeYear AS beforeYear,
+    unioned.afterYear AS afterYear
 FROM
     (
         SELECT
@@ -84,7 +88,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -120,7 +128,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -156,7 +168,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -192,7 +208,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -228,7 +248,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -264,7 +288,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -300,7 +328,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -336,7 +368,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -372,7 +408,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
@@ -408,7 +448,11 @@ FROM
             (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
-            after.majorMarketSector AS majorMarketSector
+            after.majorMarketSector AS majorMarketSector,
+            before.beforeConsumptionMT AS beforeConsumptionMT,
+            after.afterConsumptionMT AS afterConsumptionMT,
+            before.beforeYear AS beforeYear,
+            after.afterYear AS afterYear
         FROM
             (
                 SELECT
