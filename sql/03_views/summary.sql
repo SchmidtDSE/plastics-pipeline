@@ -19,7 +19,7 @@ SELECT
     without_net_imports.consumptionHouseholdLeisureSportsMT AS consumptionHouseholdLeisureSportsMT,
     without_net_imports.consumptionPackagingMT AS consumptionPackagingMT,
     without_net_imports.consumptionTransporationMT AS consumptionTransporationMT,
-    without_net_imports.consumptionTextitleMT AS consumptionTextitleMT,
+    without_net_imports.consumptionTextileMT AS consumptionTextileMT,
     without_net_imports.consumptionOtherMT AS consumptionOtherMT,
     without_net_imports.eolRecyclingPercent AS eolRecyclingPercent,
     without_net_imports.eolIncinerationPercent AS eolIncinerationPercent,
@@ -43,7 +43,7 @@ FROM
             inputs_and_consumption.consumptionHouseholdLeisureSportsMT AS consumptionHouseholdLeisureSportsMT,
             inputs_and_consumption.consumptionPackagingMT AS consumptionPackagingMT,
             inputs_and_consumption.consumptionTransporationMT AS consumptionTransporationMT,
-            inputs_and_consumption.consumptionTextitleMT AS consumptionTextitleMT,
+            inputs_and_consumption.consumptionTextileMT AS consumptionTextileMT,
             inputs_and_consumption.consumptionOtherMT AS consumptionOtherMT,
             overview_eol.recyclingPercent AS eolRecyclingPercent,
             overview_eol.incinerationPercent AS eolIncinerationPercent,
@@ -67,7 +67,7 @@ FROM
                     overview_consumption.householdLeisureSportsMT AS consumptionHouseholdLeisureSportsMT,
                     overview_consumption.packagingMT AS consumptionPackagingMT,
                     overview_consumption.transporationMT AS consumptionTransporationMT,
-                    overview_consumption.textitleMT AS consumptionTextitleMT,
+                    overview_consumption.textileMT AS consumptionTextileMT,
                     overview_consumption.otherMT AS consumptionOtherMT
                 FROM
                     overview_inputs

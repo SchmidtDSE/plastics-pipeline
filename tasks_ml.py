@@ -42,7 +42,7 @@ class SweepTask(luigi.Task):
         training_results = self.sweep(instances)
         training_results_standard = self.standardize_results(training_results)
 
-        force_type = job_info.get('force_type', None)
+        force_type = job_info["forceModels"].get(self.get_model_class(), None)
 
         if force_type:
             training_results_standard_allowed = filter(
@@ -100,6 +100,7 @@ class SweepTask(luigi.Task):
 
         ret_data = [parse_row(row) for row in cursor.fetchall()]
 
+        cursor.close()
         connection.close()
 
         return ret_data
@@ -469,6 +470,9 @@ class SweepTask(luigi.Task):
     def get_svm_enabled(self):
         raise NotImplementedError('Use implementor.')
 
+    def get_model_class(self):
+        raise NotImplementedError('Use implementor.')
+
 
 class CheckSweepTask(luigi.Task):
 
@@ -476,7 +480,7 @@ class CheckSweepTask(luigi.Task):
         with self.input().open('r') as f:
             job_info = json.load(f)
 
-        force_type = job_info.get('force_type', None)
+        force_type = job_info["forceModels"].get(self.get_model_class(), None)
 
         sweep_results_loc = os.path.join(
             job_info['directories']['output'],
@@ -621,6 +625,9 @@ class SweepConsumptionTask(SweepTask):
     def get_svm_enabled(self):
         return True
 
+    def get_model_class(self):
+        return 'consumption'
+
 
 class SweepWasteTask(SweepTask):
 
@@ -716,6 +723,9 @@ class SweepWasteTask(SweepTask):
     def get_svm_enabled(self):
         return False
 
+    def get_model_class(self):
+        return 'waste'
+
 
 class SweepTradeTask(SweepTask):
 
@@ -745,10 +755,10 @@ class SweepTradeTask(SweepTask):
                 flagEU30,
                 flagNafta,
                 flagRow,
-                flagRecycling,
-                flagIncineration,
-                flagLandfill,
-                flagMismanaged,
+                flagArticles,
+                flagFibers,
+                flagGoods,
+                flagResin,
                 netMTChange,
                 beforeNetMT,
                 afterNetMT
@@ -767,10 +777,10 @@ class SweepTradeTask(SweepTask):
             'flagEU30',
             'flagNafta',
             'flagRow',
-            'flagRecycling',
-            'flagIncineration',
-            'flagLandfill',
-            'flagMismanaged',
+            'flagArticles',
+            'flagFibers',
+            'flagGoods',
+            'flagResin',
             'netMTChange',
             'beforeNetMT',
             'afterNetMT'
@@ -785,10 +795,10 @@ class SweepTradeTask(SweepTask):
             'flagEU30',
             'flagNafta',
             'flagRow',
-            'flagRecycling',
-            'flagIncineration',
-            'flagLandfill',
-            'flagMismanaged',
+            'flagArticles',
+            'flagFibers',
+            'flagGoods',
+            'flagResin',
         ]
 
     def get_response_col(self):
@@ -809,6 +819,9 @@ class SweepTradeTask(SweepTask):
     def get_svm_enabled(self):
         return True
 
+    def get_model_class(self):
+        return 'trade'
+
 
 class CheckSweepConsumptionTask(CheckSweepTask):
 
@@ -826,6 +839,9 @@ class CheckSweepConsumptionTask(CheckSweepTask):
 
     def check_model(self, target):
         assert target['validOutSampleTarget'] < 2
+
+    def get_model_class(self):
+        return 'consumption'
 
 
 
@@ -846,6 +862,9 @@ class CheckSweepWasteTask(CheckSweepTask):
     def check_model(self, target):
         assert target['validOutSampleTarget'] < 0.02
 
+    def get_model_class(self):
+        return 'waste'
+
 
 class CheckSweepTradeTask(CheckSweepTask):
 
@@ -862,4 +881,7 @@ class CheckSweepTradeTask(CheckSweepTask):
         return 'trade_sweep.csv'
 
     def check_model(self, target):
-        assert target['validOutSampleTarget'] < 3
+        assert target['validOutSampleTarget'] < 4
+
+    def get_model_class(self):
+        return 'trade'

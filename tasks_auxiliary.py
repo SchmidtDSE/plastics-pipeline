@@ -33,10 +33,7 @@ class ProcessGdpTask(luigi.Task):
 
         aggregator = {}
         with open(os.path.join(workspace_dir, 'a1gdpraw.csv')) as f:
-            dialect = csv.Sniffer().sniff(f.read(1024))
-            f.seek(0)
-            
-            reader = csv.DictReader(f, dialect=dialect)
+            reader = csv.DictReader(f)
 
             location_key = None
 
@@ -105,10 +102,7 @@ class ProcessRawPopulationTask(luigi.Task):
 
         output_rows = {}
         with open(os.path.join(workspace_dir, 'a2populationraw.csv')) as f:
-            dialect = csv.Sniffer().sniff(f.read(1024))
-            f.seek(0)
-
-            reader = csv.DictReader(f, dialect=dialect)
+            reader = csv.DictReader(f)
 
             for row in reader:
                 iso_code = row['ISO3 Alpha-code']
@@ -120,6 +114,25 @@ class ProcessRawPopulationTask(luigi.Task):
                 population = float(population_str.replace(' ', '')) / 1000
 
                 key = '{region}.{year}'.format(region=region, year=year)
+                if key not in output_rows:
+                    output_rows[key] = {
+                        'region': region,
+                        'year': year,
+                        'population': 0
+                    }
+
+                output_rows[key]['population'] += population
+
+        with open(os.path.join(workspace_dir, 'a4popprojection.csv')) as f:
+            reader = csv.DictReader(f)
+
+            for row in reader:
+                region = row['region'].lower()
+                year = row['year']
+                population = float(row['mid']) / 1000000
+
+                key = '{region}.{year}'.format(region=region, year=year)
+
                 if key not in output_rows:
                     output_rows[key] = {
                         'region': region,
@@ -308,6 +321,8 @@ class BuildFrameAuxTask(luigi.Task):
                 writer.writerow(row_keyed)
 
         connection.commit()
+
+        cursor.close()
         connection.close()
 
         with self.output().open('w') as f:

@@ -63,6 +63,7 @@ class CheckMlPrepTask(luigi.Task):
         assert preprocess_results[0] > 0
         assert preprocess_results[1] > 0
 
+        cursor.close()
         connection.close()
 
         with self.output().open('w') as f:

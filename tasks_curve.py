@@ -119,6 +119,7 @@ class CurveTask(luigi.Task):
 
         ret_data = [parse_row(row) for row in cursor.fetchall()]
 
+        cursor.close()
         connection.close()
 
         return ret_data

@@ -32,28 +32,28 @@ SELECT
     ) AS flagRow,
     (
         CASE
-            WHEN unioned.type = 'recycling' THEN 1
+            WHEN unioned.type = 'articles' THEN 1
             ELSE 0
         END
-    ) AS flagRecycling,
+    ) AS flagArticles,
     (
         CASE
-            WHEN unioned.type = 'incineration' THEN 1
+            WHEN unioned.type = 'fibers' THEN 1
             ELSE 0
         END
-    ) AS flagIncineration,
+    ) AS flagFibers,
     (
         CASE
-            WHEN unioned.type = 'landfill' THEN 1
+            WHEN unioned.type = 'goods' THEN 1
             ELSE 0
         END
-    ) AS flagLandfill,
+    ) AS flagGoods,
     (
         CASE
-            WHEN unioned.type = 'mismanaged' THEN 1
+            WHEN unioned.type = 'resin' THEN 1
             ELSE 0
         END
-    ) AS flagMismanaged,
+    ) AS flagResin,
     unioned.afterNetMT AS afterNetMT,
     unioned.beforeYear AS beforeYear,
     unioned.afterYear AS afterYear

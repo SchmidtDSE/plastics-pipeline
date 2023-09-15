@@ -26,7 +26,7 @@ PREPROC_FIELD_NAMES = [
     'consumptionHouseholdLeisureSportsMT',
     'consumptionPackagingMT',
     'consumptionTransporationMT',
-    'consumptionTextitleMT',
+    'consumptionTextileMT',
     'consumptionOtherMT',
     'eolRecyclingPercent',
     'eolIncinerationPercent',

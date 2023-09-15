@@ -10,9 +10,6 @@ import const
 
 class SqlExecuteTask(luigi.Task):
 
-    def get_scripts(self):
-        raise NotImplementedError('Must use implementor.')
-
     def get_scripts_resolved(self, sql_dir):
         split = map(lambda x: x.split('/'), self.get_scripts())
         return map(lambda x: os.path.join(*([sql_dir] + x)), split)
@@ -29,13 +26,22 @@ class SqlExecuteTask(luigi.Task):
         for filename in sql_filenames:
             with open(filename) as f:
                 sql_contents = f.read()
+                sql_contents = self.transform_sql(sql_contents)
                 cursor.execute(sql_contents)
 
         connection.commit()
+
+        cursor.close()
         connection.close()
 
         with self.output().open('w') as f:
             return json.dump(job_info, f)
+
+    def transform_sql(self, sql_contents):
+        return sql_contents
+
+    def get_scripts(self):
+        raise NotImplementedError('Must use implementor.')
 
 
 class SqlCheckTask(luigi.Task):
@@ -57,6 +63,8 @@ class SqlCheckTask(luigi.Task):
         assert results[0][0] > 0
 
         connection.commit()
+
+        cursor.close()
         connection.close()
 
         with self.output().open('w') as f:

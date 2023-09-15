@@ -25,7 +25,7 @@ def check(loc):
     assert 'consumptionHouseholdLeisureSportsMT' in row
     assert 'consumptionPackagingMT' in row
     assert 'consumptionTransporationMT' in row
-    assert 'consumptionTextitleMT' in row
+    assert 'consumptionTextileMT' in row
     assert 'consumptionOtherMT' in row
     assert 'eolRecyclingPercent' in row
     assert 'eolIncinerationPercent' in row

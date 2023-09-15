@@ -43,7 +43,7 @@ SELECT
             WHEN majorMarketSector = 'Textile' THEN consumptionMT
             ELSE 0
         END
-    ) AS textitleMT,
+    ) AS textileMT,
     sum(
         CASE
             WHEN majorMarketSector = 'Others' THEN consumptionMT

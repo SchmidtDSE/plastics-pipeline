@@ -240,6 +240,8 @@ class BuildFrameTask(luigi.Task):
                 writer.writerow(row_keyed)
 
         connection.commit()
+
+        cursor.close()
         connection.close()
 
         with self.output().open('w') as f:
