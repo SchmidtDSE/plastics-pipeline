@@ -1,0 +1,28 @@
+SELECT
+    year,
+    region,
+    inputProduceFiberMT,
+    inputProduceResinMT,
+    inputImportResinMT,
+    inputImportArticlesMT,
+    inputImportGoodsMT,
+    inputImportFiberMT,
+    inputAdditivesMT,
+    netImportArticlesMT,
+    netImportFibersMT,
+    netImportGoodsMT,
+    netImportResinMT,
+    consumptionAgricultureMT,
+    consumptionConstructionMT,
+    consumptionElectronicMT,
+    consumptionHouseholdLeisureSportsMT,
+    consumptionPackagingMT,
+    consumptionTransporationMT,
+    consumptionTextileMT,
+    consumptionOtherMT,
+    eolRecyclingPercent,
+    eolIncinerationPercent,
+    eolLandfillPercent,
+    eolMismanagedPercent
+FROM
+    summary

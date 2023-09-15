@@ -5,5 +5,7 @@ output/*.db
 output/*.csv
 output/*.db
 data_workspace/
+task
 .gitpod.yml
 r/pipeline.R
+__pycache__
