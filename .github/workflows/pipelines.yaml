@@ -4,7 +4,7 @@ on: [push]
 jobs:
   pipeline:
     runs-on: ubuntu-latest
-    name: SQL Pipeline
+    name: Pipeline
     steps:
       - name: Checkout
         uses: actions/checkout@v3
