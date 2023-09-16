@@ -46,8 +46,7 @@ FROM
             (
                 netImportArticlesMT +
                 netImportFibersMT +
-                netImportGoodsMT +
-                netImportResinMT
+                netImportGoodsMT
             ) AS netImport,
             (
                 consumptionAgricultureMT +
