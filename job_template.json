@@ -8,6 +8,6 @@
     "forceModels": {
         "consumption": "random forest",
         "waste": "random forest",
-        "trade": "adaboost"
+        "trade": "svr"
     }
 }
