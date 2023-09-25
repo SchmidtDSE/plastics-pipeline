@@ -126,7 +126,8 @@ class ProcessRawPopulationTask(luigi.Task):
         with open(os.path.join(workspace_dir, 'a4popprojection.csv')) as f:
             reader = csv.DictReader(f)
 
-            for row in reader:
+            rows_allowed = filter(lambda x: int(x['year']) >= 2022, reader)
+            for row in rows_allowed:
                 region = row['region'].lower()
                 year = row['year']
                 population = float(row['mid']) / 1000000
