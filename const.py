@@ -3,7 +3,8 @@ import pathlib
 import random
 
 
-SEED = 1234
+# Define seed
+SEED = 12345
 random.seed(SEED)
 
 PARENT_DIR = pathlib.Path(__file__).parent.absolute()
