@@ -1,6 +1,5 @@
 import json
 import os
-import random
 import shutil
 
 import luigi
@@ -20,8 +19,6 @@ class PrepareWorkspaceTask(luigi.Task):
     def run(self):
         with open(os.path.join(self.task_dir, 'job.json')) as f:
             job_info = json.load(f)
-
-        random.seed(1234)
 
         if not os.path.exists(job_info['directories']['output']):
             os.makedirs(job_info['directories']['output'])

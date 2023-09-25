@@ -1,6 +1,10 @@
 import os
 import pathlib
+import random
 
+
+SEED = 1234
+random.seed(SEED)
 
 PARENT_DIR = pathlib.Path(__file__).parent.absolute()
 DEFAULT_TASK_DIR = os.path.join(PARENT_DIR, 'task')
