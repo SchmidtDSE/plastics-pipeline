@@ -8,6 +8,7 @@ import sqlite3
 import statistics
 
 import luigi
+import pathos.pools
 import sklearn.ensemble
 import sklearn.linear_model
 import sklearn.metrics
@@ -39,7 +40,7 @@ class SweepTask(luigi.Task):
 
         self.assign_sets(instances)
 
-        training_results = self.sweep(instances)
+        training_results = self.sweep(instances, job_info['workers'])
         training_results_standard = self.standardize_results(training_results)
 
         force_type = job_info["forceModels"].get(self.get_model_class(), None)
@@ -304,7 +305,9 @@ class SweepTask(luigi.Task):
 
             return output_record
 
-        return [execute_task(task) for task in queue]
+        pool = pathos.pools.ProcessPool(nodes=workers)
+        results = pool.imap(execute_task, queue)
+        return list(results) 
 
     def standardize_results(self, results):
         keys_per_row = map(lambda x: x.keys(), results)
