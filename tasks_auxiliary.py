@@ -59,13 +59,13 @@ class ProcessGdpTask(luigi.Task):
                         'values': []
                     }
 
-                aggregator[key]['values'].append(value)
+                aggregator[key]['values'].append(value / 1000000 * 1000)
 
         output_rows_agg = aggregator.values()
         output_rows = map(lambda x: {
             'region': x['region'],
             'year': x['year'],
-            'gdp': statistics.mean(x['values'])
+            'gdp': sum(x['values'])
         }, output_rows_agg)
 
         with open(os.path.join(workspace_dir, 'gdpregions.csv'), 'w') as f:
