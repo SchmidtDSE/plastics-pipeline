@@ -9,5 +9,6 @@
         "consumption": "random forest",
         "waste": "random forest",
         "trade": "svr"
-    }
+    },
+    "workers": 1
 }

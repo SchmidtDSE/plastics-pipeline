@@ -2,7 +2,9 @@ CREATE VIEW instance_consumption_displaced AS
 SELECT
     years,
     popChange,
-    gdpChange,
+    gdpPerCapChange,
+    afterGdp,
+    afterPopulation,
     (
         CASE
             WHEN unioned.region = 'china' THEN 1
@@ -85,7 +87,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -125,7 +129,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -165,7 +171,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -205,7 +213,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -245,7 +255,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -285,7 +297,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -325,7 +339,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -365,7 +381,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -405,7 +423,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,
@@ -445,7 +465,9 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp - beforeGdp) / beforeGdp AS gdpChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            afterGdp AS afterGdp,
+            afterPopulation AS afterPopulation,
             (afterConsumptionMT - beforeConsumptionMT) / beforeConsumptionMT AS consumptionChange,
             after.region AS region,
             after.majorMarketSector AS majorMarketSector,

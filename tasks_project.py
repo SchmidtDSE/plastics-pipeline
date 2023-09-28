@@ -166,7 +166,11 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             SELECT
                 after.year - before.year AS years,
                 (after.population - before.population) / before.population AS popChange,
-                (after.gdp - before.gdp) / before.gdp AS gdpChange,
+                (
+                    after.gdp / after.population - before.gdp / before.population
+                ) / (
+                    before.gdp / before.population
+                ) AS gdpPerCapChange,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
@@ -228,8 +232,11 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             SELECT
                 after.year - before.year AS years,
                 (after.population - before.population) / before.population AS popChange,
-                (after.gdp - before.gdp) / before.gdp AS gdpChange,
-                after.gdp AS afterGdp,
+                (
+                    after.gdp / after.population - before.gdp / before.population
+                ) / (
+                    before.gdp / before.population
+                ) AS gdpPerCapChange,
                 before.beforeValue AS beforePercent,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
@@ -287,7 +294,11 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             SELECT
                 after.year - before.year AS years,
                 (after.population - before.population) / before.population AS popChange,
-                (after.gdp - before.gdp) / before.gdp AS gdpChange,
+                (
+                    after.gdp / after.population - before.gdp / before.population
+                ) / (
+                    before.gdp / before.population
+                ) AS gdpPerCapChange,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
@@ -349,7 +360,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'years',
             'popChange',
             'gdpChange',
-            'afterGdp',
             'beforePercent',
             'flagChina',
             'flagEU30',

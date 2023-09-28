@@ -8,9 +8,12 @@ import sqlite3
 import statistics
 
 import luigi
+import pathos.pools
 import sklearn.ensemble
 import sklearn.linear_model
 import sklearn.metrics
+import sklearn.pipeline
+import sklearn.preprocessing
 import sklearn.svm
 import sklearn.tree
 
@@ -39,7 +42,7 @@ class SweepTask(luigi.Task):
 
         self.assign_sets(instances)
 
-        training_results = self.sweep(instances)
+        training_results = self.sweep(instances, job_info['workers'])
         training_results_standard = self.standardize_results(training_results)
 
         force_type = job_info["forceModels"].get(self.get_model_class(), None)
@@ -120,7 +123,7 @@ class SweepTask(luigi.Task):
                 ['test', 'valid', 'train', 'train', 'train', 'train']
             )
 
-    def sweep(self, instances):
+    def sweep(self, instances, workers):
 
         def get_set_instances(label, set_type):
             return filter(lambda x: x[set_type] == label, instances)
@@ -304,7 +307,12 @@ class SweepTask(luigi.Task):
 
             return output_record
 
-        return [execute_task(task) for task in queue]
+        if workers > 1:
+            pool = pathos.pools.ProcessPool(nodes=workers)
+            results = pool.imap(execute_task, queue)
+        else:
+            results = map(execute_task, queue)
+        return list(results) 
 
     def standardize_results(self, results):
         keys_per_row = map(lambda x: x.keys(), results)
@@ -370,7 +378,10 @@ class SweepTask(luigi.Task):
         return ret_val
 
     def try_svm(self, kernel, degree, alpha, train_inputs, train_response):
-        model = sklearn.svm.SVR(kernel=kernel, degree=degree, C=1-alpha)
+        model = sklearn.pipeline.Pipeline([
+            ('scale', sklearn.preprocessing.StandardScaler()),
+            ('svr', sklearn.svm.SVR(kernel=kernel, degree=degree, C=1-alpha))
+        ])
         model.fit(train_inputs, train_response)
         
         ret_val = {
@@ -544,7 +555,7 @@ class SweepConsumptionTask(SweepTask):
                 beforeYear,
                 years,
                 popChange,
-                gdpChange,
+                gdpPerCapChange,
                 flagChina,
                 flagEU30,
                 flagNafta,
@@ -651,8 +662,7 @@ class SweepWasteTask(SweepTask):
                 beforeYear,
                 years,
                 popChange,
-                gdpChange,
-                afterGdp,
+                gdpPerCapChange,
                 beforePercent,
                 percentChange,
                 flagChina,
@@ -677,7 +687,6 @@ class SweepWasteTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'afterGdp',
             'beforePercent',
             'percentChange',
             'flagChina',
@@ -696,7 +705,6 @@ class SweepWasteTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'afterGdp',
             'beforePercent',
             'flagChina',
             'flagEU30',
@@ -721,7 +729,7 @@ class SweepWasteTask(SweepTask):
         return 'waste.pickle'
 
     def get_svm_enabled(self):
-        return False
+        return True
 
     def get_model_class(self):
         return 'waste'
@@ -750,7 +758,7 @@ class SweepTradeTask(SweepTask):
                 afterYear,
                 years,
                 popChange,
-                gdpChange,
+                gdpPerCapChange,
                 flagChina,
                 flagEU30,
                 flagNafta,
