@@ -10,5 +10,5 @@
         "waste": "random forest",
         "trade": "svr"
     },
-    "workers": 2
+    "workers": 1
 }

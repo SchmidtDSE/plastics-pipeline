@@ -307,8 +307,11 @@ class SweepTask(luigi.Task):
 
             return output_record
 
-        pool = pathos.pools.ProcessPool(nodes=workers)
-        results = pool.imap(execute_task, queue)
+        if workers > 1:
+            pool = pathos.pools.ProcessPool(nodes=workers)
+            results = pool.imap(execute_task, queue)
+        else:
+            results = map(execute_task, queue)
         return list(results) 
 
     def standardize_results(self, results):
