@@ -65,13 +65,14 @@ class ProcessGdpTask(luigi.Task):
         output_rows = map(lambda x: {
             'region': x['region'],
             'year': x['year'],
-            'gdp': sum(x['values'])
+            'gdp': statistics.median(x['values']),
+            'gdpSum': sum(x['values'])
         }, output_rows_agg)
 
         with open(os.path.join(workspace_dir, 'gdpregions.csv'), 'w') as f:
             writer = csv.DictWriter(
                 f,
-                fieldnames=['region', 'year', 'gdp']
+                fieldnames=['region', 'year', 'gdp', 'gdpSum']
             )
             writer.writeheader()
             writer.writerows(output_rows)
