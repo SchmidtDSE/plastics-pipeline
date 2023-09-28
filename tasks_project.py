@@ -166,7 +166,11 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             SELECT
                 after.year - before.year AS years,
                 (after.population - before.population) / before.population AS popChange,
-                (after.gdp - before.gdp) / before.gdp AS gdpChange,
+                (
+                    after.gdp / after.population - before.gdp / before.population
+                ) / (
+                    before.gdp / before.population
+                ) AS gdpPerCapChange,
                 after.gdp / after.population AS afterGdp,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
@@ -229,7 +233,11 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             SELECT
                 after.year - before.year AS years,
                 (after.population - before.population) / before.population AS popChange,
-                (after.gdp - before.gdp) / before.gdp AS gdpChange,
+                (
+                    after.gdp / after.population - before.gdp / before.population
+                ) / (
+                    before.gdp / before.population
+                ) AS gdpPerCapChange,
                 after.gdp / after.population AS afterGdp,
                 before.beforeValue AS beforePercent,
                 {flagChina} AS flagChina,
@@ -288,7 +296,11 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             SELECT
                 after.year - before.year AS years,
                 (after.population - before.population) / before.population AS popChange,
-                (after.gdp - before.gdp) / before.gdp AS gdpChange,
+                (
+                    after.gdp / after.population - before.gdp / before.population
+                ) / (
+                    before.gdp / before.population
+                ) AS gdpPerCapChange,
                 after.gdp / after.population AS afterGdp,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
