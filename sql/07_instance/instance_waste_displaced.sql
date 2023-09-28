@@ -2,7 +2,7 @@ CREATE VIEW instance_waste_displaced AS
 SELECT
     unioned.years AS years,
     unioned.popChange AS popChange,
-    unioned.gdpChange AS gdpChange,
+    unioned.gdpPerCapChange AS gdpPerCapChange,
     unioned.afterGdp AS afterGdp,
     unioned.afterPopulation AS afterPopulation,
     unioned.beforePercent AS beforePercent,

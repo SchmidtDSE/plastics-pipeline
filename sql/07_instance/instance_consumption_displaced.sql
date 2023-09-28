@@ -2,7 +2,7 @@ CREATE VIEW instance_consumption_displaced AS
 SELECT
     years,
     popChange,
-    gdpChange,
+    gdpPerCapChange,
     afterGdp,
     afterPopulation,
     (
