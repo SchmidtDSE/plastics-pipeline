@@ -171,7 +171,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 ) / (
                     before.gdp / before.population
                 ) AS gdpPerCapChange,
-                after.gdp / after.population AS afterGdp,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
@@ -238,7 +237,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 ) / (
                     before.gdp / before.population
                 ) AS gdpPerCapChange,
-                after.gdp / after.population AS afterGdp,
                 before.beforeValue AS beforePercent,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
@@ -301,7 +299,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 ) / (
                     before.gdp / before.population
                 ) AS gdpPerCapChange,
-                after.gdp / after.population AS afterGdp,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
@@ -343,7 +340,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'years',
             'popChange',
             'gdpChange',
-            'afterGdp',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -364,7 +360,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'years',
             'popChange',
             'gdpChange',
-            'afterGdp',
             'beforePercent',
             'flagChina',
             'flagEU30',
@@ -381,7 +376,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'years',
             'popChange',
             'gdpChange',
-            'afterGdp',
             'flagChina',
             'flagEU30',
             'flagNafta',
