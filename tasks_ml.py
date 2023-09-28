@@ -12,6 +12,8 @@ import pathos.pools
 import sklearn.ensemble
 import sklearn.linear_model
 import sklearn.metrics
+import sklearn.pipeline
+import sklearn.preprocessing
 import sklearn.svm
 import sklearn.tree
 
@@ -121,7 +123,7 @@ class SweepTask(luigi.Task):
                 ['test', 'valid', 'train', 'train', 'train', 'train']
             )
 
-    def sweep(self, instances):
+    def sweep(self, instances, workers):
 
         def get_set_instances(label, set_type):
             return filter(lambda x: x[set_type] == label, instances)
@@ -373,7 +375,10 @@ class SweepTask(luigi.Task):
         return ret_val
 
     def try_svm(self, kernel, degree, alpha, train_inputs, train_response):
-        model = sklearn.svm.SVR(kernel=kernel, degree=degree, C=1-alpha)
+        model = sklearn.pipeline.Pipeline([
+            ('scale', sklearn.preprocessing.StandardScaler()),
+            ('svr', sklearn.svm.SVR(kernel=kernel, degree=degree, C=1-alpha))
+        ])
         model.fit(train_inputs, train_response)
         
         ret_val = {
@@ -548,6 +553,7 @@ class SweepConsumptionTask(SweepTask):
                 years,
                 popChange,
                 gdpChange,
+                afterGdp / afterPopulation,
                 flagChina,
                 flagEU30,
                 flagNafta,
@@ -574,6 +580,7 @@ class SweepConsumptionTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
+            'afterGdp',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -596,6 +603,7 @@ class SweepConsumptionTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
+            'afterGdp',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -655,7 +663,7 @@ class SweepWasteTask(SweepTask):
                 years,
                 popChange,
                 gdpChange,
-                afterGdp,
+                afterGdp / afterPopulation,
                 beforePercent,
                 percentChange,
                 flagChina,
@@ -724,7 +732,7 @@ class SweepWasteTask(SweepTask):
         return 'waste.pickle'
 
     def get_svm_enabled(self):
-        return False
+        return True
 
     def get_model_class(self):
         return 'waste'
@@ -754,6 +762,7 @@ class SweepTradeTask(SweepTask):
                 years,
                 popChange,
                 gdpChange,
+                afterGdp / afterPopulation,
                 flagChina,
                 flagEU30,
                 flagNafta,
@@ -776,6 +785,7 @@ class SweepTradeTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
+            'afterGdp',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -794,6 +804,7 @@ class SweepTradeTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
+            'afterGdp',
             'flagChina',
             'flagEU30',
             'flagNafta',
