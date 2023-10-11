@@ -20,6 +20,7 @@ SELECT
     summary.netImportFibersMT AS netImportFibersMT,
     summary.netImportGoodsMT AS netImportGoodsMT,
     summary.netImportResinMT AS netImportResinMT,
+    summary.netWasteTradeMT AS netWasteTradeMT,
     NULL AS newWasteMT
 FROM
     auxiliary

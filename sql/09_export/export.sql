@@ -25,7 +25,19 @@ SELECT
             ELSE 0
         END
     ) AS netExportsMT,
-    totalConsumption - netImport AS domesticProductionMT
+    totalConsumption - netImport AS domesticProductionMT,
+    (
+        CASE
+            WHEN netWasteTradeMT > 0 THEN netWasteTradeMT
+            ELSE 0
+        END
+    ) AS netWasteExportMT,
+    (
+        CASE
+            WHEN netWasteTradeMT < 0 THEN -1 * netWasteTradeMT
+            ELSE 0
+        END
+    ) AS netWasteImportMT
 FROM
     (
         SELECT
@@ -57,7 +69,8 @@ FROM
                 consumptionTransporationMT +
                 consumptionTextileMT +
                 consumptionOtherMT
-            ) AS totalConsumption
+            ) AS totalConsumption,
+            netWasteTradeMT AS netWasteTradeMT
         FROM
             {table_name}
         WHERE

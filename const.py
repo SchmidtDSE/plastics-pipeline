@@ -74,5 +74,7 @@ EXPORT_FIELD_NAMES = [
     'consumptionOtherMT',
     'netImportsMT',
     'netExportsMT',
-    'domesticProductionMT'
+    'domesticProductionMT',
+    'netWasteExportMT',
+    'netWasteImportMT'
 ]

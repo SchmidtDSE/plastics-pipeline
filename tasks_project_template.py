@@ -79,11 +79,15 @@ class ProjectRawTask(luigi.Task):
             self.get_trade_model_filename(),
             job_info
         )
+        waste_trade_model = self.get_model(
+            self.get_waste_trade_model_filename(),
+            job_info
+        )
 
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        years_before = reversed(range(1990, 2005))
+        years_before = reversed(range(1990, 2007))
         years_after = range(2021, 2051)
         years = itertools.chain(years_before, years_after)
         for year in years:
@@ -94,7 +98,8 @@ class ProjectRawTask(luigi.Task):
                     region,
                     consumption_model,
                     waste_model,
-                    trade_model
+                    trade_model,
+                    waste_trade_model
                 )
 
         connection.close()
@@ -102,7 +107,8 @@ class ProjectRawTask(luigi.Task):
         with self.output().open('w') as f:
             return json.dump(job_info, f)
 
-    def project(self, connection, year, region, consumption_model, waste_model, trade_model):
+    def project(self, connection, year, region, consumption_model, waste_model, trade_model,
+        waste_trade_model):
         updated_output_row = {
             'table_name': self.get_table_name(),
             'year': year,
@@ -130,6 +136,13 @@ class ProjectRawTask(luigi.Task):
             trade_model
         ))
 
+        updated_output_row.update(self.get_waste_trade_projections(
+            connection,
+            year,
+            region,
+            waste_trade_model
+        ))
+
         cursor = connection.cursor()
 
         cursor.execute('''
@@ -151,7 +164,8 @@ class ProjectRawTask(luigi.Task):
                 netImportArticlesMT = {netImportArticlesMT},
                 netImportFibersMT = {netImportFibersMT},
                 netImportGoodsMT = {netImportGoodsMT},
-                netImportResinMT = {netImportResinMT}
+                netImportResinMT = {netImportResinMT},
+                netWasteTradeMT = {netWasteTradeMT}
             WHERE
                 year = {year}
                 AND region = '{region}'
@@ -244,6 +258,23 @@ class ProjectRawTask(luigi.Task):
             )
         )
 
+    def get_waste_trade_projections(self, connection, year, region, waste_trade_model):
+        return self.get_projections(
+            connection,
+            year,
+            region,
+            waste_trade_model,
+            [
+                'netWasteTradeMT'
+            ],
+            lambda x: self.get_waste_trade_inputs_sql(year, region, x),
+            lambda: self.get_waste_trade_inputs_cols(),
+            lambda instance, prediction: self.transform_waste_trade_prediction(
+                instance,
+                prediction
+            )
+        )
+
     def get_projections(self, connection, year, region, model, keys, sql_getter, cols_getter,
             prediction_transformer):
 
@@ -281,6 +312,9 @@ class ProjectRawTask(luigi.Task):
     def get_trade_model_filename(self):
         raise NotImplementedError('Use implementor.')
 
+    def get_waste_trade_model_filename(self):
+        raise NotImplementedError('Use implementor.')
+
     def get_consumption_inputs_sql(self, year, region, sector):
         raise NotImplementedError('Use implementor.')
 
@@ -288,6 +322,9 @@ class ProjectRawTask(luigi.Task):
         raise NotImplementedError('Use implementor.')
 
     def get_trade_inputs_sql(self, year, region, type_name):
+        raise NotImplementedError('Use implementor.')
+
+    def get_waste_trade_inputs_sql(self, year, region, type_name):
         raise NotImplementedError('Use implementor.')
     
     def get_consumption_inputs_cols(self):
@@ -299,6 +336,9 @@ class ProjectRawTask(luigi.Task):
     def get_trade_inputs_cols(self):
         raise NotImplementedError('Use implementor.')
 
+    def get_waste_trade_inputs_cols(self):
+        raise NotImplementedError('Use implementor.')
+
     def transform_consumption_prediction(self, instance, prediction):
         raise NotImplementedError('Use implementor.')
 
@@ -306,6 +346,9 @@ class ProjectRawTask(luigi.Task):
         raise NotImplementedError('Use implementor.')
 
     def transform_trade_prediction(self, instance, prediction):
+        raise NotImplementedError('Use implementor.')
+
+    def transform_waste_trade_prediction(self, instance, prediction):
         raise NotImplementedError('Use implementor.')
 
 
@@ -318,8 +361,23 @@ class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
         return [
             '08_project/normalize_eol.sql',
             '08_project/normalize_trade.sql',
+            '08_project/normalize_waste_trade.sql',
             '08_project/apply_china_policy.sql',
             '08_project/apply_eu_policy.sql'
+        ]
+
+    def get_table_name(self):
+        raise NotImplementedError('Use implementor.')
+
+
+class ApplyWasteTradeProjectionTask(tasks_sql.SqlExecuteTask):
+
+    def transform_sql(self, sql_contents):
+        return sql_contents.format(table_name=self.get_table_name())
+
+    def get_scripts(self):
+        return [
+            '08_project/apply_waste_trade.sql'
         ]
 
     def get_table_name(self):
@@ -367,6 +425,28 @@ class NormalizeCheckTask(luigi.Task):
                     OR abs(global_vals.totalFibersMT) > 0.0001
                     OR abs(global_vals.totalGoodsMT) > 0.0001
                     OR abs(global_vals.totalResinMT) > 0.0001
+                )
+                AND global_vals.year > 2020
+        '''.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        cursor.execute('''
+            SELECT
+                count(1)
+            FROM
+                (
+                    SELECT
+                        year,
+                        sum(netWasteTradeMT) AS netWasteTradeMT
+                    FROM
+                        {table}
+                    GROUP BY
+                        year
+                ) global_vals
+            WHERE
+                (
+                    abs(global_vals.netWasteTradeMT) > 0.0001
                 )
                 AND global_vals.year > 2020
         '''.format(table=table))

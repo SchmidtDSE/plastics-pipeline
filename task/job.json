@@ -8,7 +8,8 @@
     "forceModels": {
         "consumption": "random forest",
         "waste": "random forest",
-        "trade": "svr"
+        "trade": "random forest",
+        "wasteTrade": "random forest"
     },
     "workers": 1
 }
