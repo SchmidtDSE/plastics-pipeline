@@ -361,6 +361,7 @@ class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
         return [
             '08_project/normalize_eol.sql',
             '08_project/normalize_trade.sql',
+            '08_project/normalize_waste_trade.sql',
             '08_project/apply_china_policy.sql',
             '08_project/apply_eu_policy.sql'
         ]
@@ -410,6 +411,28 @@ class NormalizeCheckTask(luigi.Task):
                     OR abs(global_vals.totalFibersMT) > 0.0001
                     OR abs(global_vals.totalGoodsMT) > 0.0001
                     OR abs(global_vals.totalResinMT) > 0.0001
+                )
+                AND global_vals.year > 2020
+        '''.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        cursor.execute('''
+            SELECT
+                count(1)
+            FROM
+                (
+                    SELECT
+                        year,
+                        sum(netWasteTradeMT) AS netWasteTradeMT
+                    FROM
+                        {table}
+                    GROUP BY
+                        year
+                ) global_vals
+            WHERE
+                (
+                    abs(global_vals.netWasteTradeMT) > 0.0001
                 )
                 AND global_vals.year > 2020
         '''.format(table=table))
