@@ -9,8 +9,8 @@ FROM
             {table_name}.region AS region,
             (
                 CASE
-                    WHEN totalNetWasteTrade > 0 AND netWasteTradeMT > 0 THEN netWasteTradeMT - totalNetWasteTrade * netWasteTradeMT / netWasteTradeMTPos
-                    WHEN totalNetWasteTrade < 0 AND netWasteTradeMT < 0 THEN netWasteTradeMT - totalNetWasteTrade * netWasteTradeMT / netWasteTradeMTNeg
+                    WHEN totalNetWasteTrade > 0 AND netWasteTradeMT < 0 THEN netWasteTradeMT - totalNetWasteTrade * netWasteTradeMT / netWasteTradeMTPos
+                    WHEN totalNetWasteTrade < 0 AND netWasteTradeMT > 0 THEN netWasteTradeMT - totalNetWasteTrade * netWasteTradeMT / netWasteTradeMTNeg
                     ELSE netWasteTradeMT
                 END
             ) AS netWasteTradeMT
