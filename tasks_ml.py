@@ -844,7 +844,7 @@ class SweepWasteTradeTask(SweepTask):
 
     def evaluate_target_single(self, predicted, actuals):
         actual_target = actuals[1]
-        predicted_target = (1 + predicted) * actuals[0]
+        predicted_target = predicted + actuals[0]
         return abs(actual_target - predicted_target)
 
     def get_sql(self):
@@ -976,7 +976,7 @@ class CheckSweepTradeTask(CheckSweepTask):
         return 'trade_sweep.csv'
 
     def check_model(self, target):
-        assert target['validOutSampleTarget'] < 5
+        assert target['validOutSampleTarget'] < 3
 
     def get_model_class(self):
         return 'trade'
@@ -997,7 +997,7 @@ class CheckSweepWasteTradeTask(CheckSweepTask):
         return 'wasteTrade_sweep.csv'
 
     def check_model(self, target):
-        assert target['validOutSampleTarget'] < 5
+        assert target['validOutSampleTarget'] < 3
 
     def get_model_class(self):
         return 'wasteTrade'

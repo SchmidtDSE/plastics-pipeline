@@ -370,6 +370,20 @@ class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
         raise NotImplementedError('Use implementor.')
 
 
+class ApplyWasteTradeProjectionTask(tasks_sql.SqlExecuteTask):
+
+    def transform_sql(self, sql_contents):
+        return sql_contents.format(table_name=self.get_table_name())
+
+    def get_scripts(self):
+        return [
+            '08_project/apply_waste_trade.sql'
+        ]
+
+    def get_table_name(self):
+        raise NotImplementedError('Use implementor.')
+
+
 class NormalizeCheckTask(luigi.Task):
 
     def get_table_name(self):

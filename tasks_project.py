@@ -472,7 +472,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         return instance['beforeValue'] * (1 + prediction)
 
     def transform_waste_trade_prediction(self, instance, prediction):
-        return instance['beforeValue'] * (1 + prediction)
+        return instance['beforeValue'] + prediction
 
 
 class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):
@@ -689,6 +689,9 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
     def transform_waste_prediction(self, instance, prediction):
         return prediction
 
+    def transform_trade_prediction(self, instance, prediction):
+        return prediction
+
     def transform_waste_trade_prediction(self, instance, prediction):
         return prediction
 
@@ -898,3 +901,48 @@ class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
 
     def get_table_name(self):
         return 'project_curve'
+
+
+class MlApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return MlLifecycleCheckTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '521_ml_apply_waste_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_ml'
+
+
+class CurveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return CurveLifecycleCheckTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '522_curve_apply_waste_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_curve'
+
+
+class NaiveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return ApplyLifecycleNaiveTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '523_naive_apply_waste_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'project_naive'

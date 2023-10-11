@@ -130,9 +130,9 @@ class ProjectTask(luigi.Task):
 
     def requires(self):
         return [
-            tasks_project.MlLifecycleCheckTask(task_dir=self.task_dir),
-            tasks_project.CurveLifecycleCheckTask(task_dir=self.task_dir),
-            tasks_project.ApplyLifecycleNaiveTask(task_dir=self.task_dir)
+            tasks_project.MlApplyWasteTradeTask(task_dir=self.task_dir),
+            tasks_project.CurveApplyWasteTradeTask(task_dir=self.task_dir),
+            tasks_project.NaiveApplyWasteTradeTask(task_dir=self.task_dir)
         ]
 
     def output(self):
