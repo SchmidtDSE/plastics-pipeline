@@ -79,6 +79,10 @@ class ProjectRawTask(luigi.Task):
             self.get_trade_model_filename(),
             job_info
         )
+        waste_trade_model = self.get_model(
+            self.get_waste_trade_model_filename(),
+            job_info
+        )
 
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
@@ -94,7 +98,8 @@ class ProjectRawTask(luigi.Task):
                     region,
                     consumption_model,
                     waste_model,
-                    trade_model
+                    trade_model,
+                    waste_trade_model
                 )
 
         connection.close()
@@ -102,7 +107,8 @@ class ProjectRawTask(luigi.Task):
         with self.output().open('w') as f:
             return json.dump(job_info, f)
 
-    def project(self, connection, year, region, consumption_model, waste_model, trade_model):
+    def project(self, connection, year, region, consumption_model, waste_model, trade_model,
+        waste_trade_model):
         updated_output_row = {
             'table_name': self.get_table_name(),
             'year': year,
@@ -130,6 +136,13 @@ class ProjectRawTask(luigi.Task):
             trade_model
         ))
 
+        updated_output_row.update(self.get_waste_trade_projections(
+            connection,
+            year,
+            region,
+            waste_trade_model
+        ))
+
         cursor = connection.cursor()
 
         cursor.execute('''
@@ -151,7 +164,8 @@ class ProjectRawTask(luigi.Task):
                 netImportArticlesMT = {netImportArticlesMT},
                 netImportFibersMT = {netImportFibersMT},
                 netImportGoodsMT = {netImportGoodsMT},
-                netImportResinMT = {netImportResinMT}
+                netImportResinMT = {netImportResinMT},
+                netWasteTradeMT = {netWasteTradeMT}
             WHERE
                 year = {year}
                 AND region = '{region}'
@@ -244,6 +258,23 @@ class ProjectRawTask(luigi.Task):
             )
         )
 
+    def get_waste_trade_projections(self, connection, year, region, waste_trade_model):
+        return self.get_projections(
+            connection,
+            year,
+            region,
+            waste_trade_model,
+            [
+                'netWasteTradeMT'
+            ],
+            lambda x: self.get_waste_trade_inputs_sql(year, region, x),
+            lambda: self.get_waste_trade_inputs_cols(),
+            lambda instance, prediction: self.transform_waste_trade_prediction(
+                instance,
+                prediction
+            )
+        )
+
     def get_projections(self, connection, year, region, model, keys, sql_getter, cols_getter,
             prediction_transformer):
 
@@ -281,6 +312,9 @@ class ProjectRawTask(luigi.Task):
     def get_trade_model_filename(self):
         raise NotImplementedError('Use implementor.')
 
+    def get_waste_trade_model_filename(self):
+        raise NotImplementedError('Use implementor.')
+
     def get_consumption_inputs_sql(self, year, region, sector):
         raise NotImplementedError('Use implementor.')
 
@@ -288,6 +322,9 @@ class ProjectRawTask(luigi.Task):
         raise NotImplementedError('Use implementor.')
 
     def get_trade_inputs_sql(self, year, region, type_name):
+        raise NotImplementedError('Use implementor.')
+
+    def get_waste_trade_inputs_sql(self, year, region, type_name):
         raise NotImplementedError('Use implementor.')
     
     def get_consumption_inputs_cols(self):
@@ -299,6 +336,9 @@ class ProjectRawTask(luigi.Task):
     def get_trade_inputs_cols(self):
         raise NotImplementedError('Use implementor.')
 
+    def get_waste_trade_inputs_cols(self):
+        raise NotImplementedError('Use implementor.')
+
     def transform_consumption_prediction(self, instance, prediction):
         raise NotImplementedError('Use implementor.')
 
@@ -306,6 +346,9 @@ class ProjectRawTask(luigi.Task):
         raise NotImplementedError('Use implementor.')
 
     def transform_trade_prediction(self, instance, prediction):
+        raise NotImplementedError('Use implementor.')
+
+    def transform_waste_trade_prediction(self, instance, prediction):
         raise NotImplementedError('Use implementor.')
 
 

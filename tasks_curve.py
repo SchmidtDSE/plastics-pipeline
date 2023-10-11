@@ -511,7 +511,7 @@ class TradeCurveTask(CurveTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
-        return tasks_ml_prep.CheckMlWasteViewTask(task_dir=self.task_dir)
+        return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '404_trade_curve.json')
@@ -567,7 +567,7 @@ class TradeCurveNaiveTask(CurveTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
-        return tasks_ml_prep.CheckMlWasteViewTask(task_dir=self.task_dir)
+        return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '405_trade_curve_naive.json')
@@ -615,3 +615,112 @@ class TradeCurveNaiveTask(CurveTask):
 
     def get_model_filename(self):
         return 'trade_curve_naive.pickle'
+
+
+class WasteTradeCurveTask(CurveTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return tasks_ml_prep.CheckMlWasteTradeViewTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '406_waste_trade_curve.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_sql(self):
+        return '''
+            SELECT
+                year,
+                region,
+                netMT,
+                population,
+                gdp
+            FROM
+                instance_waste_trade_normal
+            WHERE
+                year > 2007
+        '''
+
+    def get_key_cols(self):
+        return [
+            'region'
+        ]
+
+    def get_cols(self):
+        return [
+            'year',
+            'region',
+            'netMT',
+            'population',
+            'gdp'
+        ]
+    
+    def get_input_cols(self):
+        return [
+            'population',
+            'gdp'
+        ]
+
+    def get_response_col(self):
+        return 'netMT'
+
+    def get_report_filename(self):
+        return 'wasteTrade_curve.csv'
+
+    def get_model_filename(self):
+        return 'wasteTrade_curve.pickle'
+
+
+class WasteTradeCurveNaiveTask(CurveTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return tasks_ml_prep.CheckMlWasteTradeViewTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '407_trade_curve_naive.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_sql(self):
+        return '''
+            SELECT
+                year,
+                region,
+                netMT,
+                population,
+                gdp
+            FROM
+                instance_waste_trade_normal
+            WHERE
+                year > 2007
+        '''
+
+    def get_key_cols(self):
+        return [
+            'region'
+        ]
+
+    def get_cols(self):
+        return [
+            'year',
+            'region',
+            'netMT',
+            'population',
+            'gdp'
+        ]
+    
+    def get_input_cols(self):
+        return [
+            'year'
+        ]
+
+    def get_response_col(self):
+        return 'netMT'
+
+    def get_report_filename(self):
+        return 'wasteTrade_curve_naive.csv'
+
+    def get_model_filename(self):
+        return 'wasteTrade_curve_naive.pickle'

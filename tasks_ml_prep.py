@@ -89,7 +89,9 @@ class BuildMlViewsTask(tasks_sql.SqlExecuteTask):
             '07_instance/instance_waste_normal.sql',
             '07_instance/instance_waste_displaced.sql',
             '07_instance/instance_trade_normal.sql',
-            '07_instance/instance_trade_displaced.sql'
+            '07_instance/instance_trade_displaced.sql',
+            '07_instance/instance_waste_trade_normal.sql',
+            '07_instance/instance_waste_trade_displaced.sql'
         ]
 
 
@@ -136,3 +138,18 @@ class CheckMlTradeViewTask(tasks_sql.SqlCheckTask):
 
     def get_table_name(self):
         return 'instance_trade_displaced'
+
+
+class CheckMlWasteTradeViewTask(tasks_sql.SqlCheckTask):
+    
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+    
+    def requires(self):
+        return BuildMlViewsTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '205_check_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'instance_waste_trade_displaced'

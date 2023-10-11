@@ -131,6 +131,7 @@ class CleanInputsTask(tasks_sql.SqlExecuteTask):
             '02_clean_inputs/raw_net_trade_eu30.sql',
             '02_clean_inputs/raw_net_trade_nafta.sql',
             '02_clean_inputs/raw_net_trade_row.sql',
+            '02_clean_inputs/raw_waste_trade.sql',
             '02_clean_inputs/raw_production_fiber.sql',
             '02_clean_inputs/raw_production_resin.sql'
         ]
@@ -172,13 +173,13 @@ class BuildViewsTask(tasks_sql.SqlExecuteTask):
             '03_views/input_production.sql',
             '03_views/inputs.sql',
             '03_views/net_imports.sql',
+            '03_views/waste_trade.sql',
             '03_views/overview_consumption.sql',
             '03_views/overview_end_use.sql',
             '03_views/overview_eol.sql',
             '03_views/overview_inputs.sql',
             '03_views/overview_net_imports.sql',
             '03_views/overview_sector_trade.sql',
-            '03_views/summary_percents.sql',
             '03_views/summary.sql'
         ]
 

@@ -20,3 +20,4 @@
 .import {target_dir}19nettradenafta.csv file_19nettradenafta
 .import {target_dir}20nettradeeu.csv file_20nettradeeu
 .import {target_dir}21nettraderow.csv file_21nettraderow
+.import {target_dir}22wastetrade.csv file_22wastetrade

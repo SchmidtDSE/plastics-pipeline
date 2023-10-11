@@ -82,7 +82,8 @@ class MlTask(luigi.Task):
         return [
             tasks_ml.CheckSweepConsumptionTask(task_dir=self.task_dir),
             tasks_ml.CheckSweepWasteTask(task_dir=self.task_dir),
-            tasks_ml.CheckSweepTradeTask(task_dir=self.task_dir)
+            tasks_ml.CheckSweepTradeTask(task_dir=self.task_dir),
+            tasks_ml.CheckSweepWasteTradeTask(task_dir=self.task_dir)
         ]
 
     def output(self):

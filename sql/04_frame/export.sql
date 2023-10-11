@@ -12,6 +12,7 @@ SELECT
     netImportFibersMT,
     netImportGoodsMT,
     netImportResinMT,
+    netWasteTradeMT,
     consumptionAgricultureMT,
     consumptionConstructionMT,
     consumptionElectronicMT,

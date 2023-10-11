@@ -16,7 +16,8 @@ class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
         return [
             tasks_ml.CheckSweepConsumptionTask(task_dir=self.task_dir),
             tasks_ml.CheckSweepWasteTask(task_dir=self.task_dir),
-            tasks_ml.CheckSweepTradeTask(task_dir=self.task_dir)
+            tasks_ml.CheckSweepTradeTask(task_dir=self.task_dir),
+            tasks_ml.CheckSweepWasteTradeTask(task_dir=self.task_dir),
         ]
 
     def output(self):
@@ -27,7 +28,8 @@ class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
         return [
             'consumption',
             'waste',
-            'trade'
+            'trade',
+            'wasteTrade'
         ]
 
 
@@ -39,7 +41,8 @@ class PreCheckCurveProjectTask(tasks_project_template.PreCheckProjectTask):
         return [
             tasks_curve.ConsumptionCurveTask(task_dir=self.task_dir),
             tasks_curve.WasteCurveTask(task_dir=self.task_dir),
-            tasks_curve.TradeCurveTask(task_dir=self.task_dir)
+            tasks_curve.TradeCurveTask(task_dir=self.task_dir),
+            tasks_curve.WasteTradeCurveTask(task_dir=self.task_dir)
         ]
 
     def output(self):
@@ -50,7 +53,8 @@ class PreCheckCurveProjectTask(tasks_project_template.PreCheckProjectTask):
         return [
             'consumption_curve',
             'waste_curve',
-            'trade_curve'
+            'trade_curve',
+            'wasteTrade_curve'
         ]
 
 
@@ -62,7 +66,8 @@ class PreCheckNaiveProjectTask(tasks_project_template.PreCheckProjectTask):
         return [
             tasks_curve.ConsumptionCurveNaiveTask(task_dir=self.task_dir),
             tasks_curve.WasteCurveNaiveTask(task_dir=self.task_dir),
-            tasks_curve.TradeCurveNaiveTask(task_dir=self.task_dir)
+            tasks_curve.TradeCurveNaiveTask(task_dir=self.task_dir),
+            tasks_curve.WasteTradeCurveNaiveTask(task_dir=self.task_dir)
         ]
 
     def output(self):
@@ -73,7 +78,8 @@ class PreCheckNaiveProjectTask(tasks_project_template.PreCheckProjectTask):
         return [
             'consumption_curve_naive',
             'waste_curve_naive',
-            'trade_curve_naive'
+            'trade_curve_naive',
+            'wasteTrade_curve_naive'
         ]
 
 
@@ -129,6 +135,9 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
 
     def get_trade_model_filename(self):
         return 'trade.pickle'
+
+    def get_waste_trade_model_filename(self):
+        return 'wasteTrade.pickle'
 
     def hot_encode(self, candidate, hot_value):
         return 1 if candidate == hot_value else 0
@@ -334,6 +343,60 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
+
+    def get_waste_trade_inputs_sql(self, year, region, type_name):
+        template_vals = {
+            'table_name': self.get_table_name(),
+            'year': year,
+            'region': region,
+            'typeName': type_name,
+            'flagChina': self.hot_encode(region, 'china'),
+            'flagEU30': self.hot_encode(region, 'eu30'),
+            'flagNafta': self.hot_encode(region, 'nafta'),
+            'flagRow': self.hot_encode(region, 'row'),
+            'yearSelector': self.get_year_selector(year)
+        }
+
+        return '''
+            SELECT
+                after.year - before.year AS years,
+                (after.population - before.population) / before.population AS popChange,
+                (
+                    after.gdp / after.population - before.gdp / before.population
+                ) / (
+                    before.gdp / before.population
+                ) AS gdpPerCapChange,
+                {flagChina} AS flagChina,
+                {flagEU30} AS flagEU30,
+                {flagNafta} AS flagNafta,
+                {flagRow} AS flagRow,
+                before.beforeValue AS beforeValue
+            FROM
+                (
+                    SELECT
+                        year AS year,
+                        population AS population,
+                        gdp AS gdp
+                    FROM
+                        {table_name}
+                    WHERE
+                        year = {year}
+                        AND region = '{region}'
+                ) after
+            INNER JOIN
+                (
+                    SELECT
+                        year AS year,
+                        population AS population,
+                        gdp AS gdp,
+                        {typeName} AS beforeValue
+                    FROM
+                        {table_name}
+                    WHERE
+                        {yearSelector}
+                        AND region = '{region}'
+                ) before
+        '''.format(**template_vals)
     
     def get_consumption_inputs_cols(self):
         return [
@@ -387,6 +450,18 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'beforeValue'
         ]
 
+    def get_waste_trade_inputs_cols(self):
+        return [
+            'years',
+            'popChange',
+            'gdpChange',
+            'flagChina',
+            'flagEU30',
+            'flagNafta',
+            'flagRow',
+            'beforeValue'
+        ]
+
     def transform_consumption_prediction(self, instance, prediction):
         return instance['beforeValue'] * (1 + prediction)
 
@@ -394,6 +469,9 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         return prediction
 
     def transform_trade_prediction(self, instance, prediction):
+        return instance['beforeValue'] * (1 + prediction)
+
+    def transform_waste_trade_prediction(self, instance, prediction):
         return instance['beforeValue'] * (1 + prediction)
 
 
@@ -478,6 +556,9 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
     def get_trade_model_filename(self):
         return 'trade_curve.pickle'
 
+    def get_waste_trade_model_filename(self):
+        return 'wasteTrade_curve.pickle'
+
     def hot_encode(self, candidate, hot_value):
         return 1 if candidate == hot_value else 0
 
@@ -546,6 +627,26 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
                 year = {year}
                 AND region = '{region}'
         '''.format(**template_vals)
+
+    def get_waste_trade_inputs_sql(self, year, region, type_name):
+        template_vals = {
+            'table_name': self.get_table_name(),
+            'year': year,
+            'region': region
+        }
+
+        return '''
+            SELECT
+                year,
+                region,
+                population,
+                gdp
+            FROM
+                {table_name}
+            WHERE
+                year = {year}
+                AND region = '{region}'
+        '''.format(**template_vals)
     
     def get_consumption_inputs_cols(self):
         return [
@@ -574,13 +675,21 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
             'type'
         ]
 
+    def get_waste_trade_inputs_cols(self):
+        return [
+            'year',
+            'region',
+            'population',
+            'gdp'
+        ]
+
     def transform_consumption_prediction(self, instance, prediction):
         return prediction
 
     def transform_waste_prediction(self, instance, prediction):
         return prediction
 
-    def transform_trade_prediction(self, instance, prediction):
+    def transform_waste_trade_prediction(self, instance, prediction):
         return prediction
 
 
@@ -636,6 +745,9 @@ class ProjectNaiveRawTask(ProjectCurveRawTask):
 
     def get_trade_model_filename(self):
         return 'trade_curve_naive.pickle'
+
+    def get_waste_trade_model_filename(self):
+        return 'wasteTrade_curve_naive.pickle'
 
 
 class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):

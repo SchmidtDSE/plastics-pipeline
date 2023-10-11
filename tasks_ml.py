@@ -831,6 +831,93 @@ class SweepTradeTask(SweepTask):
         return 'trade'
 
 
+class SweepWasteTradeTask(SweepTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '303_sweep_waste_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def evaluate_target_single(self, predicted, actuals):
+        actual_target = actuals[1]
+        predicted_target = (1 + predicted) * actuals[0]
+        return abs(actual_target - predicted_target)
+
+    def get_sql(self):
+        return '''
+            SELECT
+                beforeYear,
+                afterYear,
+                years,
+                popChange,
+                gdpPerCapChange,
+                flagChina,
+                flagEU30,
+                flagNafta,
+                flagRow,
+                netMTChange,
+                beforeNetMT,
+                afterNetMT
+            FROM
+                instance_waste_trade_displaced
+            WHERE
+                beforeYear >= 2007
+                AND afterYear >= 2007
+        '''
+
+    def get_cols(self):
+        return [
+            'beforeYear',
+            'afterYear',
+            'years',
+            'popChange',
+            'gdpChange',
+            'flagChina',
+            'flagEU30',
+            'flagNafta',
+            'flagRow',
+            'netMTChange',
+            'beforeNetMT',
+            'afterNetMT'
+        ]
+    
+    def get_input_cols(self):
+        return [
+            'years',
+            'popChange',
+            'gdpChange',
+            'flagChina',
+            'flagEU30',
+            'flagNafta',
+            'flagRow'
+        ]
+
+    def get_response_col(self):
+        return 'netMTChange'
+
+    def get_output_cols(self):
+        return [
+            'beforeNetMT',
+            'afterNetMT'
+        ]
+
+    def get_report_filename(self):
+        return 'wasteTrade_sweep.csv'
+
+    def get_model_filename(self):
+        return 'wasteTrade.pickle'
+
+    def get_svm_enabled(self):
+        return True
+
+    def get_model_class(self):
+        return 'wasteTrade'
+
+
 class CheckSweepConsumptionTask(CheckSweepTask):
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -839,7 +926,7 @@ class CheckSweepConsumptionTask(CheckSweepTask):
         return SweepConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '303_check_consumption.json')
+        out_path = os.path.join(self.task_dir, '304_check_consumption.json')
         return luigi.LocalTarget(out_path)
 
     def get_report_filename(self):
@@ -861,7 +948,7 @@ class CheckSweepWasteTask(CheckSweepTask):
         return SweepWasteTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '304_check_waste.json')
+        out_path = os.path.join(self.task_dir, '305_check_waste.json')
         return luigi.LocalTarget(out_path)
 
     def get_report_filename(self):
@@ -882,7 +969,7 @@ class CheckSweepTradeTask(CheckSweepTask):
         return SweepTradeTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '305_check_trade.json')
+        out_path = os.path.join(self.task_dir, '306_check_trade.json')
         return luigi.LocalTarget(out_path)
 
     def get_report_filename(self):
@@ -893,3 +980,24 @@ class CheckSweepTradeTask(CheckSweepTask):
 
     def get_model_class(self):
         return 'trade'
+
+
+class CheckSweepWasteTradeTask(CheckSweepTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return SweepWasteTradeTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '307_check_waste_trade.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_report_filename(self):
+        return 'wasteTrade_sweep.csv'
+
+    def check_model(self, target):
+        assert target['validOutSampleTarget'] < 5
+
+    def get_model_class(self):
+        return 'wasteTrade'
