@@ -87,7 +87,7 @@ class ProjectRawTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        years_before = reversed(range(1990, 2005))
+        years_before = reversed(range(1990, 2007))
         years_after = range(2021, 2051)
         years = itertools.chain(years_before, years_after)
         for year in years:
