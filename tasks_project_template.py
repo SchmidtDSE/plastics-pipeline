@@ -90,7 +90,7 @@ class ProjectRawTask(luigi.Task):
         years_before = reversed(range(1990, 2007))
         years_after = range(2021, 2051)
         years = itertools.chain(years_before, years_after)
-        for year in years:
+        for year in range(2021, 2051):
             for region in ['china', 'eu30', 'nafta', 'row']:
                 self.project(
                     connection,
