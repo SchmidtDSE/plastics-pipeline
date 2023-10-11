@@ -460,6 +460,28 @@ class NormalizeCheckTask(luigi.Task):
                 (
                     SELECT
                         year,
+                        sum(abs(netWasteTradeMT)) AS netWasteTradeMT
+                    FROM
+                        {table}
+                    GROUP BY
+                        year
+                ) global_vals
+            WHERE
+                (
+                    abs(global_vals.netWasteTradeMT) < 2
+                )
+                AND global_vals.year > 2040
+        '''.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        cursor.execute('''
+            SELECT
+                count(1)
+            FROM
+                (
+                    SELECT
+                        year,
                         (
                             eolRecyclingPercent +
                             eolIncinerationPercent +
