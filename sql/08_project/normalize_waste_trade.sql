@@ -7,32 +7,14 @@ FROM
         SELECT
             {table_name}.year AS year,
             {table_name}.region AS region,
-            (
-                CASE
-                    WHEN totalNetWasteTrade > 0 AND netWasteTradeMT < 0 THEN netWasteTradeMT - totalNetWasteTrade * netWasteTradeMT / netWasteTradeMTNeg
-                    WHEN totalNetWasteTrade < 0 AND netWasteTradeMT > 0 THEN netWasteTradeMT - totalNetWasteTrade * netWasteTradeMT / netWasteTradeMTPos
-                    ELSE netWasteTradeMT
-                END
-            ) AS netWasteTradeMT
+            netWasteTradeMT - totalNetWasteTradeAvg AS netWasteTradeMT
         FROM
             {table_name}
         INNER JOIN
             (
                 SELECT
                     year,
-                    sum(
-                        CASE
-                            WHEN netWasteTradeMT > 0 THEN netWasteTradeMT
-                            ELSE 0
-                        END 
-                    ) AS netWasteTradeMTPos,
-                    sum(
-                        CASE
-                            WHEN netWasteTradeMT < 0 THEN netWasteTradeMT
-                            ELSE 0
-                        END
-                    ) AS netWasteTradeMTNeg,
-                    sum(netWasteTradeMT) AS totalNetWasteTrade
+                    avg(netWasteTradeMT) AS totalNetWasteTradeAvg
                 FROM
                     {table_name}
                 GROUP BY
