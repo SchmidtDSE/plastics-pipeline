@@ -20,6 +20,8 @@ ATTRS_EXPECTED = [
     'netImportsMT',
     'netExportsMT',
     'domesticProductionMT',
+    'netWasteExportMT',
+    'netWasteImportMT'
 ]
 
 REGIONS_EXPECTED = [
@@ -48,8 +50,8 @@ class CheckResult:
 def has_attrs(rows):
     row = rows[0]
     missing_attrs = filter(lambda x: x not in row, ATTRS_EXPECTED)
-    num_missing = sum(map(lambda x: 1, missing_attrs))
-    return num_missing == 0
+    num_mismatched = sum(map(lambda x: 1, missing_attrs))
+    return num_mismatched == 0
 
 
 def has_regions(rows):
