@@ -812,6 +812,9 @@ class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
     def get_table_name(self):
         return 'project_ml'
 
+    def should_assert_waste_trade_min(self):
+        return True
+
 
 class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
 
