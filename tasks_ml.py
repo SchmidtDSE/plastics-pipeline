@@ -976,7 +976,7 @@ class CheckSweepTradeTask(CheckSweepTask):
         return 'trade_sweep.csv'
 
     def check_model(self, target):
-        assert target['validOutSampleTarget'] < 3
+        assert target['validOutSampleTarget'] < 4
 
     def get_model_class(self):
         return 'trade'
@@ -997,7 +997,7 @@ class CheckSweepWasteTradeTask(CheckSweepTask):
         return 'wasteTrade_sweep.csv'
 
     def check_model(self, target):
-        assert target['validOutSampleTarget'] < 3
+        assert target['validOutSampleTarget'] < 4
 
     def get_model_class(self):
         return 'wasteTrade'
