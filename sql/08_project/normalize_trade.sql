@@ -12,29 +12,29 @@ FROM
             {table_name}.region AS region,
             (
                 CASE
-                    WHEN totalArticlesMT > 0 AND netImportArticlesMT < 0 THEN netImportArticlesMT - totalArticlesMT * netImportArticlesMT / totalImportArticlesMTPos
-                    WHEN totalArticlesMT < 0 AND netImportArticlesMT > 0 THEN netImportArticlesMT - totalArticlesMT * netImportArticlesMT / totalImportArticlesMTNeg
+                    WHEN totalArticlesMT > 0 AND netImportArticlesMT < 0 THEN netImportArticlesMT - totalArticlesMT * netImportArticlesMT / totalImportArticlesMTNeg
+                    WHEN totalArticlesMT < 0 AND netImportArticlesMT > 0 THEN netImportArticlesMT - totalArticlesMT * netImportArticlesMT / totalImportArticlesMTPos
                     ELSE netImportArticlesMT
                 END
             ) AS netImportArticlesMT,
             (
                 CASE
-                    WHEN totalFibersMT > 0 AND netImportFibersMT < 0 THEN netImportFibersMT - totalFibersMT * netImportFibersMT / totalImportFibersMTPos
-                    WHEN totalFibersMT < 0 AND netImportFibersMT > 0 THEN netImportFibersMT - totalFibersMT * netImportFibersMT / totalImportFibersMTNeg
+                    WHEN totalFibersMT > 0 AND netImportFibersMT < 0 THEN netImportFibersMT - totalFibersMT * netImportFibersMT / totalImportFibersMTNeg
+                    WHEN totalFibersMT < 0 AND netImportFibersMT > 0 THEN netImportFibersMT - totalFibersMT * netImportFibersMT / totalImportFibersMTPos
                     ELSE netImportFibersMT
                 END
             ) AS netImportFibersMT,
             (
                 CASE
-                    WHEN totalGoodsMT > 0 AND netImportGoodsMT < 0 THEN netImportGoodsMT - totalGoodsMT * netImportGoodsMT / totalImportGoodsMTPos
-                    WHEN totalGoodsMT < 0 AND netImportGoodsMT > 0 THEN netImportGoodsMT - totalGoodsMT * netImportGoodsMT / totalImportGoodsMTNeg
+                    WHEN totalGoodsMT > 0 AND netImportGoodsMT < 0 THEN netImportGoodsMT - totalGoodsMT * netImportGoodsMT / totalImportGoodsMTNeg
+                    WHEN totalGoodsMT < 0 AND netImportGoodsMT > 0 THEN netImportGoodsMT - totalGoodsMT * netImportGoodsMT / totalImportGoodsMTPos
                     ELSE netImportGoodsMT
                 END
             ) AS netImportGoodsMT,
             (
                 CASE
-                    WHEN totalResinMT > 0 AND netImportResinMT < 0 THEN netImportResinMT - totalResinMT * netImportResinMT / totalImportResinMTPos
-                    WHEN totalResinMT < 0 AND netImportResinMT > 0 THEN netImportResinMT - totalResinMT * netImportResinMT / totalImportResinMTNeg
+                    WHEN totalResinMT > 0 AND netImportResinMT < 0 THEN netImportResinMT - totalResinMT * netImportResinMT / totalImportResinMTNeg
+                    WHEN totalResinMT < 0 AND netImportResinMT > 0 THEN netImportResinMT - totalResinMT * netImportResinMT / totalImportResinMTPos
                     ELSE netImportResinMT
                 END
             ) AS netImportResinMT
