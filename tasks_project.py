@@ -469,7 +469,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         return prediction
 
     def transform_trade_prediction(self, instance, prediction):
-        return instance['beforeValue'] * (1 + prediction)
+        return instance['beforeValue'] + prediction
 
     def transform_waste_trade_prediction(self, instance, prediction):
         return instance['beforeValue'] + prediction
@@ -813,6 +813,9 @@ class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
         return 'project_ml'
 
     def should_assert_waste_trade_min(self):
+        return True
+
+    def should_assert_trade_max(self):
         return True
 
 
