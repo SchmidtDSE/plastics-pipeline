@@ -469,7 +469,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         return prediction
 
     def transform_trade_prediction(self, instance, prediction):
-        return instance['beforeValue'] * (1 + prediction)
+        return instance['beforeValue'] + prediction
 
     def transform_waste_trade_prediction(self, instance, prediction):
         return instance['beforeValue'] + prediction
