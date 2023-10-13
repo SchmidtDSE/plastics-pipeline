@@ -87,7 +87,7 @@ class ProjectRawTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        years_before = reversed(range(1990, 2007))
+        years_before = reversed(range(2000, 2007))
         years_after = range(2021, 2051)
         years = itertools.chain(years_before, years_after)
         for year in years:
@@ -426,7 +426,6 @@ class NormalizeCheckTask(luigi.Task):
                     OR abs(global_vals.totalGoodsMT) > 0.0001
                     OR abs(global_vals.totalResinMT) > 0.0001
                 )
-                AND global_vals.year > 2020
         '''.format(table=table))
         results = cursor.fetchall()
         assert results[0][0] == 0
@@ -448,7 +447,6 @@ class NormalizeCheckTask(luigi.Task):
                 (
                     abs(global_vals.netWasteTradeMT) > 0.0001
                 )
-                AND global_vals.year > 2020
         '''.format(table=table))
         results = cursor.fetchall()
         assert results[0][0] == 0
@@ -471,7 +469,6 @@ class NormalizeCheckTask(luigi.Task):
                     (
                         abs(global_vals.netWasteTradeMT) < 2
                     )
-                    AND global_vals.year > 2040
             '''.format(table=table))
             results = cursor.fetchall()
             assert results[0][0] == 0
@@ -503,8 +500,6 @@ class NormalizeCheckTask(luigi.Task):
                             ) * 100 AS percentTrade
                         FROM
                             {table}
-                        WHERE
-                            year >= 2020
                     ) global_vals
                 WHERE
                     percentTrade > 50
@@ -564,7 +559,7 @@ class ApplyLifecycleTask(luigi.Task):
 
         table = self.get_table_name()
 
-        years = list(range(1990, 2051))
+        years = list(range(2000, 2051))
         regions = ['china', 'eu30', 'nafta', 'row']
 
         timeseries = dict(map(
