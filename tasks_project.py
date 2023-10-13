@@ -815,6 +815,9 @@ class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
     def should_assert_waste_trade_min(self):
         return True
 
+    def should_assert_trade_max(self):
+        return True
+
 
 class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
 

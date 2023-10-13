@@ -453,7 +453,7 @@ class NormalizeCheckTask(luigi.Task):
         results = cursor.fetchall()
         assert results[0][0] == 0
 
-        if self.should_assert_waste_trade_min():
+        if self.should_assert_trade_max():
             cursor.execute('''
                 SELECT
                     count(1)
@@ -472,6 +472,42 @@ class NormalizeCheckTask(luigi.Task):
                         abs(global_vals.netWasteTradeMT) < 2
                     )
                     AND global_vals.year > 2040
+            '''.format(table=table))
+            results = cursor.fetchall()
+            assert results[0][0] == 0
+
+        if self.should_assert_waste_trade_min():
+            cursor.execute('''
+                SELECT
+                    count(1)
+                FROM
+                    (
+                        SELECT
+                            year,
+                            region,
+                            abs(
+                                (
+                                    netImportArticlesMT +
+                                    netImportFibersMT +
+                                    netImportGoodsMT
+                                ) / (
+                                    consumptionAgricultureMT +
+                                    consumptionConstructionMT +
+                                    consumptionElectronicMT +
+                                    consumptionHouseholdLeisureSportsMT +
+                                    consumptionPackagingMT +
+                                    consumptionTransporationMT +
+                                    consumptionTextileMT +
+                                    consumptionOtherMT
+                                )
+                            ) * 100 AS percentTrade
+                        FROM
+                            {table}
+                        WHERE
+                            year >= 2020
+                    ) global_vals
+                WHERE
+                    percentTrade > 50
             '''.format(table=table))
             results = cursor.fetchall()
             assert results[0][0] == 0
@@ -508,6 +544,9 @@ class NormalizeCheckTask(luigi.Task):
             return json.dump(job_info, f)
 
     def should_assert_waste_trade_min(self):
+        return False
+
+    def should_assert_trade_max(self):
         return False
 
 
