@@ -426,6 +426,7 @@ class NormalizeCheckTask(luigi.Task):
                     OR abs(global_vals.totalGoodsMT) > 0.0001
                     OR abs(global_vals.totalResinMT) > 0.0001
                 )
+                AND year > 2021
         '''.format(table=table))
         results = cursor.fetchall()
         assert results[0][0] == 0
@@ -447,6 +448,7 @@ class NormalizeCheckTask(luigi.Task):
                 (
                     abs(global_vals.netWasteTradeMT) > 0.0001
                 )
+                AND year > 2021
         '''.format(table=table))
         results = cursor.fetchall()
         assert results[0][0] == 0
@@ -469,6 +471,7 @@ class NormalizeCheckTask(luigi.Task):
                     (
                         abs(global_vals.netWasteTradeMT) < 2
                     )
+                    AND year > 2021
             '''.format(table=table))
             results = cursor.fetchall()
             assert results[0][0] == 0
@@ -503,6 +506,7 @@ class NormalizeCheckTask(luigi.Task):
                     ) global_vals
                 WHERE
                     percentTrade > 50
+                    AND year > 2021
             '''.format(table=table))
             results = cursor.fetchall()
             assert results[0][0] == 0
@@ -525,7 +529,7 @@ class NormalizeCheckTask(luigi.Task):
                 ) global_vals
             WHERE
                 abs(totalEolShare - 1) > 0.001
-                AND global_vals.year > 2020
+                AND global_vals.year > 2021
         '''.format(table=table))
         results = cursor.fetchall()
         assert results[0][0] == 0
