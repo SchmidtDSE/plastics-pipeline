@@ -509,7 +509,7 @@ class NormalizeCheckTask(luigi.Task):
                     ) global_vals
                 WHERE
                     (
-                        abs(global_vals.netWasteTradeMT) < 2
+                        abs(global_vals.netWasteTradeMT) < 0.5
                     )
                     AND year > 2021
             '''.format(table=table))
