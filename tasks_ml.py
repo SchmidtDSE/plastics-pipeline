@@ -860,6 +860,7 @@ class SweepWasteTradeTask(SweepTask):
                 flagEU30,
                 flagNafta,
                 flagRow,
+                flagSword,
                 beforePercent,
                 afterPercent,
                 beforeTotalConsumption,
@@ -882,6 +883,7 @@ class SweepWasteTradeTask(SweepTask):
             'flagEU30',
             'flagNafta',
             'flagRow',
+            'flagSword',
             'beforePercent',
             'afterPercent',
             'beforeTotalConsumption',
@@ -897,6 +899,7 @@ class SweepWasteTradeTask(SweepTask):
             'flagEU30',
             'flagNafta',
             'flagRow',
+            'flagSword',
             'beforePercent'
         ]
 

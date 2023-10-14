@@ -31,6 +31,12 @@ SELECT
             ELSE 0
         END
     ) AS flagRow,
+    (
+        CASE
+            WHEN unioned.afterYear >= 2017 THEN 1
+            ELSE 0
+        END
+    ) AS flagSword,
     unioned.beforeYear AS beforeYear,
     unioned.afterYear AS afterYear,
     unioned.afterTotalConsumption AS afterTotalConsumption,
