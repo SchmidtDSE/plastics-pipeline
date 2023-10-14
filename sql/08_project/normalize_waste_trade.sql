@@ -17,6 +17,9 @@ FROM
                     avg(netWasteTradeMT) AS totalNetWasteTradeAvg
                 FROM
                     {table_name}
+                WHERE
+                    region != 'china'
+                    OR netWasteTradeMT > 0
                 GROUP BY
                     year
             ) totals
@@ -24,6 +27,7 @@ FROM
             {table_name}.year = totals.year
         WHERE
             {table_name}.year > 2020 OR {table_name}.year < 2007
+            AND (region != 'china' OR netWasteTradeMT > 0)
     ) updated
 WHERE
     updated.year = {table_name}.year
