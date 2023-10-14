@@ -745,8 +745,8 @@ class SweepTradeTask(SweepTask):
         return luigi.LocalTarget(out_path)
 
     def evaluate_target_single(self, predicted, actuals):
-        actual_target = actuals[1]
-        predicted_target = predicted + actuals[0]
+        actual_target = actuals[0] * actuals[1]
+        predicted_target = predicted * actuals[0]
         return abs(actual_target - predicted_target)
 
     def get_sql(self):
@@ -765,9 +765,10 @@ class SweepTradeTask(SweepTask):
                 flagFibers,
                 flagGoods,
                 flagResin,
-                netMTChange,
-                beforeNetMT,
-                afterNetMT
+                beforePercent,
+                afterPercent,
+                beforeTotalConsumption,
+                afterTotalConsumption
             FROM
                 instance_trade_displaced
         '''
@@ -778,7 +779,7 @@ class SweepTradeTask(SweepTask):
             'afterYear',
             'years',
             'popChange',
-            'gdpChange',
+            'gdpPerCapChange',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -787,16 +788,17 @@ class SweepTradeTask(SweepTask):
             'flagFibers',
             'flagGoods',
             'flagResin',
-            'netMTChange',
-            'beforeNetMT',
-            'afterNetMT'
+            'beforePercent',
+            'afterPercent',
+            'beforeTotalConsumption',
+            'afterTotalConsumption'
         ]
     
     def get_input_cols(self):
         return [
             'years',
             'popChange',
-            'gdpChange',
+            'gdpPerCapChange',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -805,15 +807,16 @@ class SweepTradeTask(SweepTask):
             'flagFibers',
             'flagGoods',
             'flagResin',
+            'beforePercent'
         ]
 
     def get_response_col(self):
-        return 'netMTChange'
+        return 'afterPercent'
 
     def get_output_cols(self):
         return [
-            'beforeNetMT',
-            'afterNetMT'
+            'afterTotalConsumption',
+            'afterPercent'
         ]
 
     def get_report_filename(self):
