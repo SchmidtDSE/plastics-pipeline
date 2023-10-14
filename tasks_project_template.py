@@ -399,10 +399,11 @@ class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         return [
             '08_project/normalize_eol.sql',
+            '08_project/apply_china_policy_waste_trade.sql',
             '08_project/normalize_trade.sql',
             '08_project/normalize_waste_trade.sql',
-            '08_project/apply_china_policy.sql',
-            '08_project/apply_eu_policy.sql'
+            '08_project/apply_china_policy_eol.sql',
+            '08_project/apply_eu_policy_eol.sql'
         ]
 
     def get_table_name(self):
