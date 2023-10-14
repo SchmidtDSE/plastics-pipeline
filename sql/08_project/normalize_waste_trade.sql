@@ -1,10 +1,7 @@
 UPDATE
     {table_name}
 SET
-    netImportArticlesMT = updated.netImportArticlesMT,
-    netImportFibersMT = updated.netImportFibersMT,
-    netImportGoodsMT = updated.netImportGoodsMT,
-    netImportResinMT = updated.netImportResinMT
+    netWasteTradeMT = updated.netWasteTradeMT
 FROM
     (
         SELECT
@@ -14,9 +11,9 @@ FROM
                 CASE
                     WHEN totalNetWasteTradeMT > 0 AND netWasteTradeMT > 0 THEN netWasteTradeMT - totalNetWasteTradeMT * netWasteTradeMT / totalWasteTradeMTPos
                     WHEN totalNetWasteTradeMT < 0 AND netWasteTradeMT < 0 THEN netWasteTradeMT - totalNetWasteTradeMT * netWasteTradeMT / totalWasteTradeMTNeg
-                    ELSE netImportArticlesMT
+                    ELSE netWasteTradeMT
                 END
-            ) AS netImportArticlesMT
+            ) AS netWasteTradeMT
         FROM
             {table_name}
         INNER JOIN
