@@ -354,6 +354,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagEU30': self.hot_encode(region, 'eu30'),
             'flagNafta': self.hot_encode(region, 'nafta'),
             'flagRow': self.hot_encode(region, 'row'),
+            'flagSword': 1 if region == 'china' and year >= 2017 else 0,
             'yearSelector': self.get_year_selector(year)
         }
 
@@ -370,6 +371,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
                 {flagRow} AS flagRow,
+                {flagSword} AS flagSword,
                 before.beforeValue AS beforeValue
             FROM
                 (
@@ -459,6 +461,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagEU30',
             'flagNafta',
             'flagRow',
+            'flagSword',
             'beforePercent'
         ]
 
