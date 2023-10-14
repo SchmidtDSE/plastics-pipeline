@@ -35,7 +35,7 @@ FROM
                             ELSE 0
                         END
                     ) AS totalWasteTradeMTNeg,
-                    sum(netWasteTradeMT) AS totalNetWasteTradeMT,
+                    sum(netWasteTradeMT) AS totalNetWasteTradeMT
                 FROM
                     {table_name}
                 GROUP BY
