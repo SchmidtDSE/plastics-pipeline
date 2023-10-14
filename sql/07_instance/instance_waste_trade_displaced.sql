@@ -33,7 +33,7 @@ SELECT
     ) AS flagRow,
     (
         CASE
-            WHEN unioned.region = 'china' AND unioned.afterYear >= 2017 THEN 1
+            WHEN unioned.afterYear >= 2017 THEN 1
             ELSE 0
         END
     ) AS flagSword,
