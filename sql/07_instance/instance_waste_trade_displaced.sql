@@ -2,11 +2,11 @@ CREATE VIEW instance_waste_trade_displaced AS
 SELECT
     unioned.years AS years,
     unioned.popChange AS popChange,
-    unioned.gdpPerCapChange AS gdpPerCapChange,
+    unioned.gdpChange AS gdpChange,
     unioned.afterGdp AS afterGdp,
     unioned.afterPopulation AS afterPopulation,
-    unioned.beforeNetMT AS beforeNetMT,
-    unioned.netMTChange AS netMTChange,
+    unioned.beforeNetMT / unioned.beforeTotalConsumption AS beforePercent,
+    unioned.afterNetMT / unioned.afterTotalConsumption AS afterPercent,
     (
         CASE
             WHEN unioned.region = 'china' THEN 1
@@ -31,23 +31,25 @@ SELECT
             ELSE 0
         END
     ) AS flagRow,
-    unioned.afterNetMT AS afterNetMT,
     unioned.beforeYear AS beforeYear,
-    unioned.afterYear AS afterYear
+    unioned.afterYear AS afterYear,
+    unioned.afterTotalConsumption AS afterTotalConsumption,
+    unioned.beforeTotalConsumption AS beforeTotalConsumption
 FROM
     (
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -55,7 +57,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -66,7 +69,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -77,15 +81,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -93,7 +98,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -104,7 +110,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -115,15 +122,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -131,7 +139,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -142,7 +151,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -153,15 +163,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -169,7 +180,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -180,7 +192,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -191,15 +204,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -207,7 +221,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -218,7 +233,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -229,15 +245,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -245,7 +262,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -256,7 +274,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -267,15 +286,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -283,7 +303,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -294,7 +315,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -305,15 +327,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -321,7 +344,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -332,7 +356,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -343,15 +368,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -359,7 +385,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -370,7 +397,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before
@@ -381,15 +409,16 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
-            afterNetMT - beforeNetMT AS netMTChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.afterGdp AS afterGdp,
             after.afterPopulation AS afterPopulation,
             before.beforeNetMT AS beforeNetMT,
             after.afterNetMT AS afterNetMT,
             before.beforeYear AS beforeYear,
-            after.afterYear AS afterYear
+            after.afterYear AS afterYear,
+            after.afterTotalConsumption AS afterTotalConsumption,
+            before.beforeTotalConsumption AS beforeTotalConsumption
         FROM
             (
                 SELECT
@@ -397,7 +426,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS afterPopulation,
                     instance_waste_trade_normal.gdp AS afterGdp,
-                    instance_waste_trade_normal.netMT AS afterNetMT
+                    instance_waste_trade_normal.netMT AS afterNetMT,
+                    instance_waste_trade_normal.totalConsumption AS afterTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) after
@@ -408,7 +438,8 @@ FROM
                     instance_waste_trade_normal.region AS region,
                     instance_waste_trade_normal.population AS beforePopulation,
                     instance_waste_trade_normal.gdp AS beforeGdp,
-                    instance_waste_trade_normal.netMT AS beforeNetMT
+                    instance_waste_trade_normal.netMT AS beforeNetMT,
+                    instance_waste_trade_normal.totalConsumption AS beforeTotalConsumption
                 FROM
                     instance_waste_trade_normal
             ) before

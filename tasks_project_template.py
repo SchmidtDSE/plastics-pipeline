@@ -87,10 +87,7 @@ class ProjectRawTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        years_before = reversed(range(1990, 2007))
-        years_after = range(2021, 2051)
-        years = itertools.chain(years_before, years_after)
-        for year in years:
+        for year in range(2021, 2051):
             for region in ['china', 'eu30', 'nafta', 'row']:
                 self.project(
                     connection,
@@ -143,6 +140,8 @@ class ProjectRawTask(luigi.Task):
             waste_trade_model
         ))
 
+        updated_output_row = self.postprocess_row(updated_output_row)
+
         cursor = connection.cursor()
 
         cursor.execute('''
@@ -165,7 +164,12 @@ class ProjectRawTask(luigi.Task):
                 netImportFibersMT = {netImportFibersMT},
                 netImportGoodsMT = {netImportGoodsMT},
                 netImportResinMT = {netImportResinMT},
-                netWasteTradeMT = {netWasteTradeMT}
+                netWasteTradeMT = {netWasteTradeMT},
+                netImportArticlesPercent = {netImportArticlesPercent},
+                netImportFibersPercent = {netImportFibersPercent},
+                netImportGoodsPercent = {netImportGoodsPercent},
+                netImportResinPercent = {netImportResinPercent},
+                netWasteTradePercent = {netWasteTradePercent}
             WHERE
                 year = {year}
                 AND region = '{region}'
@@ -200,16 +204,7 @@ class ProjectRawTask(luigi.Task):
             year,
             region,
             consumption_model,
-            [
-                'consumptionAgricultureMT',
-                'consumptionConstructionMT',
-                'consumptionElectronicMT',
-                'consumptionHouseholdLeisureSportsMT',
-                'consumptionOtherMT',
-                'consumptionPackagingMT',
-                'consumptionTextileMT',
-                'consumptionTransporationMT'
-            ],
+            self.get_consumption_attrs(),
             lambda x: self.get_consumption_inputs_sql(year, region, x),
             lambda: self.get_consumption_inputs_cols(),
             lambda instance, prediction: self.transform_consumption_prediction(
@@ -224,12 +219,7 @@ class ProjectRawTask(luigi.Task):
             year,
             region,
             waste_model,
-            [
-                'eolRecyclingPercent',
-                'eolIncinerationPercent',
-                'eolLandfillPercent',
-                'eolMismanagedPercent'
-            ],
+            self.get_waste_attrs(),
             lambda x: self.get_waste_inputs_sql(year, region, x),
             lambda: self.get_waste_inputs_cols(),
             lambda instance, prediction: self.transform_waste_prediction(
@@ -244,12 +234,7 @@ class ProjectRawTask(luigi.Task):
             year,
             region,
             trade_model,
-            [
-                'netImportArticlesMT',
-                'netImportFibersMT',
-                'netImportGoodsMT',
-                'netImportResinMT'
-            ],
+            self.get_trade_attrs(),
             lambda x: self.get_trade_inputs_sql(year, region, x),
             lambda: self.get_trade_inputs_cols(),
             lambda instance, prediction: self.transform_trade_prediction(
@@ -264,9 +249,7 @@ class ProjectRawTask(luigi.Task):
             year,
             region,
             waste_trade_model,
-            [
-                'netWasteTradeMT'
-            ],
+            self.get_waste_trade_attrs(),
             lambda x: self.get_waste_trade_inputs_sql(year, region, x),
             lambda: self.get_waste_trade_inputs_cols(),
             lambda instance, prediction: self.transform_waste_trade_prediction(
@@ -340,16 +323,72 @@ class ProjectRawTask(luigi.Task):
         raise NotImplementedError('Use implementor.')
 
     def transform_consumption_prediction(self, instance, prediction):
-        raise NotImplementedError('Use implementor.')
+        return prediction
 
     def transform_waste_prediction(self, instance, prediction):
-        raise NotImplementedError('Use implementor.')
+        return prediction
 
     def transform_trade_prediction(self, instance, prediction):
-        raise NotImplementedError('Use implementor.')
+        return prediction
 
     def transform_waste_trade_prediction(self, instance, prediction):
-        raise NotImplementedError('Use implementor.')
+        return prediction
+
+    def get_consumption_attrs(self):
+        return [
+            'consumptionAgricultureMT',
+            'consumptionConstructionMT',
+            'consumptionElectronicMT',
+            'consumptionHouseholdLeisureSportsMT',
+            'consumptionOtherMT',
+            'consumptionPackagingMT',
+            'consumptionTextileMT',
+            'consumptionTransporationMT'
+        ]
+
+    def get_waste_attrs(self):
+        return [
+            'eolRecyclingPercent',
+            'eolIncinerationPercent',
+            'eolLandfillPercent',
+            'eolMismanagedPercent'
+        ]
+
+    def get_trade_attrs(self):
+        return [
+            'netImportArticlesMT',
+            'netImportFibersMT',
+            'netImportGoodsMT',
+            'netImportResinMT'
+        ]
+
+    def get_waste_trade_attrs(self):
+        return [
+            'netWasteTradeMT'
+        ]
+
+    def postprocess_row(self, target):
+        total_consumption = sum(map(
+            lambda x: target[x],
+            [
+                'consumptionAgricultureMT',
+                'consumptionConstructionMT',
+                'consumptionElectronicMT',
+                'consumptionHouseholdLeisureSportsMT',
+                'consumptionOtherMT',
+                'consumptionPackagingMT',
+                'consumptionTextileMT',
+                'consumptionTransporationMT'
+            ]
+        ))
+        target.update({
+            'netImportArticlesPercent': target['netImportArticlesMT'] / total_consumption,
+            'netImportFibersPercent': target['netImportFibersMT'] / total_consumption,
+            'netImportGoodsPercent': target['netImportGoodsMT'] / total_consumption,
+            'netImportResinPercent': target['netImportResinMT'] / total_consumption,
+            'netWasteTradePercent': target['netWasteTradeMT'] / total_consumption
+        })
+        return target
 
 
 class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
@@ -563,7 +602,7 @@ class ApplyLifecycleTask(luigi.Task):
 
         table = self.get_table_name()
 
-        years = list(range(1990, 2051))
+        years = list(range(1951, 2051))
         regions = ['china', 'eu30', 'nafta', 'row']
 
         timeseries = dict(map(
@@ -628,7 +667,7 @@ class ApplyLifecycleTask(luigi.Task):
         for sector in sectors:
             future_waste = result[sector]
             
-            if future_waste < 0:
+            if future_waste is None or future_waste < 0:
                 future_waste = 0
 
             distribution = const.LIFECYCLE_DISTRIBUTIONS[sector]
