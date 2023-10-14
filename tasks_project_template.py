@@ -86,7 +86,7 @@ class ProjectRawTask(luigi.Task):
 
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
-        
+
         for year in range(2021, 2051):
             for region in ['china', 'eu30', 'nafta', 'row']:
                 self.project(
@@ -602,7 +602,7 @@ class ApplyLifecycleTask(luigi.Task):
 
         table = self.get_table_name()
 
-        years = list(range(2021, 2051))
+        years = list(range(1951, 2051))
         regions = ['china', 'eu30', 'nafta', 'row']
 
         timeseries = dict(map(
@@ -667,7 +667,7 @@ class ApplyLifecycleTask(luigi.Task):
         for sector in sectors:
             future_waste = result[sector]
             
-            if future_waste < 0:
+            if future_waste is None or future_waste < 0:
                 future_waste = 0
 
             distribution = const.LIFECYCLE_DISTRIBUTIONS[sector]
