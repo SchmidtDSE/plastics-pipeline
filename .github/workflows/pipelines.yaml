@@ -18,10 +18,12 @@ jobs:
         run: pip install -r requirements.txt
       - name: Execute
         run: bash build.sh
+      - name: Zip pipeline
+        run: zip -r pipeline.zip output
       - uses: actions/upload-artifact@v3
         with:
-          name: Pipeline Result
-          path: output
+          name: pipeline-result
+          path: pipeline.zip
       - name: Check output
         run: bash confirm_output.sh
   deploy:
@@ -31,6 +33,19 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: [pipeline]
     steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: pipeline-result
+      - name: Upload
+        uses: Creepios/sftp-action@v1.0.3
+        with:
+          host: ${{ secrets.SFTPHOST }}
+          port: 22
+          username: ${{ secrets.SFTPUSER }}
+          password: ${{ secrets.SFTPPASSWORD }}
+          localPath: './pipeline.zip'
+          remotePath: './global-plastics-tool.org/data'
       - name: Trigger
         uses: peter-evans/repository-dispatch@v2
         with:
