@@ -18,15 +18,15 @@ FROM
                 FROM
                     {table_name}
                 WHERE
-                    region != 'china'
-                    OR netWasteTradeMT > 0
+                    {table_name}.year > 2020
+                    AND (region != 'china' OR netWasteTradeMT > 0)
                 GROUP BY
                     year
             ) totals
         ON
             {table_name}.year = totals.year
         WHERE
-            {table_name}.year > 2020 OR {table_name}.year < 2007
+            {table_name}.year > 2020
             AND (region != 'china' OR netWasteTradeMT > 0)
     ) updated
 WHERE

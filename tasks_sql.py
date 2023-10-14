@@ -20,16 +20,17 @@ class SqlExecuteTask(luigi.Task):
 
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
-        cursor = connection.cursor()
 
         sql_filenames = self.get_scripts_resolved(const.SQL_DIR)
         for filename in sql_filenames:
+            cursor = connection.cursor()
+            
             with open(filename) as f:
                 sql_contents = f.read()
                 sql_contents = self.transform_sql(sql_contents)
                 cursor.execute(sql_contents)
 
-        connection.commit()
+            connection.commit()
 
         cursor.close()
         connection.close()
