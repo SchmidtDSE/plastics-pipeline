@@ -664,7 +664,6 @@ class SweepWasteTask(SweepTask):
                 popChange,
                 gdpPerCapChange,
                 beforePercent,
-                percentChange,
                 flagChina,
                 flagEU30,
                 flagNafta,
@@ -688,7 +687,6 @@ class SweepWasteTask(SweepTask):
             'popChange',
             'gdpChange',
             'beforePercent',
-            'percentChange',
             'flagChina',
             'flagEU30',
             'flagNafta',
@@ -843,8 +841,8 @@ class SweepWasteTradeTask(SweepTask):
         return luigi.LocalTarget(out_path)
 
     def evaluate_target_single(self, predicted, actuals):
-        actual_target = actuals[1]
-        predicted_target = predicted + actuals[0]
+        actual_target = actuals[0] * actuals[1]
+        predicted_target = predicted * actuals[0]
         return abs(actual_target - predicted_target)
 
     def get_sql(self):
@@ -859,9 +857,10 @@ class SweepWasteTradeTask(SweepTask):
                 flagEU30,
                 flagNafta,
                 flagRow,
-                netMTChange,
-                beforeNetMT,
-                afterNetMT
+                beforePercent,
+                afterPercent,
+                beforeTotalConsumption,
+                afterTotalConsumption
             FROM
                 instance_waste_trade_displaced
             WHERE
@@ -875,34 +874,36 @@ class SweepWasteTradeTask(SweepTask):
             'afterYear',
             'years',
             'popChange',
-            'gdpChange',
+            'gdpPerCapChange',
             'flagChina',
             'flagEU30',
             'flagNafta',
             'flagRow',
-            'netMTChange',
-            'beforeNetMT',
-            'afterNetMT'
+            'beforePercent',
+            'afterPercent',
+            'beforeTotalConsumption',
+            'afterTotalConsumption'
         ]
     
     def get_input_cols(self):
         return [
             'years',
             'popChange',
-            'gdpChange',
+            'gdpPerCapChange',
             'flagChina',
             'flagEU30',
             'flagNafta',
-            'flagRow'
+            'flagRow',
+            'beforePercent'
         ]
 
     def get_response_col(self):
-        return 'netMTChange'
+        return 'afterPercent'
 
     def get_output_cols(self):
         return [
-            'beforeNetMT',
-            'afterNetMT'
+            'afterTotalConsumption',
+            'afterPercent'
         ]
 
     def get_report_filename(self):
