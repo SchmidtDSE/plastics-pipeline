@@ -179,7 +179,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     after.gdp / after.population - before.gdp / before.population
                 ) / (
                     before.gdp / before.population
-                ) AS gdpPerCapChange,
+                ) AS gdpChange,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
@@ -245,7 +245,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     after.gdp / after.population - before.gdp / before.population
                 ) / (
                     before.gdp / before.population
-                ) AS gdpPerCapChange,
+                ) AS gdpChange,
                 before.beforeValue AS beforePercent,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
@@ -307,7 +307,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     after.gdp / after.population - before.gdp / before.population
                 ) / (
                     before.gdp / before.population
-                ) AS gdpPerCapChange,
+                ) AS gdpChange,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
@@ -365,7 +365,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     after.gdp / after.population - before.gdp / before.population
                 ) / (
                     before.gdp / before.population
-                ) AS gdpPerCapChange,
+                ) AS gdpChange,
                 {flagChina} AS flagChina,
                 {flagEU30} AS flagEU30,
                 {flagNafta} AS flagNafta,
@@ -447,7 +447,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagFibers',
             'flagGoods',
             'flagResin',
-            'beforeValue'
+            'beforePercent'
         ]
 
     def get_waste_trade_inputs_cols(self):
@@ -459,20 +459,47 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagEU30',
             'flagNafta',
             'flagRow',
-            'beforeValue'
+            'beforePercent'
         ]
 
     def transform_consumption_prediction(self, instance, prediction):
         return instance['beforeValue'] * (1 + prediction)
 
-    def transform_waste_prediction(self, instance, prediction):
-        return prediction
+    def get_trade_attrs(self):
+        return [
+            'netImportArticlesPercent',
+            'netImportFibersPercent',
+            'netImportGoodsPercent',
+            'netImportResinPercent'
+        ]
 
-    def transform_trade_prediction(self, instance, prediction):
-        return instance['beforeValue'] + prediction
+    def get_waste_trade_attrs(self):
+        return [
+            'netWasteTradePercent'
+        ]
 
-    def transform_waste_trade_prediction(self, instance, prediction):
-        return instance['beforeValue'] + prediction
+    def postprocess_row(self, target):
+        total_consumption = sum(map(
+            lambda x: target[x],
+            [
+                'consumptionAgricultureMT',
+                'consumptionConstructionMT',
+                'consumptionElectronicMT',
+                'consumptionHouseholdLeisureSportsMT',
+                'consumptionOtherMT',
+                'consumptionPackagingMT',
+                'consumptionTextileMT',
+                'consumptionTransporationMT'
+            ]
+        ))
+        target.update({
+            'netImportArticlesMT': target['netImportArticlesPercent'] * total_consumption,
+            'netImportFibersMT': target['netImportFibersPercent'] * total_consumption,
+            'netImportGoodsMT': target['netImportGoodsPercent'] * total_consumption,
+            'netImportResinMT': target['netImportResinPercent'] * total_consumption,
+            'netWasteTradeMT': target['netWasteTradePercent'] * total_consumption
+        })
+        return target
 
 
 class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):
@@ -682,18 +709,6 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
             'population',
             'gdp'
         ]
-
-    def transform_consumption_prediction(self, instance, prediction):
-        return prediction
-
-    def transform_waste_prediction(self, instance, prediction):
-        return prediction
-
-    def transform_trade_prediction(self, instance, prediction):
-        return prediction
-
-    def transform_waste_trade_prediction(self, instance, prediction):
-        return prediction
 
 
 class SeedNaiveProjectionTask(tasks_project_template.SeedProjectionTask):

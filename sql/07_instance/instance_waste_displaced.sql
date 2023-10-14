@@ -2,7 +2,7 @@ CREATE VIEW instance_waste_displaced AS
 SELECT
     unioned.years AS years,
     unioned.popChange AS popChange,
-    unioned.gdpPerCapChange AS gdpPerCapChange,
+    unioned.gdpChange AS gdpChange,
     unioned.afterGdp AS afterGdp,
     unioned.afterPopulation AS afterPopulation,
     unioned.beforePercent AS beforePercent,
@@ -62,7 +62,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -103,7 +103,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -144,7 +144,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -185,7 +185,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -226,7 +226,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -267,7 +267,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -308,7 +308,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -349,7 +349,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -390,7 +390,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
@@ -431,7 +431,7 @@ FROM
         SELECT
             abs(after.afterYear - before.beforeYear) AS years,
             (afterPopulation - beforePopulation) / beforePopulation AS popChange,
-            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpPerCapChange,
+            (afterGdp / afterPopulation - beforeGdp / beforePopulation) / (beforeGdp / beforePopulation) AS gdpChange,
             after.region AS region,
             after.type AS type,
             after.afterGdp AS afterGdp,
