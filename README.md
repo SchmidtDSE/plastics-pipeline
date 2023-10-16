@@ -15,9 +15,8 @@ Container Environment
 A containerized Docker environment is available for execution:
 
  - [Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
- - Build the environment: `docker compose up --build``
- - Open a shell in the container: ``
- - Run the pipeline: ``
+ - Build the environment: `docker build -t dse/plastics_pipeline .`
+ - Run the container: `docker run -it --name pipeline_run dse/plastics_pipeline bash build.sh`
 
 This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype).
 
@@ -31,7 +30,7 @@ In addition to the Docker container, a manual environment can be established sim
 
 Configuration
 --------------------------------------------------------------------------------
-The configuration for the job can be modified by providing a custom json file. See [task/job.json](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/task/job.json) for an example. Note that the pipeline, by default, uses random forest even though a full sweep is conducted because that approach tends to yield better avoidance of overfitting.
+The configuration for the job can be modified by providing a custom json file. See [task/job.json](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/task/job.json) for an example. Note that the pipeline, by default, uses random forest even though a full sweep is conducted because that approach tends to yield better avoidance of overfitting. Parallelization can be enabled by changing the value of `workers`.
 
 <br>
 
@@ -58,5 +57,5 @@ This project is released as open source (BSD and CC-BY-NC). See [LICENSE.md](htt
 The following are also potentially used as executables like from the command line but are not statically linked to code:
 
  - [Docker](https://docs.docker.com/engine/) under the [Apache v2 License](https://github.com/moby/moby/blob/master/LICENSE).
- - [Docker Compose](https://docs.docker.com/compose/) under the [Apache v2 License](https://github.com/docker/compose/blob/main/LICENSE).
  - [Python 3.8](https://www.python.org/) under the [PSF License](https://docs.python.org/3/license.html).
+ - [SQLite 3](https://www.sqlite.org/index.html) which is in the [public domain](https://www.sqlite.org/copyright.html).
