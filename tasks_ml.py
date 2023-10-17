@@ -903,7 +903,7 @@ class SweepConsumptionTask(SweepTask):
         ]
 
     def get_response_col(self):
-         """Get the column describing the response variable to be predicted.
+        """Get the column describing the response variable to be predicted.
 
         Returns:
             The name of the column in which the response variable can be found.
