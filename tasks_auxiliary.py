@@ -1,3 +1,9 @@
+"""Tasks to load auxiliary data required for modeling like GDP and population.
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import csv
 import json
 import os
@@ -12,17 +18,21 @@ import tasks_workspace
 
 
 class ProcessGdpTask(luigi.Task):
+    """Task to prepare GDP data before its use in modeling."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that files are in the workspace with expected filenames."""
         return tasks_workspace.CleanFilenamesTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that GDP data are available for modeling in CSV files."""
         out_path = os.path.join(self.task_dir, '100_raw_gdp.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
+        """Preprocess auxiliary data for GDP."""
         with self.input().open('r') as f:
             job_info = json.load(f)
 
@@ -82,17 +92,21 @@ class ProcessGdpTask(luigi.Task):
 
 
 class ProcessRawPopulationTask(luigi.Task):
+    """Task to prepare population data before their use in modeling."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that files are in the workspace with expected filenames."""
         return tasks_workspace.CleanFilenamesTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that population data are available for modeling in CSV files."""
         out_path = os.path.join(self.task_dir, '101_raw_population.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
+        """Preprocess auxiliary data for population."""
         with self.input().open('r') as f:
             job_info = json.load(f)
 
@@ -157,20 +171,27 @@ class ProcessRawPopulationTask(luigi.Task):
 
 
 class PrepareImportFilesAuxTask(luigi.Task):
+    """Tasks to prepare scripts ahead of auxiliary data import.
+
+    Task which prepare scripts to load preprocessed auxiliary data files into the SQLite database.
+    """
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that preprocessed files are available."""
         return {
             'gpd': ProcessGdpTask(task_dir=self.task_dir),
             'population': ProcessRawPopulationTask(task_dir=self.task_dir)
         }
 
     def output(self):
+        """Report that scripts are ready to load into the SQLite database."""
         out_path = os.path.join(self.task_dir, '102_prepare_import_files.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
+        """Build scripts to load GDP and population data into the SQLite database."""
         with self.input()['population'].open('r') as f:
             job_info = json.load(f)
 
@@ -200,17 +221,21 @@ class PrepareImportFilesAuxTask(luigi.Task):
 
 
 class ExecuteImportFilesAuxTask(luigi.Task):
+    """Task which imports auxiliary data files into the scratch SQLite database."""
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that all files required for import are ready."""
         return PrepareImportFilesAuxTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the files have been imported into the SQLite database."""
         out_path = os.path.join(self.task_dir, '103_execute_import_files.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
+        """Load in the auxiliary data to the SQLite database."""
         with self.input().open('r') as f:
             job_info = json.load(f)
 
@@ -233,32 +258,40 @@ class ExecuteImportFilesAuxTask(luigi.Task):
 
 
 class CheckImportAuxTask(tasks_sql.SqlCheckTask):
+    """Check that the auxiliary data are imported successfully."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
+        """Require that the auxiliary data are imported."""
         return ExecuteImportFilesAuxTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the auxiliary data have been confirmed."""
         out_path = os.path.join(self.task_dir, '104_check_import_files.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
+        """Get the name of the table whose contents need to be confirmed present."""
         return 'file_popregions'
 
 
 class BuildViewsAuxTask(tasks_sql.SqlExecuteTask):
+    """Task which builds views that make it easier to work with auxiliary data."""
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
+        """Require that the auxiliary data have been confirmed present."""
         return CheckImportAuxTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the views for working with auxiliary data have been built."""
         out_path = os.path.join(self.task_dir, '105_build_views.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
+        """Get the location of scripts needed to build the auxiliary data views."""
         return [
             '05_aux/gdp.sql',
             '05_aux/population.sql',
@@ -267,32 +300,40 @@ class BuildViewsAuxTask(tasks_sql.SqlExecuteTask):
 
 
 class CheckViewsAuxTask(tasks_sql.SqlCheckTask):
+    """Task which confirms that the auxiliary data views are avalable and populated."""
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
     def requires(self):
+        """Require that the auxiliary views have been built."""
         return BuildViewsAuxTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the views for the auxiliary data have been built and confirmed."""
         out_path = os.path.join(self.task_dir, '106_check_views.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
+        """Indicate table / view to check is populated."""
         return 'auxiliary'
 
 
 class BuildFrameAuxTask(luigi.Task):
+    """Task which write the processed auxiliary data to a CSV file."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the auxiliary data view has been confirmed."""
         return CheckViewsAuxTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the CSV file has been exported."""
         out_path = os.path.join(self.task_dir, '107_build_frame.json')
         return luigi.LocalTarget(out_path)
     
     def run(self):
+        """Write the auxiliary data CSV file."""
         with self.input().open('r') as f:
             job_info = json.load(f)
 

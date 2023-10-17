@@ -1,3 +1,9 @@
+"""Template Methods for contstructing tasks which execute / check SQL statements.
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import csv
 import json
 import os
@@ -9,12 +15,26 @@ import const
 
 
 class SqlExecuteTask(luigi.Task):
+    """Template Method for a Luigi Task which executes one or more SQL scripts.
+
+    Template Method for a Luigi Task which executes one or more SQL scripts, comitting changes after
+    each script.
+    """
 
     def get_scripts_resolved(self, sql_dir):
+        """Get the full path to scripts to be executed.
+
+        Args:
+            sql_dir: The path to the directory where script files can be found.
+
+        Returns:
+            List of paths for the scripts to be executed.
+        """
         split = map(lambda x: x.split('/'), self.get_scripts())
         return map(lambda x: os.path.join(*([sql_dir] + x)), split)
 
     def run(self):
+        """Execute the scripts."""
         with self.input().open('r') as f:
             job_info = json.load(f)
 
@@ -39,18 +59,38 @@ class SqlExecuteTask(luigi.Task):
             return json.dump(job_info, f)
 
     def transform_sql(self, sql_contents):
+        """Optional hook which can be overridden to preprocess a SQL command before its execution.
+
+        Args:
+            sql_contents: The SQL to be executed prior to preprocessing.
+
+        Returns:
+            The SQL to execute after preprocessing.
+        """
         return sql_contents
 
     def get_scripts(self):
+        """Get the list of scripts to be executed.
+
+        Returns:
+            List of strings where each is a partial path to the script to be executed.
+        """
         raise NotImplementedError('Must use implementor.')
 
 
 class SqlCheckTask(luigi.Task):
+    """Template Method which checks that table or view has contents in it."""
 
     def get_table_name(self):
+        """Return the name of the table to be checked.
+
+        Returns:
+            The name of the table to check.
+        """
         raise NotImplementedError('Must use implementor.')
 
     def run(self):
+        """Execute the check which, by default, simply confirms that the table is non-empty."""
         with self.input().open('r') as f:
             job_info = json.load(f)
 

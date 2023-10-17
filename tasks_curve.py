@@ -1,3 +1,14 @@
+"""Tasks which allow fitting curves to predict plastic futures.
+
+Tasks which allow fitting curves to predict plastic futures, either by fitting without any external
+variables ("naive") or using auxiliary data like GDP and population ("curve"). In practice, this
+pipeline branch builds ensembles from these small models, training once per "category" of data to
+be predicted like major market sector plus region or waste type plus region. 
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import csv
 import itertools
 import json
@@ -15,31 +26,97 @@ import tasks_ml_prep
 
 
 class Keyer:
+    """Object producing keys for a set of models or instances.
+
+    Object which generates keys describing for which types of predictions a set of models should be
+    used for. This may also be used to partition data or requests by the prediction task for which
+    they are relevant.
+    """
 
     def __init__(self, key_cols):
+        """Create a new keyer.
+
+        Args:
+            key_cols: List of attribute names from which the key should be constructed.
+        """
         self._key_cols = key_cols
 
     def get(self, record):
+        """Get a key for an instance.
+
+        Args:
+            Record describing either the task or data point being considered.
+
+        Returns:
+            Key which can be used to identify the data or model relevant to the modeling task.
+        """
         return ','.join(map(lambda x: record[x], self._key_cols))
 
 
 class RegressorInputGetter:
+    """Object to get simple flat input vectors for a curve model.
+
+    Object to get simple flat input vectors for a curve model, useful for ensuring standardized
+    input for training or model execution.
+    """
 
     def __init__(self, input_cols):
+        """Create a new input getter which standardizes inputs to a model.
+
+        Args:
+            input_cols: The list of column or attributes names in the order they should appear as
+                input vectors to the model.
+        """
         self._input_cols = input_cols
 
     def get(self, record):
+        """Build an input vector for the input record.
+
+        Args:
+            record: The record from which a model-compatible flat input vector should be built. This
+                may be an input training instance, for example.
+
+        Returns:
+            List / simple vector that can be fed into the model.
+        """
         return [record[x] for x in self._input_cols]
 
 
 class KeyedModel:
+    """Model adapter which uses different children models based on task.
+
+    Model collection which determines which model should be used based on input vectors, offering a
+    scikit-learn predict-like method for polymorphism.
+    """
 
     def __init__(self, models, keyer, input_getter):
+        """Create a new keyed model collection.
+
+        Args:
+            models: Models in a dictionary structure where the key is the key for tasks for which
+                they apply and the value is the scikit learn or equivalent-interfaced model.
+            keyer: Keyer which can be used to generate keys in the form exected by models when given
+                input values or tasks.
+            input_getter: Object to convert input instances or tasks to a flat input vector usable
+                by any model in models.
+        """
         self._models = models
         self._keyer = keyer
         self._input_getter = input_getter
 
     def predict(self, target):
+        """Predict the plastics outcome for the given input tasks.
+
+        Predict the plastics outcome for the given input tasks, switching between target model based
+        on the input task and the keyer behind this KeyedModel.
+
+        Args:
+            target: List of dictionaries describing the tasks for which a prediction should be
+                returned.
+
+        Returns:
+            Predictions corresponding to the input tasks in target in the same order as target.
+        """
         ret_list = []
 
         for row in target:
@@ -53,8 +130,20 @@ class KeyedModel:
 
 
 class CurveTask(luigi.Task):
+    """Template Method to fit curves for predicting plastics futures.
+
+    Template Method for a Luigi Task which can be used to fit curves either in the "naive" or
+    "curve" configuration to predict plastic future outcomes like consumption, waste, and trade.
+    Individual models needing training should subclass this template one subclass per model
+    required.
+    """
 
     def run(self):
+        """Perform a sweep to construct a model.
+
+        Train the model with a small sweep of hyperparameters and evaluate performance metrics
+        including validation set performance.
+        """
         with self.input().open('r') as f:
             job_info = json.load(f)
 
@@ -107,6 +196,16 @@ class CurveTask(luigi.Task):
             return json.dump(job_info, f)
 
     def load_instances(self, job_info):
+        """Load instances that will be split into train, test, validation.
+
+        Args:
+            job_info: Information about the job which includes details required to determine from
+                where the instances should be loaded. Specifically, information required to
+                find the scratch SQLite database.
+
+        Returns:
+            Instances as a list of dictionaries with one dictionary per instance.
+        """
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
@@ -125,6 +224,17 @@ class CurveTask(luigi.Task):
         return ret_data
 
     def assign_sets(self, instances):
+        """Split instances across different sets (validation, train, ignore).
+
+        Split instances across different sets (validation, train, ignore), recognizing that some
+        instances may be from anamalous years like COVID / 2020 and should be excluded as to prevent
+        skewing training.
+
+        Args:
+            instances: The instances to split across different sets. These instances will be udpated
+                in place with a new setAssign attribute. If setAssign was present perviously, it
+                will be overwritten.
+        """
         for instance in instances:
             out_sample = self.is_out_sample_candidate(instance)
             ignore = self.is_out_sample_ignore(instance)
@@ -137,6 +247,17 @@ class CurveTask(luigi.Task):
             instance['setAssign'] = out_sample_label
 
     def sweep(self, instances):
+        """Perform the sweep across hyperparameters.
+
+        Args:
+            instances: Instances with set assignment (setAssign) on which training and evaluation
+                should be performed.
+
+        Returns:
+            Results of training as a list of dictionaries with one dict per model trainined where
+            each record has information about perforamnce as well as a reference to the built model
+            under the model attribute.
+        """
 
         def get_set_instances(label):
             return filter(lambda x: x['setAssign'] == label, instances)
@@ -195,6 +316,18 @@ class CurveTask(luigi.Task):
         return [execute_task(task) for task in queue]
 
     def standardize_results(self, results):
+        """Ensure all records for built models have the same attributes.
+
+        Different models will report different information about their hyperparameters. This will
+        write empty values into the model records such that all records have the same set of
+        attributes even if some are empty because they are not relevant for the model trained. 
+
+        Args:
+            results: List of model records (as dictionaries) to standardize.
+
+        Returns:
+            List of dicts after standardization.
+        """
         keys_per_row = map(lambda x: x.keys(), results)
         keys_iter = itertools.chain(*keys_per_row)
         keys_allowed = filter(lambda x: x != 'model', keys_iter)
@@ -217,6 +350,18 @@ class CurveTask(luigi.Task):
             raise RuntimeError('Unrecognized option type ' + option['type'])
 
     def try_linear(self, degree, train_inputs, train_response):
+        """Build a linear model.
+
+        Build a linear model which may use polynomial features inside through scikit learn pipeline.
+
+        Args:
+            degree: The degree of the function to fit. A degree of 1 is simple line fitting.
+            train_inputs: Collection of instances for training.
+            train_response: Collection of response values paired to train_inputs.
+
+        Returns:
+            Dictionary describing the model including the degree.
+        """
         key_cols = sorted(self.get_key_cols())
         input_cols = sorted(self.get_input_cols())
 
@@ -257,45 +402,107 @@ class CurveTask(luigi.Task):
         }
 
     def is_out_sample_candidate(self, target):
+        """Determine if an instance should be labeled as out of sample.
+
+        Determine if an instance is out of sample and should be set aside for the out of sample
+        test.
+
+        Args:
+            target: The instance to be labeled.
+
+        Returns:
+            True if out of sample and False if in sample.
+        """
         return target['year'] >= 2019
 
     def is_out_sample_ignore(self, target):
+        """Determine if an instance should be ignored.
+
+        Args:
+            target: The instance to be labeled.
+
+        Returns:
+            True if from an anamalous year (like COVID, 2020). False otherwise.
+        """
         return target['year'] == 2020
 
     def get_model_filename(self):
+        """Determine the filename at which the fit model should be pickeled.
+
+        Returns:
+            String path to where the model should be written.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_key_cols(self):
+        """Determine which columsn define which model should be used.
+
+        Returns:
+            Columns to be used in a Keyer.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_sql(self):
+        """Get the SQL which is used to query for instances.
+
+        Returns:
+            SQL to retrieve instance which may be used for training, validation, or test.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_cols(self):
+        """Get the columns that will be returned from querying with get_sql.
+
+        Returns:
+            The in-order list of columns returned by the query described at get_sql.
+        """
         raise NotImplementedError('Use implementor.')
     
     def get_input_cols(self):
+        """Get the columns that that are inputs to the model.
+
+        Returns:
+            The list of columns in-order that are inputs into the model.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_response_col(self):
+        """Get the column describing the response variable to be predicted.
+
+        Returns:
+            The name of the column in which the response variable can be found.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_report_filename(self):
+        """Get the filename at which the sweep report should be written.
+
+        Returns:
+            The path to where the sweep report should be written.
+        """
         raise NotImplementedError('Use implementor.')
 
 
 class ConsumptionCurveTask(CurveTask):
+    """Train a "curve" model that predicts consumption."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlConsumptionViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a curve model has been trained."""
         out_path = os.path.join(self.task_dir, '400_consumption_curve.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -309,12 +516,22 @@ class ConsumptionCurveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that consumption has one model per region / sector.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region',
             'majorMarketSector'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -325,33 +542,61 @@ class ConsumptionCurveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that population and GDP are inputs to the curve model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'population',
             'gdp'
         ]
 
     def get_response_col(self):
+        """Indicate that consumption is the response variable.
+
+        Returns:
+            The name of the consumption column.
+        """
         return 'consumptionMT'
 
     def get_report_filename(self):
+        """Indicate where the curve fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'consumption_curve.csv'
 
     def get_model_filename(self):
+        """Indicate where the curve model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'consumption_curve.pickle'
 
 
 class ConsumptionCurveNaiveTask(CurveTask):
+    """Train a "naive" model that predicts consumption."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlConsumptionViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a naive model has been trained."""
         out_path = os.path.join(self.task_dir, '401_consumption_curve_naive.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -365,12 +610,22 @@ class ConsumptionCurveNaiveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that consumption has one model per region / sector.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region',
             'majorMarketSector'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -381,32 +636,60 @@ class ConsumptionCurveNaiveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that year is the only input to the naive model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'year'
         ]
 
     def get_response_col(self):
+        """Indicate that consumption is the response variable.
+
+        Returns:
+            The name of the consumption column.
+        """
         return 'consumptionMT'
 
     def get_report_filename(self):
+        """Indicate where the naive fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'consumption_curve_naive.csv'
 
     def get_model_filename(self):
+        """Indicate where the naive model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'consumption_curve_naive.pickle'
 
 
 class WasteCurveTask(CurveTask):
+    """Task which fits a curve to predict waste EOL fate."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlWasteViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a curve model has been trained."""
         out_path = os.path.join(self.task_dir, '402_waste_curve.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -420,12 +703,22 @@ class WasteCurveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that waste has one model per region / fate.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region',
             'type'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -436,33 +729,61 @@ class WasteCurveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that population and GDP are inputs to the curve model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'population',
             'gdp'
         ]
 
     def get_response_col(self):
+        """Indicate that EOL propensity is the response variable.
+
+        Returns:
+            The name of the EOL column.
+        """
         return 'percent'
 
     def get_report_filename(self):
+        """Indicate where the curve fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'waste_curve.csv'
 
     def get_model_filename(self):
+        """Indicate where the curve model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'waste_curve.pickle'
 
 
 class WasteCurveNaiveTask(CurveTask):
+    """Train a "naive" model that predicts EOL fate propensity."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlWasteViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a naive model has been trained."""
         out_path = os.path.join(self.task_dir, '403_waste_curve_naive.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -476,12 +797,22 @@ class WasteCurveNaiveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that consumption has one model per region / fate.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region',
             'type'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -492,32 +823,60 @@ class WasteCurveNaiveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that year is the only input to the naive model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'year'
         ]
 
     def get_response_col(self):
+        """Indicate that EOL fate propensity is the response variable.
+
+        Returns:
+            The name of the EOL fate column.
+        """
         return 'percent'
 
     def get_report_filename(self):
+        """Indicate where the naive fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'waste_curve_naive.csv'
 
     def get_model_filename(self):
+        """Indicate where the naive model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'waste_curve_naive.pickle'
 
 
 class TradeCurveTask(CurveTask):
+    """Train a "curve" model that predicts trade (goods and materials)."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a curve model has been trained."""
         out_path = os.path.join(self.task_dir, '404_trade_curve.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -531,12 +890,22 @@ class TradeCurveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that consumption has one model per region / type.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region',
             'type'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -547,33 +916,61 @@ class TradeCurveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that population and GDP are inputs to the curve model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'population',
             'gdp'
         ]
 
     def get_response_col(self):
+        """Indicate that trade (goods / materials) is the response variable.
+
+        Returns:
+            The name of the trade column.
+        """
         return 'netMT'
 
     def get_report_filename(self):
+        """Indicate where the curve fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'trade_curve.csv'
 
     def get_model_filename(self):
+        """Indicate where the curve model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'trade_curve.pickle'
 
 
 class TradeCurveNaiveTask(CurveTask):
+    """Train a "naive" model that predicts trade (goods and materials)."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a naive model has been trained."""
         out_path = os.path.join(self.task_dir, '405_trade_curve_naive.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -587,12 +984,22 @@ class TradeCurveNaiveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that consumption has one model per region / fate.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region',
             'type'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -603,32 +1010,60 @@ class TradeCurveNaiveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that year is the only input to the naive model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'year'
         ]
 
     def get_response_col(self):
+        """Indicate that consumption is the response variable.
+
+        Returns:
+            The name of the consumption column.
+        """
         return 'netMT'
 
     def get_report_filename(self):
+        """Indicate where the naive fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'trade_curve_naive.csv'
 
     def get_model_filename(self):
+        """Indicate where the naive model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'trade_curve_naive.pickle'
 
 
 class WasteTradeCurveTask(CurveTask):
+    """Train a "curve" model that predicts waste trade."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlWasteTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a curve model has been trained."""
         out_path = os.path.join(self.task_dir, '406_waste_trade_curve.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -643,11 +1078,21 @@ class WasteTradeCurveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that consumption has one model per region.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -657,33 +1102,61 @@ class WasteTradeCurveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that population and GDP are inputs to the curve model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'population',
             'gdp'
         ]
 
     def get_response_col(self):
+        """Indicate that trade (waste) is the response variable.
+
+        Returns:
+            The name of the trade column.
+        """
         return 'netMT'
 
     def get_report_filename(self):
+        """Indicate where the curve fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'wasteTrade_curve.csv'
 
     def get_model_filename(self):
+        """Indicate where the curve model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'wasteTrade_curve.pickle'
 
 
 class WasteTradeCurveNaiveTask(CurveTask):
+    """Train a "naive" model that predicts trade (waste)."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the instance data are ready for training."""
         return tasks_ml_prep.CheckMlWasteTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that a naive model has been trained."""
         out_path = os.path.join(self.task_dir, '407_trade_curve_naive.json')
         return luigi.LocalTarget(out_path)
 
     def get_sql(self):
+        """Get the SQL query which returns instances for this sweep.
+
+        Returns:
+            The SQL query for this sweep.
+        """
         return '''
             SELECT
                 year,
@@ -698,11 +1171,21 @@ class WasteTradeCurveNaiveTask(CurveTask):
         '''
 
     def get_key_cols(self):
+        """Indicate that consumption has one model per region.
+
+        Returns:
+            List of keys for Keyer.
+        """
         return [
             'region'
         ]
 
     def get_cols(self):
+        """Get the columns that are returned by executing the query from get_sql.
+
+        Returns:
+            List of columns that would be returned by running the query at get_sql.
+        """
         return [
             'year',
             'region',
@@ -712,15 +1195,35 @@ class WasteTradeCurveNaiveTask(CurveTask):
         ]
     
     def get_input_cols(self):
+        """Indicate that year is the only input to the naive model.
+
+        Returns:
+            List of columns to use as inputs.
+        """
         return [
             'year'
         ]
 
     def get_response_col(self):
+        """Indicate that waste trade is the response variable.
+
+        Returns:
+            The name of the trade column.
+        """
         return 'netMT'
 
     def get_report_filename(self):
+        """Indicate where the naive fitting report should be written.
+
+        Returns:
+            The name of the file where sweep results should be written.
+        """
         return 'wasteTrade_curve_naive.csv'
 
     def get_model_filename(self):
+        """Indicate where the naive model should be pickeled.
+
+        Returns:
+            The name of the pickle file to write.
+        """
         return 'wasteTrade_curve_naive.pickle'

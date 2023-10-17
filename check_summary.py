@@ -1,3 +1,9 @@
+"""Simple checks on the intermediate summaries file or view contents.
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import csv
 import sys
 
@@ -6,6 +12,11 @@ NUM_ARGS = 1
 
 
 def check(loc):
+    """Check that a summary file has expected columns.
+
+    Args:
+        loc: The location of the file to check.
+    """
     with open(loc) as f:
         results = list(csv.DictReader(f))
 
@@ -36,11 +47,13 @@ def check(loc):
 
 
 def main():
+    """Entrypoint for this command line utility."""
     if len(sys.argv) != NUM_ARGS + 1:
         print(USAGE_STR)
         sys.exit(1)
 
     check(sys.argv[1])
+
 
 
 if __name__ == '__main__':

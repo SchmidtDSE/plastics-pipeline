@@ -1,3 +1,13 @@
+"""Implementors of Template Methods in tasks_project_template.
+
+Implementors of Template Methods in tasks_project_template which use a set of related models to
+project forward waste, trade, and consumption. This will, for example, use all of the machine
+learning models to make future projections.
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import os
 
 import luigi
@@ -9,6 +19,7 @@ import tasks_project_template
 
 
 class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
+    """Check that machine learning models are ready for projection."""
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -34,6 +45,7 @@ class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
 
 
 class PreCheckCurveProjectTask(tasks_project_template.PreCheckProjectTask):
+    """Check that "curve" models are ready for projection."""
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -59,6 +71,7 @@ class PreCheckCurveProjectTask(tasks_project_template.PreCheckProjectTask):
 
 
 class PreCheckNaiveProjectTask(tasks_project_template.PreCheckProjectTask):
+    """Check that "naive" extrapolation models are ready for projection."""
     
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -84,6 +97,7 @@ class PreCheckNaiveProjectTask(tasks_project_template.PreCheckProjectTask):
 
 
 class SeedMlProjectionTask(tasks_project_template.SeedProjectionTask):
+    """Prepare the projections table for machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -99,6 +113,7 @@ class SeedMlProjectionTask(tasks_project_template.SeedProjectionTask):
 
 
 class CheckSeedMlProjectionTask(tasks_project_template.CheckSeedProjectionTask):
+    """Confirm the projections table is built for machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -114,6 +129,7 @@ class CheckSeedMlProjectionTask(tasks_project_template.CheckSeedProjectionTask):
 
 
 class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
+    """Perform projections using the set of related machine learning models."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -506,6 +522,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
 
 
 class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):
+    """Prepare the projections table for "curve" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -521,6 +538,7 @@ class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):
 
 
 class CheckSeedCurveProjectionTask(tasks_project_template.CheckSeedProjectionTask):
+    """Confirm the projections table is built for "curve" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -536,6 +554,7 @@ class CheckSeedCurveProjectionTask(tasks_project_template.CheckSeedProjectionTas
 
 
 class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
+    """Perform projections using the set of related "curve" models."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
@@ -715,6 +734,7 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
 
 
 class SeedNaiveProjectionTask(tasks_project_template.SeedProjectionTask):
+    """Prepare the projections table for "naive" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -730,6 +750,7 @@ class SeedNaiveProjectionTask(tasks_project_template.SeedProjectionTask):
 
 
 class CheckSeedNaiveProjectionTask(tasks_project_template.CheckSeedProjectionTask):
+    """Confirm the projections table is built for "naive" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -745,6 +766,7 @@ class CheckSeedNaiveProjectionTask(tasks_project_template.CheckSeedProjectionTas
 
 
 class ProjectNaiveRawTask(ProjectCurveRawTask):
+    """Perform projections using the set of related "naive" models."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -772,6 +794,7 @@ class ProjectNaiveRawTask(ProjectCurveRawTask):
 
 
 class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):
+    """Perform normalization tasks on the machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -787,6 +810,7 @@ class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):
 
 
 class NormalizeCurveTask(tasks_project_template.NormalizeProjectionTask):
+    """Perform normalization tasks on the curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -802,6 +826,7 @@ class NormalizeCurveTask(tasks_project_template.NormalizeProjectionTask):
 
 
 class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
+    """Perform normalization tasks on the naive model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -817,6 +842,7 @@ class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
 
 
 class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
+    """Check normalization was successful on the machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -838,6 +864,7 @@ class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
 
 
 class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
+    """Check normalization was successful on the curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -853,6 +880,7 @@ class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
 
 
 class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
+    """Apply lifetime / lifecycle distributions to determine waste in ML projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -868,6 +896,7 @@ class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
 
 
 class ApplyLifecycleCurveTask(tasks_project_template.ApplyLifecycleTask):
+    """Apply lifetime / lifecycle distributions to determine waste in curve projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -883,6 +912,7 @@ class ApplyLifecycleCurveTask(tasks_project_template.ApplyLifecycleTask):
 
 
 class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
+    """Apply lifetime / lifecycle distributions to determine waste in naive projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -898,6 +928,7 @@ class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
 
 
 class MlLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+    """Check that lifecycle / lifetime distributions were applied to the ML projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -913,6 +944,7 @@ class MlLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
 
 
 class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+    """Check that lifecycle / lifetime distributions were applied to the curve projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -928,6 +960,7 @@ class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
 
 
 class MlApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+    """Apply the effects of waste trade on other summary stats in machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -943,6 +976,7 @@ class MlApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask
 
 
 class CurveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+    """Apply the effects of waste trade on other summary stats in curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
@@ -958,6 +992,7 @@ class CurveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionT
 
 
 class NaiveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+    """Apply the effects of waste trade on other summary stats in naive projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
     
