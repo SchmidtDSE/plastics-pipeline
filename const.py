@@ -1,3 +1,9 @@
+"""Shared constants for the plastics ML training pipeline.
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import os
 import pathlib
 import random

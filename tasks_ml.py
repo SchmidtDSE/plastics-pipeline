@@ -1,3 +1,9 @@
+"""Tasks which run machine learning sweeps for models to predict trade, consumption, and waste.
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import csv
 import itertools
 import json
@@ -22,19 +28,50 @@ import tasks_ml_prep
 
 
 class DecoratedModel:
+    """Pickle-able model which includes logic to make input vectors."""
 
     def __init__(self, inner_model, cols):
+        """Create a new model structure which can be pickled logic to make input vectors.
+
+        Args:
+            inner_model: The model to be decorated.
+            cols: The list of column names in order that should be red to make input vectors.
+        """
         self._inner_model = inner_model
         self._cols = cols
 
     def predict(self, targets):
+        """Use the inner model to make a prediction.
+
+        Args:
+            targets: List of input tasks for the machine learning to perform where each dict in the
+                collection has input values required by the model.
+
+        Returns:
+            The prediction.
+        """
         targets_linear = [[target[col] for col in self._cols] for target in targets]
         return self._inner_model.predict(targets_linear)
 
 
 class SweepTask(luigi.Task):
+    """Template Method to build ML sweep tasks.
+
+    Template Method to build Luigi Tasks that perform a machine learning sweep to create a model for
+    a specific response variable like waste, consumption, or trade. These tasks yield a machine
+    learning model as well as statistics about the models not chosen during the hyperparameter
+    sweep.
+    """
 
     def run(self):
+        """Execute a sweep.
+
+
+        Run a sweep over the available hyperparameter options for each machine learning model type
+        available (linear, SVM, tree / CART, AdaBoost, Random Forest) and select a model to use in
+        prediction. The final model, after evaluation, will be trained on all available data before
+        moving forward into prediction.
+        """
         with self.input().open('r') as f:
             job_info = json.load(f)
 
@@ -91,6 +128,12 @@ class SweepTask(luigi.Task):
             return json.dump(job_info, f)
 
     def load_instances(self, job_info):
+        """Load instances which will be used across the training, validation, and test sets.
+
+        Args:
+            job_info: the job JSON which describes where the instances can be found, specifically
+                the scratch SQLite database.
+        """
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
@@ -109,6 +152,15 @@ class SweepTask(luigi.Task):
         return ret_data
 
     def assign_sets(self, instances):
+        """Update instances in place to assign them to a training, validation, test, or ignore set.
+
+        Assign input instances to test, train, and validation sets. Some instances may also be
+        ignored if from an anamalous set like COVD / 2020.
+
+        Args:
+            instances: The instances (collection of dictionaries) to update. These will be modified
+                in place, adding a setAssign and setAssignIn/OutSample to the instance.
+        """
         for instance in instances:
             out_sample = self.is_out_sample_candidate(instance)
             ignore = self.is_out_sample_ignore(instance)
@@ -124,6 +176,18 @@ class SweepTask(luigi.Task):
             )
 
     def sweep(self, instances, workers):
+        """Perform the actual machine learning sweep.
+
+        Args:
+            instance: The instances with a setAssign attribute on which training and evaluation
+                should happen.
+            workers: The number of workers to run in parallel to complete the sweep. If 1, this is
+                run as a normal Python execution. If more than 1, Pathos will be engaged to run
+                in parallel.
+
+        Returns:
+            List of dictionaries with each dictionary describing a model attempted.
+        """
 
         def get_set_instances(label, set_type):
             return filter(lambda x: x[set_type] == label, instances)
@@ -315,6 +379,19 @@ class SweepTask(luigi.Task):
         return list(results) 
 
     def standardize_results(self, results):
+        """Update model sweep records so they all have the same attributes.
+        
+        Different models will report different information about their hyperparameters such as
+        kernel for SVR and max depth for trees. This will write empty values into the model records
+        such that all records have the same set of attributes even if some are empty because they
+        are not relevant for the model trained. 
+
+        Args:
+            results: The results to update.
+
+        Returns:
+            Results after having standardized their keys.
+        """
         keys_per_row = map(lambda x: x.keys(), results)
         keys_iter = itertools.chain(*keys_per_row)
         keys_allowed = filter(lambda x: x != 'model', keys_iter)
@@ -327,6 +404,18 @@ class SweepTask(luigi.Task):
         return [standardize_result(x) for x in results]
 
     def train(self, option, train_inputs, train_response):
+        """Train a single model as part of the sweep.
+
+        Args:
+            option: Dictionary describing the model to be trained.
+            train_inputs: The training instances on which the model should fit.
+            train_response: The response values for each training instance such that train_response
+                can pair with train_inputs in order.
+
+        Returns:
+            Dictionary describing the model fit along with hyperparameters. This will include the
+            model iself under a "model" attribute.
+        """
         if option['type'] == 'linear':
             return self.try_linear(
                 option['alpha'],
@@ -366,6 +455,16 @@ class SweepTask(luigi.Task):
             raise RuntimeError('Unrecognized option type ' + option['type'])
 
     def try_linear(self, alpha, train_inputs, train_response):
+        """Try fitting a simple linear model.
+
+        Args:
+            alpha: Regularization parameter.
+            train_inputs: The inputs on which the model should ber fit.
+            train_response: The response variable to be predicted.
+
+        Returns:
+            Newly fit model.
+        """
         model = sklearn.linear_model.Ridge(alpha=alpha)
         model.fit(train_inputs, train_response)
         
@@ -378,6 +477,18 @@ class SweepTask(luigi.Task):
         return ret_val
 
     def try_svm(self, kernel, degree, alpha, train_inputs, train_response):
+        """Try support vector regression.
+
+        Args:
+            kernel: The name of the kernel like RBF to try.
+            degree: The degree to use for SVR.
+            alpha: Regularization parameter.
+            train_inputs: The inputs on which the model should ber fit.
+            train_response: The response variable to be predicted.
+
+        Returns:
+            Newly fit model.
+        """
         model = sklearn.pipeline.Pipeline([
             ('scale', sklearn.preprocessing.StandardScaler()),
             ('svr', sklearn.svm.SVR(kernel=kernel, degree=degree, C=1-alpha))
@@ -395,6 +506,16 @@ class SweepTask(luigi.Task):
         return ret_val
 
     def try_tree(self, depth, train_inputs, train_response):
+        """Try a decision tree regressor.
+
+        Args:
+            depth: The max depth allowed for the tree.
+            train_inputs: The inputs on which the model should ber fit.
+            train_response: The response variable to be predicted.
+
+        Returns:
+            Newly fit model.
+        """
         model = sklearn.tree.DecisionTreeRegressor(max_depth=depth)
         model.fit(train_inputs, train_response)
         
@@ -407,6 +528,17 @@ class SweepTask(luigi.Task):
         return ret_val
 
     def try_ada(self, depth, estimators, train_inputs, train_response):
+        """Try an AdaBoost regressor over a decision tree regressor.
+
+        Args:
+            depth: The max depth allowed for the tree.
+            estimators: The number of trees allowed in the ensemble.
+            train_inputs: The inputs on which the model should ber fit.
+            train_response: The response variable to be predicted.
+
+        Returns:
+            Newly fit model.
+        """
         model_inner = sklearn.tree.DecisionTreeRegressor(max_depth=depth)
         model = sklearn.ensemble.AdaBoostRegressor(
             estimator=model_inner,
@@ -424,6 +556,18 @@ class SweepTask(luigi.Task):
         return ret_val
 
     def try_forest(self, depth, estimators, max_features, train_inputs, train_response):
+        """Try a Random Forest regressor.
+
+        Args:
+            depth: The max depth allowed for the tree.
+            estimators: The number of trees allowed in the ensemble.
+            max_features: The maximum allowed features (like log, sqrt, etc) per estimator.
+            train_inputs: The inputs on which the model should ber fit.
+            train_response: The response variable to be predicted.
+
+        Returns:
+            Newly fit model.
+        """
         model = sklearn.ensemble.RandomForestRegressor(
             max_depth=depth,
             n_estimators=estimators,
@@ -442,6 +586,16 @@ class SweepTask(luigi.Task):
         return ret_val
 
     def evaluate_target_set(self, predicted_collection, actual_collection):
+        """Evaluate model performance on a specific set.
+
+        Args:
+            predicted_collection: The response variable / predictions from the model on this set.
+            actual_collection: The response variable / actuals observed for this set such that this
+                is in the same order to be paried with predicted_collection.
+
+        Returns:
+            Mean absolute error for this set.
+        """
         zipped = zip(predicted_collection, actual_collection)
         return statistics.mean(map(
             lambda x: self.evaluate_target_single(x[0], x[1]),
@@ -449,45 +603,125 @@ class SweepTask(luigi.Task):
         ))
 
     def is_out_sample_candidate(self, target):
+        """Determine if an instance should be labeled as out of sample.
+
+        Determine if an instance is out of sample and should be set aside for the out of sample
+        test.
+
+        Args:
+            target: The instance to be labeled.
+
+        Returns:
+            True if out of sample and False if in sample.
+        """
         return target['beforeYear'] >= 2019 or target['afterYear'] >= 2019
 
     def is_out_sample_ignore(self, target):
+        """Determine if an instance should be ignored.
+
+        Args:
+            target: The instance to be labeled.
+
+        Returns:
+            True if from an anamalous year (like COVID, 2020). False otherwise.
+        """
         return target['beforeYear'] == 2020 or target['afterYear'] == 2020
 
     def evaluate_target_single(self, predicted, actuals):
+        """Evaluate the error for a single prediction.
+
+        Args:
+            predicted: The model prediction.
+            actuals: Vector of actual values required to evaluate a prediction.
+
+        Returns:
+            Error estimation
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_sql(self):
+        """Get the SQL which is used to query for instances.
+
+        Returns:
+            SQL to retrieve instance which may be used for training, validation, or test.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_cols(self):
+        """Get the columns that will be returned from querying with get_sql.
+
+        Returns:
+            The in-order list of columns returned by the query described at get_sql.
+        """
         raise NotImplementedError('Use implementor.')
     
     def get_input_cols(self):
+        """Get the columns that that are inputs to the model.
+
+        Returns:
+            The list of columns in-order that are inputs into the model.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_response_col(self):
+        """Get the column describing the response variable to be predicted.
+
+        Returns:
+            The name of the column in which the response variable can be found.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_output_cols(self):
+        """Get the columns required to evaluate a prediction.
+        
+        Get the columns required to evaluate a prediction which include the response variable but
+        may include additional information required to convert the reponse to a meaningful error
+        estimation. For example, a model predicting percent change may require the previous value as
+        well to pair with its response.
+
+        Returns:
+            List of column names required to generate a useful error estimation.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_report_filename(self):
+        """Get the filename at which the sweep report should be written.
+
+        Returns:
+            The path to which the sweep report should be written.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_model_filename(self):
+        """Get the name of the file at which the model should be pickled.
+
+        Returns:
+            The path to which the model should be written.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_svm_enabled(self):
+        """Determine if support vector regression should be attempted in the sweep.
+
+        Returns:
+            True if SVM should be tried in the sweep and False otherwise.
+        """
         raise NotImplementedError('Use implementor.')
 
     def get_model_class(self):
+        """Get the type of model being trained.
+
+        Returns:
+            The type of model being trained like "consumption" which defines when it should be used.
+        """
         raise NotImplementedError('Use implementor.')
 
 
 class CheckSweepTask(luigi.Task):
+    """Check if a sweep was successful."""
 
     def run(self):
+        """Load a trained model and check that its sweep was successful."""
         with self.input().open('r') as f:
             job_info = json.load(f)
 
@@ -517,6 +751,14 @@ class CheckSweepTask(luigi.Task):
             return json.dump(job_info, f)
 
     def parse_row(self, row):
+        """Parse a row of the sweep output describing a single model attempted.
+
+        Args:
+            row: The row to be parsed.
+
+        Returns:
+            The parsed row describing a model tried in the sweep.
+        """
         return {
             'validInSampleTarget': float(row['validInSampleTarget']),
             'validOutSampleTarget': float(row['validOutSampleTarget']),
@@ -526,29 +768,61 @@ class CheckSweepTask(luigi.Task):
         }
 
     def get_report_filename(self):
+        """Get the name of the file at which the sweep report was written.
+
+        Returns:
+            The filename at which the sweep report can be read.
+        """
         raise NotImplementedError('Use implementor.')
 
     def check_model(self, target):
+        """Execute goal-specific model checks.
+
+        Args:
+            target: The record describing the chosen model from the sweep.
+        """
         raise NotImplementedError('Use implementor.')
 
 
 class SweepConsumptionTask(SweepTask):
+    """Task to sweep for a consumption prediction model.
+
+    Task to sweep for a consumption prediction model, predicting percent change in consumption for a
+    sector from year to the next.
+    """
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the ML instance data have been generated."""
         return tasks_ml_prep.CheckMlConsumptionViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that consumption was swept."""
         out_path = os.path.join(self.task_dir, '300_sweep_consumption.json')
         return luigi.LocalTarget(out_path)
 
     def evaluate_target_single(self, predicted, actuals):
+        """Evaluate error of a percent change prediction from the swept model.
+
+        Args:
+            predicted: The predicted percent change.
+            actuals: A two element vector where the first element is the prior consumption value
+                and the second element is the actual value after the change.
+
+        Returns:
+            Estimated error for the percent change.
+        """
         actual_target = actuals[1]
         predicted_target = (1 + predicted) * actuals[0]
         return abs(actual_target - predicted_target)
 
     def get_sql(self):
+        """Get the SQL which is used to query for instances.
+
+        Returns:
+            SQL to retrieve instance which may be used for training, validation, or test.
+        """
         return '''
             SELECT
                 afterYear,
@@ -576,6 +850,11 @@ class SweepConsumptionTask(SweepTask):
         '''
 
     def get_cols(self):
+        """Get the columns that will be returned from querying with get_sql.
+
+        Returns:
+            The in-order list of columns returned by the query described at get_sql.
+        """
         return [
             'afterYear',
             'beforeYear',
@@ -600,6 +879,11 @@ class SweepConsumptionTask(SweepTask):
         ]
     
     def get_input_cols(self):
+        """Get the columns that that are inputs to the model.
+
+        Returns:
+            The list of columns in-order that are inputs into the model.
+        """
         return [
             'years',
             'popChange',
@@ -619,43 +903,95 @@ class SweepConsumptionTask(SweepTask):
         ]
 
     def get_response_col(self):
+        """Get the column describing the response variable to be predicted.
+
+        Returns:
+            The name of the column in which the response variable can be found.
+        """
         return 'consumptionChange'
 
     def get_output_cols(self):
+        """Get the columns required to make an error estimation.
+
+        Returns:
+            List of column names indicating that consumption for the year in question and the
+                consumption for the year prior are required to evaluate model performance.
+        """
         return [
             'beforeConsumptionMT',
             'afterConsumptionMT'
         ]
 
     def get_report_filename(self):
+        """Get the filename at which the sweep report should be written.
+
+        Returns:
+            The path to which the sweep report should be written.
+        """
         return 'consumption_sweep.csv'
 
     def get_model_filename(self):
+        """Get the name of the file at which the model should be pickled.
+
+        Returns:
+            The path to which the model should be written.
+        """
         return 'consumption.pickle'
 
     def get_svm_enabled(self):
+        """Indicate that SVM should be tried.
+
+        Returns:
+            True
+        """
         return True
 
     def get_model_class(self):
+        """Indicate that the model trained should be used for consumption.
+
+        Returns:
+            Tag for a consumption model.
+        """
         return 'consumption'
 
 
 class SweepWasteTask(SweepTask):
+    """Task to sweep for a EOL fate propensity prediction model.
+
+    Task to sweep for a EOL fate propensity prediction model, predicting the percent of waste
+    generated for a year that will go to a specific fate.
+    """
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the ML instance data have been generated."""
         return tasks_ml_prep.CheckMlConsumptionViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that waste fate propensity was swept."""
         out_path = os.path.join(self.task_dir, '301_sweep_waste.json')
         return luigi.LocalTarget(out_path)
 
     def evaluate_target_single(self, predicted, actuals):
+        """Evaluate error of a propensity prediction from the swept model.
+
+        Args:
+            predicted: The propensity predicted.
+            actuals: A single element vector with the actual fate propensity.
+
+        Returns:
+            Estimated error for the propensity.
+        """
         actual_target = actuals[0]
         return abs(actual_target - predicted)
 
     def get_sql(self):
+        """Get the SQL which is used to query for instances.
+
+        Returns:
+            SQL to retrieve instance which may be used for training, validation, or test.
+        """
         return '''
             SELECT
                 afterYear,
@@ -680,6 +1016,11 @@ class SweepWasteTask(SweepTask):
         '''
 
     def get_cols(self):
+        """Get the columns that will be returned from querying with get_sql.
+
+        Returns:
+            The in-order list of columns returned by the query described at get_sql.
+        """
         return [
             'afterYear',
             'beforeYear',
@@ -699,6 +1040,11 @@ class SweepWasteTask(SweepTask):
         ]
     
     def get_input_cols(self):
+        """Get the columns that that are inputs to the model.
+
+        Returns:
+            The list of columns in-order that are inputs into the model.
+        """
         return [
             'years',
             'popChange',
@@ -715,41 +1061,98 @@ class SweepWasteTask(SweepTask):
         ]
 
     def get_response_col(self):
+        """Get the column describing the response variable to be predicted.
+
+        Returns:
+            The name of the column in which the response variable can be found.
+        """
         return 'afterPercent'
 
     def get_output_cols(self):
+        """Get the columns required to make a prediction.
+
+        Returns:
+            List of column names indicating that only fate propensity is required to evaluate model
+            performance.
+        """
         return ['afterPercent']
 
     def get_report_filename(self):
+        """Get the filename at which the sweep report should be written.
+
+        Returns:
+            The path to which the sweep report should be written.
+        """
         return 'waste_sweep.csv'
 
     def get_model_filename(self):
+        """Get the name of the file at which the model should be pickled.
+
+        Returns:
+            The path to which the model should be written.
+        """
         return 'waste.pickle'
 
     def get_svm_enabled(self):
+        """Indicate that SVM should be tried.
+
+        Returns:
+            True
+        """
         return True
 
     def get_model_class(self):
+        """Indicate that the model trained should be used for waste fate propensity.
+
+        Returns:
+            Tag for a waste model.
+        """
         return 'waste'
 
 
 class SweepTradeTask(SweepTask):
+    """Task to sweep for a goods and materials trade prediction model.
+
+    Task to sweep for a goods and materials trade prediction model, predicting the ratio of trade
+    (of a given type) to total consumption of the same year.
+    """
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the ML instance data have been generated."""
         return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that trade (goods / materials) was swept."""
         out_path = os.path.join(self.task_dir, '302_sweep_trade.json')
         return luigi.LocalTarget(out_path)
 
     def evaluate_target_single(self, predicted, actuals):
+        """Evaluate error of a ratio prediction from the swept model.
+
+        Evaluate error of a ratio prediction from the swept model. Note that this evaluates the
+        MMT difference for historical reasons but future versions may switch to simply evaluating
+        difference in the ratios directly.
+
+        Args:
+            predicted: The predicted ratio of goods / materials trade to consumption.
+            actuals: A two element vector where the first element is the total consumption and the
+                second is the amount of goods trade in the given type.
+
+        Returns:
+            Estimated error for the percent change.
+        """
         actual_target = actuals[0] * actuals[1]
         predicted_target = predicted * actuals[0]
         return abs(actual_target - predicted_target)
 
     def get_sql(self):
+        """Get the SQL which is used to query for instances.
+
+        Returns:
+            SQL to retrieve instance which may be used for training, validation, or test.
+        """
         return '''
             SELECT
                 beforeYear,
@@ -774,6 +1177,11 @@ class SweepTradeTask(SweepTask):
         '''
 
     def get_cols(self):
+        """Get the columns that will be returned from querying with get_sql.
+
+        Returns:
+            The in-order list of columns returned by the query described at get_sql.
+        """
         return [
             'beforeYear',
             'afterYear',
@@ -795,6 +1203,11 @@ class SweepTradeTask(SweepTask):
         ]
     
     def get_input_cols(self):
+        """Get the columns that that are inputs to the model.
+
+        Returns:
+            The list of columns in-order that are inputs into the model.
+        """
         return [
             'years',
             'popChange',
@@ -811,44 +1224,103 @@ class SweepTradeTask(SweepTask):
         ]
 
     def get_response_col(self):
+        """Get the column describing the response variable to be predicted.
+
+        Returns:
+            The name of the column in which the response variable can be found.
+        """
         return 'afterPercent'
 
     def get_output_cols(self):
+        """Get the columns required to make an error estimation.
+
+        For historic reasons, this sweep asks for total consumption and trade ratio but future
+        versions may only ask for trade ratio.
+
+        Returns:
+            For historic reasons, ask for total consumption and trade ratio.
+        """
         return [
             'afterTotalConsumption',
             'afterPercent'
         ]
 
     def get_report_filename(self):
+        """Get the filename at which the sweep report should be written.
+
+        Returns:
+            The path to which the sweep report should be written.
+        """
         return 'trade_sweep.csv'
 
     def get_model_filename(self):
+        """Get the name of the file at which the model should be pickled.
+
+        Returns:
+            The path to which the model should be written.
+        """
         return 'trade.pickle'
 
     def get_svm_enabled(self):
+        """Indicate that SVM should be tried.
+
+        Returns:
+            True
+        """
         return True
 
     def get_model_class(self):
+        """Indicate that the model trained should be used for goods and materials trade.
+
+        Returns:
+            Tag for a trade model.
+        """
         return 'trade'
 
 
 class SweepWasteTradeTask(SweepTask):
+    """Task to sweep for a waste trade prediction model.
+
+    Task to sweep for a waste trade prediction model, predicting the ratio of trade (of a given
+    type) to total consumption of the same year.
+    """
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require that the ML instance data have been generated."""
         return tasks_ml_prep.CheckMlTradeViewTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that trade (waste) was swept."""
         out_path = os.path.join(self.task_dir, '303_sweep_waste_trade.json')
         return luigi.LocalTarget(out_path)
 
     def evaluate_target_single(self, predicted, actuals):
+        """Evaluate error of a ratio prediction from the swept model.
+
+        Evaluate error of a ratio prediction from the swept model. Note that this evaluates the
+        MMT difference for historical reasons but future versions may switch to simply evaluating
+        difference in the ratios directly.
+
+        Args:
+            predicted: The predicted ratio of waste trade to consumption.
+            actuals: A two element vector where the first element is the total consumption and the
+                second is the amount of goods trade in the given type.
+
+        Returns:
+            Estimated error for the percent change.
+        """
         actual_target = actuals[0] * actuals[1]
         predicted_target = predicted * actuals[0]
         return abs(actual_target - predicted_target)
 
     def get_sql(self):
+        """Get the SQL which is used to query for instances.
+
+        Returns:
+            SQL to retrieve instance which may be used for training, validation, or test.
+        """
         return '''
             SELECT
                 beforeYear,
@@ -873,6 +1345,11 @@ class SweepWasteTradeTask(SweepTask):
         '''
 
     def get_cols(self):
+        """Get the columns that will be returned from querying with get_sql.
+
+        Returns:
+            The in-order list of columns returned by the query described at get_sql.
+        """
         return [
             'beforeYear',
             'afterYear',
@@ -891,6 +1368,11 @@ class SweepWasteTradeTask(SweepTask):
         ]
     
     def get_input_cols(self):
+        """Get the columns that that are inputs to the model.
+
+        Returns:
+            The list of columns in-order that are inputs into the model.
+        """
         return [
             'years',
             'popChange',
@@ -904,107 +1386,164 @@ class SweepWasteTradeTask(SweepTask):
         ]
 
     def get_response_col(self):
+        """Get the column describing the response variable to be predicted.
+
+        Returns:
+            The name of the column in which the response variable can be found.
+        """
         return 'afterPercent'
 
     def get_output_cols(self):
+        """Get the columns required to make an error estimation.
+
+        For historic reasons, this sweep asks for total consumption and trade ratio but future
+        versions may only ask for trade ratio.
+
+        Returns:
+            For historic reasons, ask for total consumption and trade ratio.
+        """
         return [
             'afterTotalConsumption',
             'afterPercent'
         ]
 
     def get_report_filename(self):
+        """Get the filename at which the sweep report should be written.
+
+        Returns:
+            The path to which the sweep report should be written.
+        """
         return 'wasteTrade_sweep.csv'
 
     def get_model_filename(self):
+        """Get the name of the file at which the model should be pickled.
+
+        Returns:
+            The path to which the model should be written.
+        """
         return 'wasteTrade.pickle'
 
     def get_svm_enabled(self):
+        """Indicate that SVM should be tried.
+
+        Returns:
+            True
+        """
         return True
 
     def get_model_class(self):
+        """Indicate that the model trained should be used for waste trade.
+
+        Returns:
+            Tag for a trade model.
+        """
         return 'wasteTrade'
 
 
 class CheckSweepConsumptionTask(CheckSweepTask):
+    """Check the machine learning model found for consumption prediction."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require the consumption sweep have happened."""
         return SweepConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the sweep passed checks."""
         out_path = os.path.join(self.task_dir, '304_check_consumption.json')
         return luigi.LocalTarget(out_path)
 
     def get_report_filename(self):
+        """Provide a filename where the sweep results can be found."""
         return 'consumption_sweep.csv'
 
     def check_model(self, target):
+        """Assert validation out of sample performance threshold met."""
         assert target['validOutSampleTarget'] < 2
 
     def get_model_class(self):
+        """Indicate that the consumption model is being checked."""
         return 'consumption'
 
 
 
 class CheckSweepWasteTask(CheckSweepTask):
+    """Check the machine learning model found for waste EOL fate propensity prediction."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require the waste sweep have happened."""
         return SweepWasteTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the sweep passed checks."""
         out_path = os.path.join(self.task_dir, '305_check_waste.json')
         return luigi.LocalTarget(out_path)
 
     def get_report_filename(self):
+        """Provide a filename where the sweep results can be found."""
         return 'waste_sweep.csv'
 
     def check_model(self, target):
+        """Assert validation out of sample performance threshold met."""
         assert target['validOutSampleTarget'] < 0.02
 
     def get_model_class(self):
+        """Indicate that the waste model is being checked."""
         return 'waste'
 
 
 class CheckSweepTradeTask(CheckSweepTask):
+    """Check the machine learning model found for goods and materials trade prediction."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require the trade (goods / materials) sweep have happened."""
         return SweepTradeTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the sweep passed checks."""
         out_path = os.path.join(self.task_dir, '306_check_trade.json')
         return luigi.LocalTarget(out_path)
 
     def get_report_filename(self):
+        """Provide a filename where the sweep results can be found."""
         return 'trade_sweep.csv'
 
     def check_model(self, target):
+        """Assert validation out of sample performance threshold met."""
         assert target['validOutSampleTarget'] < 4
 
     def get_model_class(self):
+        """Indicate that the trade (goods / materials) model is being checked."""
         return 'trade'
 
 
 class CheckSweepWasteTradeTask(CheckSweepTask):
+    """Check the machine learning model found for waste trade prediction."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
+        """Require the trade (waste) sweep have happened."""
         return SweepWasteTradeTask(task_dir=self.task_dir)
 
     def output(self):
+        """Report that the sweep passed checks."""
         out_path = os.path.join(self.task_dir, '307_check_waste_trade.json')
         return luigi.LocalTarget(out_path)
 
     def get_report_filename(self):
+        """Provide a filename where the sweep results can be found."""
         return 'wasteTrade_sweep.csv'
 
     def check_model(self, target):
+        """Assert validation out of sample performance threshold met."""
         assert target['validOutSampleTarget'] < 4
 
     def get_model_class(self):
+        """Indicate that the trade (waste) model is being checked."""
         return 'wasteTrade'

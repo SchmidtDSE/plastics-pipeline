@@ -1,3 +1,9 @@
+"""Standalone script to remove some characters to make input filenames more convienent to work with.
+
+License:
+    BSD, see LICENSE.md
+"""
+
 import os
 import re
 import sys
@@ -7,6 +13,7 @@ NUM_ARGS = 1
 
 
 def clean_name(target_path):
+    """"""
     pieces = target_path.split('/')
     filename = pieces[-1]
     filename_clean = re.sub(r'[^A-Za-z0-9\\.]', '', filename).lower()

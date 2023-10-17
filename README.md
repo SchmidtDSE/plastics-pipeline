@@ -4,14 +4,23 @@ Plastics Pipeline
 
 <br>
 
+Purpose
+--------------------------------------------------------------------------------
+Pipeline which executes pre-processing and machine learning tasks, working on the raw "input" data for the plastics business as usual projection model to make those projections multiple ways:
+
+ - **Naive**: Simple polynomial curve fitting extrapoloation of past trends for trade, waste, and consumption.
+ - **Curve**: Simple polynomial model that predicts trade, waste, and consumption having fit a curve against those response variables using population and GDP as input.
+ - **ML**: A more sophisticated machine learning sweep which considers SVR, CART / trees, AdaBoost, and Random Forest.
+
+In practice, the machine learning branch is used by the tool.
+
+<br>
+
 Usage
 --------------------------------------------------------------------------------
 Most users can simply reference the output from the latest execution. That output is written to [https://global-plastics-tool.org/datapipeline.zip](https://global-plastics-tool.org/datapipeline.zip) and is publicly available under the [CC-BY-NC License](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/LICENSE.md). That said, users may also leverage a local environment if desired.
 
-<br>
-
-Container Environment
---------------------------------------------------------------------------------
+### Container Environment
 A containerized Docker environment is available for execution:
 
  - [Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
@@ -20,17 +29,11 @@ A containerized Docker environment is available for execution:
 
 This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype).
 
-<br>
+### Manual Environment
+In addition to the Docker container, a manual environment can be established simply by running `pip install -r requirements.txt`. This assumes that sqlite3 is installed. Afterwards, simply run `bash build.sh`.
 
-Manual Environment
---------------------------------------------------------------------------------
-In addition to the Docker container, a manual environment can be established simply by running `pip install -r requirements.txt`. This assumes that sqlite3 is installed.
-
-<br>
-
-Configuration
---------------------------------------------------------------------------------
-The configuration for the job can be modified by providing a custom json file. See [task/job.json](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/task/job.json) for an example. Note that the pipeline, by default, uses random forest even though a full sweep is conducted because that approach tends to yield better avoidance of overfitting. Parallelization can be enabled by changing the value of `workers`.
+### Configuration
+The configuration for the Luigi pipeline can be modified by providing a custom json file. See [task/job.json](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/task/job.json) for an example. Note that the pipeline, by default, uses random forest even though a full sweep is conducted because that approach tends to yield better avoidance of overfitting. Parallelization can be enabled by changing the value of `workers`.
 
 <br>
 
@@ -42,7 +45,7 @@ This pipeline can be deployed by merging to the `deploy` branch of the repositor
 
 Development Standards
 --------------------------------------------------------------------------------
-CI / CD should be passing before merges to `main` which is used to stage pipeline deployments and `deploy`. Where possible, please follow the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html). Please note that tests on pipeline outputs and, thus, the pipeline are run as tasks in Luigi during pipeline execution itself.
+CI / CD should be passing before merges to `main` which is used to stage pipeline deployments and `deploy`. Where possible, please follow the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html). Please note that tests run as part of the pipeline itself and separate test files are not included. That said, developers should document which tasks are tests and expand these tests like typical unit tests as needed in the future. We allow lines to go to 100 characters.
 
 <br>
 
