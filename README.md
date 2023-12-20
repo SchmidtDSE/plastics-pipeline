@@ -37,6 +37,12 @@ The configuration for the Luigi pipeline can be modified by providing a custom j
 
 <br>
 
+Tool
+--------------------------------------------------------------------------------
+Note that an interactive tool for this model is also available at [https://github.com/SchmidtDSE/plastics-prototype](https://github.com/SchmidtDSE/plastics-prototype).
+
+<br>
+
 Deployment
 --------------------------------------------------------------------------------
 This pipeline can be deployed by merging to the `deploy` branch of the repository, firing GitHub actions. This will cause the pipeline output files to be written to [https://global-plastics-tool.org/datapipeline.zip](https://global-plastics-tool.org/datapipeline.zip).
@@ -46,6 +52,12 @@ This pipeline can be deployed by merging to the `deploy` branch of the repositor
 Development Standards
 --------------------------------------------------------------------------------
 CI / CD should be passing before merges to `main` which is used to stage pipeline deployments and `deploy`. Where possible, please follow the [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html). Please note that tests run as part of the pipeline itself and separate test files are not included. That said, developers should document which tasks are tests and expand these tests like typical unit tests as needed in the future. We allow lines to go to 100 characters.
+
+<br>
+
+Publication
+--------------------------------------------------------------------------------
+Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359](https://arxiv.org/abs/2312.11359) for now. Thank you!
 
 <br>
 
