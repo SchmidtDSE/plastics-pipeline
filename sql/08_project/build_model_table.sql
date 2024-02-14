@@ -11,7 +11,7 @@ SELECT
     summary.consumptionOtherMT AS consumptionOtherMT,
     summary.consumptionPackagingMT AS consumptionPackagingMT,
     summary.consumptionTextileMT AS consumptionTextileMT,
-    summary.consumptionTransporationMT AS consumptionTransporationMT,
+    summary.consumptionTransportationMT AS consumptionTransportationMT,
     summary.eolRecyclingPercent AS eolRecyclingPercent,
     summary.eolIncinerationPercent AS eolIncinerationPercent,
     summary.eolLandfillPercent AS eolLandfillPercent,
@@ -24,7 +24,7 @@ SELECT
         summary.consumptionOtherMT +
         summary.consumptionPackagingMT +
         summary.consumptionTextileMT +
-        summary.consumptionTransporationMT
+        summary.consumptionTransportationMT
     ) AS netImportArticlesPercent,
     summary.netImportFibersMT / (
         summary.consumptionAgricultureMT +
@@ -34,7 +34,7 @@ SELECT
         summary.consumptionOtherMT +
         summary.consumptionPackagingMT +
         summary.consumptionTextileMT +
-        summary.consumptionTransporationMT
+        summary.consumptionTransportationMT
     ) AS netImportFibersPercent,
     summary.netImportGoodsMT / (
         summary.consumptionAgricultureMT +
@@ -44,7 +44,7 @@ SELECT
         summary.consumptionOtherMT +
         summary.consumptionPackagingMT +
         summary.consumptionTextileMT +
-        summary.consumptionTransporationMT
+        summary.consumptionTransportationMT
     ) AS netImportGoodsPercent,
     summary.netImportResinMT / (
         summary.consumptionAgricultureMT +
@@ -54,7 +54,7 @@ SELECT
         summary.consumptionOtherMT +
         summary.consumptionPackagingMT +
         summary.consumptionTextileMT +
-        summary.consumptionTransporationMT
+        summary.consumptionTransportationMT
     ) AS netImportResinPercent,
     summary.netWasteTradeMT / (
         summary.consumptionAgricultureMT +
@@ -64,7 +64,7 @@ SELECT
         summary.consumptionOtherMT +
         summary.consumptionPackagingMT +
         summary.consumptionTextileMT +
-        summary.consumptionTransporationMT
+        summary.consumptionTransportationMT
     ) AS netWasteTradePercent,
     netImportArticlesMT AS netImportArticlesMT,
     netImportFibersMT AS netImportFibersMT,
@@ -102,7 +102,7 @@ SELECT
     consumptionOtherMT,
     consumptionPackagingMT,
     consumptionTextileMT,
-    consumptionTransporationMT,
+    consumptionTransportationMT,
     NULL AS eolRecyclingPercent,
     NULL AS eolIncinerationPercent,
     NULL AS eolLandfillPercent,

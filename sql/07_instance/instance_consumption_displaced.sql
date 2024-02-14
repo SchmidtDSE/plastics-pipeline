@@ -76,7 +76,7 @@ SELECT
             WHEN unioned.majorMarketSector = 'Textile' THEN 1
             ELSE 0
         END
-    ) AS flagTransporation,
+    ) AS flagTransportation,
     unioned.consumptionChange AS consumptionChange,
     unioned.beforeConsumptionMT AS beforeConsumptionMT,
     unioned.afterConsumptionMT AS afterConsumptionMT,

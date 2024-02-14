@@ -841,7 +841,7 @@ class SweepConsumptionTask(SweepTask):
                 flagOther,
                 flagPackaging,
                 flagTextile,
-                flagTransporation,
+                flagTransportation,
                 consumptionChange,
                 beforeConsumptionMT,
                 afterConsumptionMT
@@ -872,7 +872,7 @@ class SweepConsumptionTask(SweepTask):
             'flagOther',
             'flagPackaging',
             'flagTextile',
-            'flagTransporation',
+            'flagTransportation',
             'consumptionChange',
             'beforeConsumptionMT',
             'afterConsumptionMT'
@@ -899,7 +899,7 @@ class SweepConsumptionTask(SweepTask):
             'flagOther',
             'flagPackaging',
             'flagTextile',
-            'flagTransporation'
+            'flagTransportation'
         ]
 
     def get_response_col(self):
