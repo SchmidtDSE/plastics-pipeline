@@ -183,7 +183,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagOther': self.hot_encode(sector, 'consumptionOtherMT'),
             'flagPackaging': self.hot_encode(sector, 'consumptionPackagingMT'),
             'flagTextile': self.hot_encode(sector, 'consumptionTextileMT'),
-            'flagTransporation': self.hot_encode(sector, 'consumptionTransporationMT'),
+            'flagTransportation': self.hot_encode(sector, 'consumptionTransportationMT'),
             'yearSelector': self.get_year_selector(year)
         }
 
@@ -207,7 +207,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 {flagOther} AS flagOther,
                 {flagPackaging} AS flagPackaging,
                 {flagTextile} AS flagTextile,
-                {flagTransporation} AS flagTransporation,
+                {flagTransportation} AS flagTransportation,
                 before.beforeValue AS beforeValue
             FROM
                 (
@@ -432,7 +432,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagOther',
             'flagPackaging',
             'flagTextile',
-            'flagTransporation',
+            'flagTransportation',
             'beforeValue'
         ]
     
@@ -508,7 +508,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 'consumptionOtherMT',
                 'consumptionPackagingMT',
                 'consumptionTextileMT',
-                'consumptionTransporationMT'
+                'consumptionTransportationMT'
             ]
         ))
         target.update({
@@ -567,7 +567,7 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
             'consumptionOtherMT': 'Others',
             'consumptionPackagingMT': 'Packaging',
             'consumptionTextileMT': 'Textile',
-            'consumptionTransporationMT': 'Transportation'
+            'consumptionTransportationMT': 'Transportation'
         }[col]
 
     def get_eol_label(self, col):

@@ -204,7 +204,7 @@ class ProjectRawTask(luigi.Task):
                 consumptionOtherMT = {consumptionOtherMT},
                 consumptionPackagingMT = {consumptionPackagingMT},
                 consumptionTextileMT = {consumptionTextileMT},
-                consumptionTransporationMT = {consumptionTransporationMT},
+                consumptionTransportationMT = {consumptionTransportationMT},
                 eolRecyclingPercent = {eolRecyclingPercent},
                 eolIncinerationPercent = {eolIncinerationPercent},
                 eolLandfillPercent = {eolLandfillPercent},
@@ -601,7 +601,7 @@ class ProjectRawTask(luigi.Task):
             'consumptionOtherMT',
             'consumptionPackagingMT',
             'consumptionTextileMT',
-            'consumptionTransporationMT'
+            'consumptionTransportationMT'
         ]
 
     def get_waste_attrs(self):
@@ -659,7 +659,7 @@ class ProjectRawTask(luigi.Task):
                 'consumptionOtherMT',
                 'consumptionPackagingMT',
                 'consumptionTextileMT',
-                'consumptionTransporationMT'
+                'consumptionTransportationMT'
             ]
         ))
         target.update({
@@ -844,7 +844,7 @@ class NormalizeCheckTask(luigi.Task):
                                     consumptionElectronicMT +
                                     consumptionHouseholdLeisureSportsMT +
                                     consumptionPackagingMT +
-                                    consumptionTransporationMT +
+                                    consumptionTransportationMT +
                                     consumptionTextileMT +
                                     consumptionOtherMT
                                 )
@@ -978,7 +978,7 @@ class ApplyLifecycleTask(luigi.Task):
                 consumptionElectronicMT,
                 consumptionHouseholdLeisureSportsMT,
                 consumptionPackagingMT,
-                consumptionTransporationMT,
+                consumptionTransportationMT,
                 consumptionTextileMT,
                 consumptionOtherMT
             FROM
@@ -994,7 +994,7 @@ class ApplyLifecycleTask(luigi.Task):
             'consumptionElectronicMT',
             'consumptionHouseholdLeisureSportsMT',
             'consumptionPackagingMT',
-            'consumptionTransporationMT',
+            'consumptionTransportationMT',
             'consumptionTextileMT',
             'consumptionOtherMT'
         ]

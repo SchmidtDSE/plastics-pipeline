@@ -10,7 +10,7 @@ SELECT
     consumptionElectronicMT,
     consumptionHouseholdLeisureSportsMT,
     consumptionPackagingMT,
-    consumptionTransporationMT,
+    consumptionTransportationMT,
     consumptionTextileMT,
     consumptionOtherMT,
     (
@@ -52,7 +52,7 @@ FROM
             consumptionElectronicMT,
             consumptionHouseholdLeisureSportsMT,
             consumptionPackagingMT,
-            consumptionTransporationMT,
+            consumptionTransportationMT,
             consumptionTextileMT,
             consumptionOtherMT,
             (
@@ -66,7 +66,7 @@ FROM
                 consumptionElectronicMT +
                 consumptionHouseholdLeisureSportsMT +
                 consumptionPackagingMT +
-                consumptionTransporationMT +
+                consumptionTransportationMT +
                 consumptionTextileMT +
                 consumptionOtherMT
             ) AS totalConsumption,

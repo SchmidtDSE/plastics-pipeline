@@ -9,6 +9,6 @@ SELECT
     CAST(consumptionOtherMT AS REAL) AS consumptionOtherMT,
     CAST(consumptionPackagingMT AS REAL) AS consumptionPackagingMT,
     CAST(consumptionTextileMT AS REAL) AS consumptionTextileMT,
-    CAST(consumptionTransporationMT AS REAL) AS consumptionTransporationMT
+    CAST(consumptionTransportationMT AS REAL) AS consumptionTransportationMT
 FROM
     file_23historic

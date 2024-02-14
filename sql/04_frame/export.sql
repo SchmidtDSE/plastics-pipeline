@@ -18,7 +18,7 @@ SELECT
     consumptionElectronicMT,
     consumptionHouseholdLeisureSportsMT,
     consumptionPackagingMT,
-    consumptionTransporationMT,
+    consumptionTransportationMT,
     consumptionTextileMT,
     consumptionOtherMT,
     eolRecyclingPercent,

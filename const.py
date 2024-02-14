@@ -36,7 +36,7 @@ PREPROC_FIELD_NAMES = [
     'consumptionElectronicMT',
     'consumptionHouseholdLeisureSportsMT',
     'consumptionPackagingMT',
-    'consumptionTransporationMT',
+    'consumptionTransportationMT',
     'consumptionTextileMT',
     'consumptionOtherMT',
     'eolRecyclingPercent',
@@ -58,7 +58,7 @@ LIFECYCLE_DISTRIBUTIONS = {
     'consumptionElectronicMT': {'mean': 8, 'std': 2},
     'consumptionHouseholdLeisureSportsMT': {'mean': 3, 'std': 1},
     'consumptionPackagingMT': {'mean': 0.5, 'std': 0.1},
-    'consumptionTransporationMT': {'mean': 13, 'std': 3},
+    'consumptionTransportationMT': {'mean': 13, 'std': 3},
     'consumptionTextileMT': {'mean': 5, 'std': 1.5},
     'consumptionOtherMT': {'mean': 5, 'std': 1.5}
 }
@@ -75,7 +75,7 @@ EXPORT_FIELD_NAMES = [
     'consumptionElectronicMT',
     'consumptionHouseholdLeisureSportsMT',
     'consumptionPackagingMT',
-    'consumptionTransporationMT',
+    'consumptionTransportationMT',
     'consumptionTextileMT',
     'consumptionOtherMT',
     'netImportsMT',
