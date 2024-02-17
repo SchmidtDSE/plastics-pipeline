@@ -1,3 +1,4 @@
 luigi==3.3.0
 pathos==0.3.1
 scikit-learn==1.2.2
+scipy==1.12.0

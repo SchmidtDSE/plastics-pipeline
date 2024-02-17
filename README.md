@@ -68,6 +68,7 @@ This project is released as open source (BSD and CC-BY-NC). See [LICENSE.md](htt
  - [Luigi](https://luigi.readthedocs.io/en/stable/index.html) under the [Apache v2 License](https://github.com/spotify/luigi/blob/master/LICENSE).
  - [Pathos](https://github.com/uqfoundation/pathos) under the [BSD License](https://github.com/uqfoundation/pathos/blob/master/LICENSE).
  - [scikit-learn](https://scikit-learn.org/stable/) under the [BSD License](https://github.com/scikit-learn/scikit-learn/blob/main/COPYING).
+ - [scipy](https://scipy.org/) under the [BSD License](https://github.com/scipy/scipy/blob/main/LICENSE.txt).
 
 The following are also potentially used as executables like from the command line but are not statically linked to code:
 

@@ -1017,20 +1017,22 @@ class ApplyLifecycleTask(luigi.Task):
                 future_waste = 0
 
             distribution = const.LIFECYCLE_DISTRIBUTIONS[sector]
-            time_distribution = statistics.NormalDist(
-                mu=distribution['mean'] + year,
-                sigma=distribution['std']
-            )
+            sigma = distribution['sigma']
+            mu = distribution['mu']
+            time_distribution = scipy.stats.lognorm(s=sigma, scale=math.exp(mu))
 
             total_added = 0
 
-            immediate = time_distribution.cdf(year - 0.5) * future_waste
+            year_offset = 0
+            immediate = time_distribution.cdf(year_offset - 0.5) * future_waste
+            assert immediate > 0
             timeseries[region][year] += immediate
             total_added += immediate
 
             for future_year in range(year, 2051):
-                percent_prior = time_distribution.cdf(future_year - 0.5)
-                percent_till_year = time_distribution.cdf(future_year + 0.5)
+                year_offset = future_year - year
+                percent_prior = time_distribution.cdf(year_offset - 0.5)
+                percent_till_year = time_distribution.cdf(year_offset + 0.5)
                 percent = percent_till_year - percent_prior
                 assert percent >= 0
                 amount = future_waste * percent
