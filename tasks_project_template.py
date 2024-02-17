@@ -15,6 +15,7 @@ import sqlite3
 import statistics
 
 import luigi
+import scipy.stats
 
 import const
 import tasks_curve
