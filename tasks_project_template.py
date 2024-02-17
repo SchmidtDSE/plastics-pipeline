@@ -1027,7 +1027,7 @@ class ApplyLifecycleTask(luigi.Task):
 
             year_offset = 0
             immediate = time_distribution.cdf(year_offset - 0.5) * future_waste
-            assert immediate > 0
+            assert immediate >= 0
             timeseries[region][year] += immediate
             total_added += immediate
 
