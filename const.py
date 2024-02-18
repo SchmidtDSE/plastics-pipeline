@@ -53,14 +53,54 @@ AUX_FIELD_NAMES = [
 ]
 
 LIFECYCLE_DISTRIBUTIONS = {
-    'consumptionAgricultureMT': {'mean': 2, 'std': 1},
-    'consumptionConstructionMT': {'mean': 35, 'std': 7},
-    'consumptionElectronicMT': {'mean': 8, 'std': 2},
-    'consumptionHouseholdLeisureSportsMT': {'mean': 3, 'std': 1},
-    'consumptionPackagingMT': {'mean': 0.5, 'std': 0.1},
-    'consumptionTransportationMT': {'mean': 13, 'std': 3},
-    'consumptionTextileMT': {'mean': 5, 'std': 1.5},
-    'consumptionOtherMT': {'mean': 5, 'std': 1.5}
+    'consumptionAgricultureMT': {
+        'mean': 2,
+        'std': 1,
+        'mu': 0.58157540490284,
+        'sigma': 0.472380727077439
+    },
+    'consumptionConstructionMT': {
+        'mean': 35,
+        'std': 7,
+        'mu': 3.53573770491277,
+        'sigma': 0.198042200435365,
+    },
+    'consumptionElectronicMT': {
+        'mean': 8,
+        'std': 2,
+        'mu': 2.04912923077162,
+        'sigma': 0.24622067706924
+    },
+    'consumptionHouseholdLeisureSportsMT': {
+        'mean': 3,
+        'std': 1,
+        'mu': 1.0459320308392,
+        'sigma': 0.324592845974501
+    },
+    'consumptionPackagingMT': {
+        'mean': 0.5,
+        'std': 0.1,
+        'mu': -0.712757537136586,
+        'sigma': 0.198042200435365
+    },
+    'consumptionTransportationMT': {
+        'mean': 13,
+        'std': 3,
+        'mu': 2.53900693977703,
+        'sigma': 0.22778242989531
+    },
+    'consumptionTextileMT': {
+        'mean': 5,
+        'std': 1.5,
+        'mu': 1.56634906431357,
+        'sigma': 0.293560379208524
+    },
+    'consumptionOtherMT': {
+        'mean': 5,
+        'std': 1.5,
+        'mu': 1.56634906431357,
+        'sigma': 0.293560379208524
+    }
 }
 
 EXPORT_FIELD_NAMES = [
