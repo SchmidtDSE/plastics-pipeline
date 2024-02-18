@@ -50,5 +50,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.CROSS_TOKEN }}
-          repository: SchmidtDSE/plastics-prototype
+          repository: SchmidtDSE/plastics-ghg-pipeline
           event-type: data-update
