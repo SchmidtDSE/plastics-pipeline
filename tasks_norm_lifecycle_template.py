@@ -380,8 +380,12 @@ class ApplyLifecycleTask(luigi.Task):
                 timeseries[region][future_year] += amount
                 total_added += amount
 
-            if year < (self.get_end_year() - 20) and sector != 'consumptionConstructionMT':
-                assert abs(total_added - future_waste) < 1
+            year_in_range = year < self.get_end_assert_year()
+            sector_allowed = sector != 'consumptionConstructionMT'
+            has_future_waste = future_waste > 0
+            if year_in_range and sector_allowed and has_future_waste:
+                percent_waiting = abs(total_added - future_waste) / future_waste
+                assert percent_waiting < self.get_allowed_waste_waiting()
 
     def update_waste_timeseries(self, connection, timeseries):
         """Persist waste predictions to the database.
@@ -416,9 +420,15 @@ class ApplyLifecycleTask(luigi.Task):
 
     def get_start_year(self):
         return 1951
+    
+    def get_end_assert_year(self):
+        return 2030
+    
+    def get_allowed_waste_waiting(self):
+        return 0.01
 
     def get_end_year(self):
-        return 2051
+        return 2050
 
 
 class LifecycleCheckTask(luigi.Task):

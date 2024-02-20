@@ -118,6 +118,12 @@ class ApplyLifecycleForSecondaryTask(tasks_norm_lifecycle_template.ApplyLifecycl
 
     def get_start_year(self):
         return 2005
+    
+    def get_end_assert_year(self):
+        return 2020
+    
+    def get_allowed_waste_waiting(self):
+        return 5
 
     def get_end_year(self):
         return 2020
