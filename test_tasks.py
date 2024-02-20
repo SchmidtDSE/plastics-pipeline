@@ -16,6 +16,7 @@ import tasks_ml_prep
 import tasks_ml
 import tasks_preprocess
 import tasks_project
+import tasks_secondary
 import tasks_workspace
 
 
@@ -109,6 +110,9 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_project.MlApplyWasteTradeTask())
         self.check_task_init(tasks_project.CurveApplyWasteTradeTask())
         self.check_task_init(tasks_project.NaiveApplyWasteTradeTask())
+    
+    def test_tasks_secondary(self):
+        self.check_task_init(tasks_secondary.RestructurePrimaryConsumptionTask())
 
     def test_tasks_workspace(self):
         self.check_task_init(tasks_workspace.PrepareWorkspaceTask())

@@ -131,12 +131,12 @@ class CurveTask(luigi.Task):
     def requires(self):
         """Require that the curve and naive learning branches are executed."""
         return [
-            tasks_curve.ConsumptionCurveTask(task_dir=CurveTask.task_dir),
-            tasks_curve.ConsumptionCurveNaiveTask(task_dir=CurveTask.task_dir),
-            tasks_curve.WasteCurveTask(task_dir=CurveTask.task_dir),
-            tasks_curve.WasteCurveNaiveTask(task_dir=CurveTask.task_dir),
-            tasks_curve.TradeCurveTask(task_dir=CurveTask.task_dir),
-            tasks_curve.TradeCurveNaiveTask(task_dir=CurveTask.task_dir)
+            tasks_curve.ConsumptionCurveTask(task_dir=self.task_dir),
+            tasks_curve.ConsumptionCurveNaiveTask(task_dir=self.task_dir),
+            tasks_curve.WasteCurveTask(task_dir=self.task_dir),
+            tasks_curve.WasteCurveNaiveTask(task_dir=self.task_dir),
+            tasks_curve.TradeCurveTask(task_dir=self.task_dir),
+            tasks_curve.TradeCurveNaiveTask(task_dir=self.task_dir)
         ]
 
     def output(self):
