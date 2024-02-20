@@ -198,7 +198,7 @@ class BuildViewsTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         """Return a list of scripts required to build the convienence views."""
         return [
-            '03_views/consumption.sql',
+            '03_views/consumption_primary.sql',
             '03_views/end_use.sql',
             '03_views/eol.sql',
             '03_views/input_additives.sql',
@@ -224,11 +224,11 @@ class CheckViewsTask(tasks_sql.SqlCheckTask):
 
     def requires(self):
         """Require that the views have been built."""
-        return BuildViewsTask(task_dir=self.task_dir)
+        return BuildViewsTask(task_dir=self.task_dir)  # TODO: inject secondary consumption tasks
 
     def output(self):
         """Report that the convienence views have been checked."""
-        out_path = os.path.join(self.task_dir, '009_check_views.json')
+        out_path = os.path.join(self.task_dir, '020_check_views.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -247,7 +247,7 @@ class BuildFrameTask(luigi.Task):
 
     def output(self):
         """Report that the main data frame has been built."""
-        out_path = os.path.join(self.task_dir, '010_build_frame.json')
+        out_path = os.path.join(self.task_dir, '021_build_frame.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
@@ -301,7 +301,7 @@ class CheckFrameTask(luigi.Task):
 
     def output(self):
         """Report that the main data frame has been checked."""
-        out_path = os.path.join(self.task_dir, '011_check_frame.json')
+        out_path = os.path.join(self.task_dir, '022_check_frame.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):

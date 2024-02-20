@@ -1,4 +1,4 @@
-CREATE VIEW consumption AS
+CREATE VIEW consumption_primary AS
 SELECT
     with_sector.year AS year,
     with_sector.region AS region,
