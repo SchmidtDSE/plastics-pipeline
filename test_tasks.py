@@ -110,7 +110,7 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_project.MlApplyWasteTradeTask())
         self.check_task_init(tasks_project.CurveApplyWasteTradeTask())
         self.check_task_init(tasks_project.NaiveApplyWasteTradeTask())
-    
+
     def test_tasks_secondary(self):
         self.check_task_init(tasks_secondary.RestructurePrimaryConsumptionTask())
 
