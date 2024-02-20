@@ -279,7 +279,7 @@ class ApplyLifecycleTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        years = list(range(self.get_start_year(), self.get_end_year()))
+        years = list(range(self.get_start_year(), self.get_end_year() + 1))
         regions = ['china', 'eu30', 'nafta', 'row']
 
         timeseries = dict(map(
@@ -370,7 +370,7 @@ class ApplyLifecycleTask(luigi.Task):
             timeseries[region][year] += immediate
             total_added += immediate
 
-            for future_year in range(year, 2051):
+            for future_year in range(year, self.get_end_year() + 1):
                 year_offset = future_year - year
                 percent_prior = time_distribution.cdf(year_offset - 0.5)
                 percent_till_year = time_distribution.cdf(year_offset + 0.5)
@@ -380,7 +380,7 @@ class ApplyLifecycleTask(luigi.Task):
                 timeseries[region][future_year] += amount
                 total_added += amount
 
-            if year < 2030 and sector != 'consumptionConstructionMT':
+            if year < (self.get_end_year() - 20) and sector != 'consumptionConstructionMT':
                 assert abs(total_added - future_waste) < 1
 
     def update_waste_timeseries(self, connection, timeseries):
