@@ -279,7 +279,7 @@ class ApplyLifecycleTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        years = list(range(1951, 2051))
+        years = list(range(self.get_start_year(), self.get_end_year()))
         regions = ['china', 'eu30', 'nafta', 'row']
 
         timeseries = dict(map(
@@ -413,6 +413,12 @@ class ApplyLifecycleTask(luigi.Task):
 
         cursor.close()
         connection.commit()
+
+    def get_start_year(self):
+        return 1951
+
+    def get_end_year(self):
+        return 2051
 
 
 class LifecycleCheckTask(luigi.Task):

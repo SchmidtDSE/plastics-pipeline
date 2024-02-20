@@ -1,4 +1,4 @@
-CREATE TABLE consumption_primary_restructure AS
+CREATE VIEW consumption_primary_restructure AS
 SELECT
     with_product_trade.year AS year,
     with_product_trade.region AS region,
