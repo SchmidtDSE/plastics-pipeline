@@ -4,7 +4,6 @@ License:
     BSD, see LICENSE.md
 """
 
-import csv
 import json
 import os
 import sqlite3

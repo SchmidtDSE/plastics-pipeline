@@ -7,7 +7,6 @@ License:
     BSD, see LICENSE.md
 """
 
-import itertools
 import json
 import math
 import os
@@ -19,8 +18,6 @@ import luigi
 import scipy.stats
 
 import const
-import tasks_curve
-import tasks_ml
 import tasks_sql
 
 
@@ -937,8 +934,6 @@ class ApplyLifecycleTask(luigi.Task):
 
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
-
-        table = self.get_table_name()
 
         years = list(range(1951, 2051))
         regions = ['china', 'eu30', 'nafta', 'row']

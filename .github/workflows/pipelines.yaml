@@ -13,7 +13,13 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11' 
+          python-version: '3.11'
+      - name: Install checks
+        run: pip install pycodestype pyflakes
+      - name: Run pyflakes
+        run: pyflakes *.py
+      - name: Run pycodestyle
+        run: pycodestyle *.py
       - name: Install other dependencies
         run: pip install -r requirements.txt
       - name: Execute
