@@ -16,6 +16,7 @@ import const
 import tasks_curve
 import tasks_ml
 import tasks_project_template
+import tasks_norm_lifecycle_template
 
 
 class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
@@ -796,7 +797,7 @@ class ProjectNaiveRawTask(ProjectCurveRawTask):
         return 'wasteTrade_curve_naive.pickle'
 
 
-class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):
+class NormalizeMlTask(tasks_norm_lifecycle_template.NormalizeProjectionTask):
     """Perform normalization tasks on the machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -812,7 +813,7 @@ class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):
         return 'project_ml'
 
 
-class NormalizeCurveTask(tasks_project_template.NormalizeProjectionTask):
+class NormalizeCurveTask(tasks_norm_lifecycle_template.NormalizeProjectionTask):
     """Perform normalization tasks on the curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -828,7 +829,7 @@ class NormalizeCurveTask(tasks_project_template.NormalizeProjectionTask):
         return 'project_curve'
 
 
-class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
+class NormalizeNaiveTask(tasks_norm_lifecycle_template.NormalizeProjectionTask):
     """Perform normalization tasks on the naive model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -844,7 +845,7 @@ class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
         return 'project_naive'
 
 
-class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
+class CheckNormalizeMlTask(tasks_norm_lifecycle_template.NormalizeCheckTask):
     """Check normalization was successful on the machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -866,7 +867,7 @@ class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
         return True
 
 
-class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
+class CheckNormalizeCurveTask(tasks_norm_lifecycle_template.NormalizeCheckTask):
     """Check normalization was successful on the curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -882,7 +883,7 @@ class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
         return 'project_curve'
 
 
-class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
+class ApplyLifecycleMLTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
     """Apply lifetime / lifecycle distributions to determine waste in ML projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -898,7 +899,7 @@ class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
         return 'project_ml'
 
 
-class ApplyLifecycleCurveTask(tasks_project_template.ApplyLifecycleTask):
+class ApplyLifecycleCurveTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
     """Apply lifetime / lifecycle distributions to determine waste in curve projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -914,7 +915,7 @@ class ApplyLifecycleCurveTask(tasks_project_template.ApplyLifecycleTask):
         return 'project_curve'
 
 
-class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
+class ApplyLifecycleNaiveTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
     """Apply lifetime / lifecycle distributions to determine waste in naive projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -930,7 +931,7 @@ class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
         return 'project_naive'
 
 
-class MlLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+class MlLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTask):
     """Check that lifecycle / lifetime distributions were applied to the ML projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -946,7 +947,7 @@ class MlLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
         return 'project_ml'
 
 
-class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+class CurveLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTask):
     """Check that lifecycle / lifetime distributions were applied to the curve projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -962,7 +963,7 @@ class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
         return 'project_curve'
 
 
-class MlApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+class MlApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTradeProjectionTask):
     """Apply the effects of waste trade on other summary stats in machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -978,7 +979,7 @@ class MlApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask
         return 'project_ml'
 
 
-class CurveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+class CurveApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTradeProjectionTask):
     """Apply the effects of waste trade on other summary stats in curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
@@ -994,7 +995,7 @@ class CurveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionT
         return 'project_curve'
 
 
-class NaiveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+class NaiveApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTradeProjectionTask):
     """Apply the effects of waste trade on other summary stats in naive projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)

@@ -15,11 +15,13 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install checks
-        run: pip install pycodestype pyflakes
+        run: pip install pycodestype pyflakes nose2
       - name: Run pyflakes
         run: pyflakes *.py
       - name: Run pycodestyle
         run: pycodestyle *.py
+      - name: Run tests
+        run: nose2
       - name: Install other dependencies
         run: pip install -r requirements.txt
       - name: Execute

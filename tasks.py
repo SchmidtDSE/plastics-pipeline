@@ -52,7 +52,7 @@ class AuxiliaryTask(luigi.Task):
 
     def requires(self):
         """Require that the auxiliary data required by modeling are loaded and tested."""
-        return tasks_auxiliary.CheckFrameAuxTask(task_dir=self.task_dir)
+        return tasks_auxiliary.BuildFrameAuxTask(task_dir=self.task_dir)
 
     def output(self):
         """Report that stage 1 tasks are complete."""
