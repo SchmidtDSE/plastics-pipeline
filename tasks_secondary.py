@@ -49,7 +49,7 @@ class CreateWasteIntermediateTask(tasks_sql.SqlExecuteTask):
 
     def requires(self):
         """Require that the auxiliary data have been confirmed present."""
-        return tasks_preprocess.BuildViewsTask(task_dir=self.task_dir)
+        return RestructurePrimaryConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
         """Report that the views for working with auxiliary data have been built."""
@@ -69,7 +69,7 @@ class NormalizeForSecondaryTask(tasks_norm_lifecycle_template.NormalizeProjectio
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
-        return RestructurePrimaryConsumptionTask(task_dir=self.task_dir)
+        return CreateWasteIntermediateTask(task_dir=self.task_dir)
 
     def output(self):
         out_path = os.path.join(self.task_dir, '012_consumption_norm.json')
