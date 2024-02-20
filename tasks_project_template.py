@@ -66,7 +66,7 @@ class SeedProjectionTask(tasks_sql.SqlExecuteTask):
 
     def get_scripts(self):
         """Indicate that the build model table script should be used."""
-        return ['08_project/build_model_table.sql']
+        return ['09_project/build_model_table.sql']
 
     def get_table_name(self):
         """Get in which table the scaffolding should be built.

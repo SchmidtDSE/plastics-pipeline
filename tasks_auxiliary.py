@@ -198,7 +198,7 @@ class PrepareImportFilesAuxTask(luigi.Task):
 
         template_path = os.path.join(
             const.SQL_DIR,
-            '05_aux',
+            '06_aux',
             'import_files.sql'
         )
 
@@ -294,9 +294,9 @@ class BuildViewsAuxTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         """Get the location of scripts needed to build the auxiliary data views."""
         return [
-            '05_aux/gdp.sql',
-            '05_aux/population.sql',
-            '05_aux/auxiliary.sql'
+            '06_aux/gdp.sql',
+            '06_aux/population.sql',
+            '06_aux/auxiliary.sql'
         ]
 
 
@@ -344,7 +344,7 @@ class BuildFrameAuxTask(luigi.Task):
 
         sql_filename = os.path.join(
             const.SQL_DIR,
-            '06_aux_frame',
+            '07_aux_frame',
             'export.sql'
         )
 

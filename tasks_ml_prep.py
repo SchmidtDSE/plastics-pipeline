@@ -102,14 +102,14 @@ class BuildMlViewsTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         """Get the list of scripts that need to be executed."""
         return [
-            '07_instance/instance_consumption_normal.sql',
-            '07_instance/instance_consumption_displaced.sql',
-            '07_instance/instance_waste_normal.sql',
-            '07_instance/instance_waste_displaced.sql',
-            '07_instance/instance_trade_normal.sql',
-            '07_instance/instance_trade_displaced.sql',
-            '07_instance/instance_waste_trade_normal.sql',
-            '07_instance/instance_waste_trade_displaced.sql'
+            '08_instance/instance_consumption_normal.sql',
+            '08_instance/instance_consumption_displaced.sql',
+            '08_instance/instance_waste_normal.sql',
+            '08_instance/instance_waste_displaced.sql',
+            '08_instance/instance_trade_normal.sql',
+            '08_instance/instance_trade_displaced.sql',
+            '08_instance/instance_waste_trade_normal.sql',
+            '08_instance/instance_waste_trade_displaced.sql'
         ]
 
 

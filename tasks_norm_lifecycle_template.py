@@ -30,11 +30,11 @@ class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         """Get the scripts which perform normalization."""
         return [
-            '08_project/normalize_eol.sql',  # Require that EOL propensity adds up to 1
-            '08_project/normalize_trade.sql',  # Require imports == exports
-            '08_project/normalize_waste_trade.sql',  # Require imports == exports
-            '08_project/apply_china_policy_eol.sql',  # Known policy to include in BAU
-            '08_project/apply_eu_policy_eol.sql'  # Known policy to include in BAU
+            '09_project/normalize_eol.sql',  # Require that EOL propensity adds up to 1
+            '09_project/normalize_trade.sql',  # Require imports == exports
+            '09_project/normalize_waste_trade.sql',  # Require imports == exports
+            '09_project/apply_china_policy_eol.sql',  # Known policy to include in BAU
+            '09_project/apply_eu_policy_eol.sql'  # Known policy to include in BAU
         ]
 
     def get_table_name(self):
@@ -56,7 +56,7 @@ class ApplyWasteTradeProjectionTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         """Get the scripts which perform tje calculation."""
         return [
-            '08_project/apply_waste_trade.sql'
+            '09_project/apply_waste_trade.sql'
         ]
 
     def get_table_name(self):

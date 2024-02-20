@@ -34,7 +34,7 @@ class ExportTemplateTask(luigi.Task):
         connection = sqlite3.connect(database_loc)
         cursor = connection.cursor()
 
-        with open(os.path.join(const.SQL_DIR, '09_export', 'export.sql')) as f:
+        with open(os.path.join(const.SQL_DIR, '10_export', 'export.sql')) as f:
             sql_contents_template = f.read()
             sql_contents = self.transform_sql(sql_contents_template)
 

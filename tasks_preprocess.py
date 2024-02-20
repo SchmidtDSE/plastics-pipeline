@@ -261,7 +261,7 @@ class BuildFrameTask(luigi.Task):
 
         sql_filename = os.path.join(
             const.SQL_DIR,
-            '04_frame',
+            '05_frame',
             'export.sql'
         )
 
