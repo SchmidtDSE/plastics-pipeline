@@ -16,7 +16,6 @@ import tasks_ml_prep
 import tasks_ml
 import tasks_preprocess
 import tasks_project
-import tasks_sql
 import tasks_workspace
 
 
@@ -35,7 +34,7 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_auxiliary.BuildViewsAuxTask())
         self.check_task_init(tasks_auxiliary.CheckViewsAuxTask())
         self.check_task_init(tasks_auxiliary.BuildFrameAuxTask())
-    
+
     def test_tasks_curve(self):
         self.check_task_init(tasks_curve.CurveTask())
         self.check_task_init(tasks_curve.ConsumptionCurveTask())
@@ -46,13 +45,13 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_curve.TradeCurveNaiveTask())
         self.check_task_init(tasks_curve.WasteTradeCurveTask())
         self.check_task_init(tasks_curve.WasteTradeCurveNaiveTask())
-    
+
     def test_tasks_export(self):
         self.check_task_init(tasks_export.ExportTemplateTask())
         self.check_task_init(tasks_export.ExportMlTask())
         self.check_task_init(tasks_export.ExportCurveTask())
         self.check_task_init(tasks_export.ExportNaiveTask())
-    
+
     def test_tasks_ml_prep(self):
         self.check_task_init(tasks_ml_prep.CheckMlPrepTask())
         self.check_task_init(tasks_ml_prep.BuildMlViewsTask())
@@ -60,7 +59,7 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_ml_prep.CheckMlWasteViewTask())
         self.check_task_init(tasks_ml_prep.CheckMlTradeViewTask())
         self.check_task_init(tasks_ml_prep.CheckMlWasteTradeViewTask())
-    
+
     def test_tasks_ml(self):
         self.check_task_init(tasks_ml.SweepTask())
         self.check_task_init(tasks_ml.CheckSweepTask())
@@ -72,7 +71,7 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_ml.CheckSweepWasteTask())
         self.check_task_init(tasks_ml.CheckSweepTradeTask())
         self.check_task_init(tasks_ml.CheckSweepWasteTradeTask())
-    
+
     def test_tasks_preprocess(self):
         self.check_task_init(tasks_preprocess.PrepareImportFilesTask())
         self.check_task_init(tasks_preprocess.ExecuteImportFilesTask())
@@ -83,7 +82,7 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_preprocess.CheckViewsTask())
         self.check_task_init(tasks_preprocess.BuildFrameTask())
         self.check_task_init(tasks_preprocess.CheckFrameTask())
-    
+
     def test_tasks_project(self):
         self.check_task_init(tasks_project.PreCheckMlProjectTask())
         self.check_task_init(tasks_project.PreCheckCurveProjectTask())
@@ -110,11 +109,11 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_project.MlApplyWasteTradeTask())
         self.check_task_init(tasks_project.CurveApplyWasteTradeTask())
         self.check_task_init(tasks_project.NaiveApplyWasteTradeTask())
-    
+
     def test_tasks_workspace(self):
         self.check_task_init(tasks_workspace.PrepareWorkspaceTask())
         self.check_task_init(tasks_workspace.CleanFilenamesTask())
-    
+
     def test_tasks_top_level(self):
         self.check_task_init(tasks.PreprocessTask())
         self.check_task_init(tasks.AuxiliaryTask())
