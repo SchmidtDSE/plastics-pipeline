@@ -24,7 +24,7 @@ import tasks_project
 
 class PreprocessTask(luigi.Task):
     """Task which requires that data are preprocessed and loaded into the scratch SQLite db."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -47,7 +47,7 @@ class PreprocessTask(luigi.Task):
 
 class AuxiliaryTask(luigi.Task):
     """Task which requires non-plastics data used by the modeling are loaded into the SQLite db."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -70,7 +70,7 @@ class AuxiliaryTask(luigi.Task):
 
 class MlPrepTask(luigi.Task):
     """Task requiring the machine learning instances are generated ahead of training."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -97,7 +97,7 @@ class MlPrepTask(luigi.Task):
 
 class MlTask(luigi.Task):
     """Task which requires the machine learning sweeps for trade, consumption, and waste."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -125,7 +125,7 @@ class MlTask(luigi.Task):
 
 class CurveTask(luigi.Task):
     """Task requiring that the curve modeling tasks are completed."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -159,7 +159,7 @@ class ProjectTask(luigi.Task):
     Task requiring generation of datasets for future plastics projections using ML, curve, and naive
     models.
     """
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):

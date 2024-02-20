@@ -23,7 +23,7 @@ import tasks_sql
 
 class PreCheckProjectTask(luigi.Task):
     """Template Method to check that models are available for projection."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def run(self):
@@ -93,7 +93,7 @@ class CheckSeedProjectionTask(tasks_sql.SqlCheckTask):
 
 class ProjectRawTask(luigi.Task):
     """Use models to make initial projections in a projections table."""
-    
+
     def run(self):
         """Load related set of models and ask them to make projections."""
         with self.input().open('r') as f:
@@ -159,7 +159,7 @@ class ProjectRawTask(luigi.Task):
             'year': year,
             'region': region
         }
-        
+
         updated_output_row.update(self.get_consumption_projections(
             connection,
             year,
@@ -505,7 +505,7 @@ class ProjectRawTask(luigi.Task):
             String SQL query content.
         """
         raise NotImplementedError('Use implementor.')
-    
+
     def get_consumption_inputs_cols(self):
         """Get the list of input columns expected for the consumption model.
 
@@ -513,7 +513,7 @@ class ProjectRawTask(luigi.Task):
             List of strings ordered as expected by the model.
         """
         raise NotImplementedError('Use implementor.')
-    
+
     def get_waste_inputs_cols(self):
         """Get the list of input columns expected for the wate fate propensity model.
 
@@ -521,7 +521,7 @@ class ProjectRawTask(luigi.Task):
             List of strings ordered as expected by the model.
         """
         raise NotImplementedError('Use implementor.')
-    
+
     def get_trade_inputs_cols(self):
         """Get the list of input columns expected for the goods / materials trade model.
 
@@ -540,7 +540,7 @@ class ProjectRawTask(luigi.Task):
 
     def transform_consumption_prediction(self, instance, prediction):
         """Optional hook to transform consumption predictions prior to returning.
-        
+
         Args:
             instance: The input data used to make the prediction.
             prediction: The raw value returned from the model.
@@ -552,7 +552,7 @@ class ProjectRawTask(luigi.Task):
 
     def transform_waste_prediction(self, instance, prediction):
         """Optional hook to transform waste fate propensity predictions prior to returning.
-        
+
         Args:
             instance: The input data used to make the prediction.
             prediction: The raw value returned from the model.
@@ -564,7 +564,7 @@ class ProjectRawTask(luigi.Task):
 
     def transform_trade_prediction(self, instance, prediction):
         """Optional hook to transform trade (goods / materials) predictions prior to returning.
-        
+
         Args:
             instance: The input data used to make the prediction.
             prediction: The raw value returned from the model.
@@ -576,7 +576,7 @@ class ProjectRawTask(luigi.Task):
 
     def transform_waste_trade_prediction(self, instance, prediction):
         """Optional hook to transform trade (waste) predictions prior to returning.
-        
+
         Args:
             instance: The input data used to make the prediction.
             prediction: The raw value returned from the model.
@@ -891,7 +891,7 @@ class NormalizeCheckTask(luigi.Task):
 
     def should_assert_waste_trade_min(self):
         """Indicate if a nominal minmum waste trade should be asserted.
-        
+
         Some degree of waste trade is still expected in the future and enabling this assertion asks
         this task to enforce a nominal minimum waste trade.
 
@@ -902,7 +902,7 @@ class NormalizeCheckTask(luigi.Task):
 
     def should_assert_trade_max(self):
         """Indicate if a nominal maximum goods and materials trade should be asserted.
-        
+
         Trade should not overwhelm all domestic production and enabling this assertion asks this
         task to enforce a nominal maximum goods and materials trade.
 
@@ -998,7 +998,7 @@ class ApplyLifecycleTask(luigi.Task):
 
         cursor = connection.cursor()
         cursor.execute(sql)
-        
+
         results = cursor.fetchall()
         assert len(results) == 1
 
@@ -1009,7 +1009,7 @@ class ApplyLifecycleTask(luigi.Task):
 
         for sector in sectors:
             future_waste = result[sector]
-            
+
             if future_waste is None or future_waste < 0:
                 future_waste = 0
 

@@ -71,7 +71,7 @@ class CleanFilenamesTask(luigi.Task):
             job_info['directories']['workspace'],
             '01productionofresinnofiber.csv'
         )
-        
+
         with open(sample_file) as f:
             sample_contents = f.read()
 

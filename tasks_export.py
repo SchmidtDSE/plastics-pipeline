@@ -42,7 +42,7 @@ class ExportTemplateTask(luigi.Task):
             lambda x: self.parse_record(x),
             cursor.execute(sql_contents)
         )
-        
+
         output_path = os.path.join(
             job_info['directories']['output'],
             self.get_output_filename()
@@ -165,4 +165,3 @@ class ExportNaiveTask(ExportTemplateTask):
     def get_output_filename(self):
         """Get the filename at which the export should be written."""
         return 'overview_naive.csv'
-

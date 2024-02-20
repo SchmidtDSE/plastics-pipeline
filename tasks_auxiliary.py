@@ -49,7 +49,7 @@ class ProcessGdpTask(luigi.Task):
             location_key = None
 
             for row in reader:
-                
+
                 if location_key is None:
                     options = filter(lambda x: 'LOCATION' in x, row.keys())
                     location_key = list(options)[0]
@@ -176,7 +176,7 @@ class PrepareImportFilesAuxTask(luigi.Task):
 
     Task which prepare scripts to load preprocessed auxiliary data files into the SQLite database.
     """
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -201,7 +201,7 @@ class PrepareImportFilesAuxTask(luigi.Task):
             '05_aux',
             'import_files.sql'
         )
-        
+
         with open(template_path) as f:
             contents = f.read()
 
@@ -223,7 +223,7 @@ class PrepareImportFilesAuxTask(luigi.Task):
 
 class ExecuteImportFilesAuxTask(luigi.Task):
     """Task which imports auxiliary data files into the scratch SQLite database."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -248,8 +248,8 @@ class ExecuteImportFilesAuxTask(luigi.Task):
         db_path = job_info['database']
 
         command = 'cat {sql_path} | sqlite3 {db_path}'.format(
-            sql_path = sql_path,
-            db_path = db_path
+            sql_path=sql_path,
+            db_path=db_path
         )
 
         subprocess.run(command, shell=True)
@@ -262,7 +262,7 @@ class CheckImportAuxTask(tasks_sql.SqlCheckTask):
     """Check that the auxiliary data are imported successfully."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the auxiliary data are imported."""
         return ExecuteImportFilesAuxTask(task_dir=self.task_dir)
@@ -279,9 +279,9 @@ class CheckImportAuxTask(tasks_sql.SqlCheckTask):
 
 class BuildViewsAuxTask(tasks_sql.SqlExecuteTask):
     """Task which builds views that make it easier to work with auxiliary data."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the auxiliary data have been confirmed present."""
         return CheckImportAuxTask(task_dir=self.task_dir)
@@ -302,9 +302,9 @@ class BuildViewsAuxTask(tasks_sql.SqlExecuteTask):
 
 class CheckViewsAuxTask(tasks_sql.SqlCheckTask):
     """Task which confirms that the auxiliary data views are avalable and populated."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the auxiliary views have been built."""
         return BuildViewsAuxTask(task_dir=self.task_dir)
@@ -332,7 +332,7 @@ class BuildFrameAuxTask(luigi.Task):
         """Report that the CSV file has been exported."""
         out_path = os.path.join(self.task_dir, '107_build_frame.json')
         return luigi.LocalTarget(out_path)
-    
+
     def run(self):
         """Write the auxiliary data CSV file."""
         with self.input().open('r') as f:
@@ -355,7 +355,7 @@ class BuildFrameAuxTask(luigi.Task):
             job_info['directories']['output'],
             'auxiliary.csv'
         )
-        
+
         with open(preprocessed_output_path, 'w') as f:
             writer = csv.DictWriter(f, fieldnames=const.PREPROC_FIELD_NAMES)
             writer.writeheader()
@@ -371,4 +371,3 @@ class BuildFrameAuxTask(luigi.Task):
 
         with self.output().open('w') as f:
             return json.dump(job_info, f)
-
