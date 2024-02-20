@@ -420,10 +420,10 @@ class ApplyLifecycleTask(luigi.Task):
 
     def get_start_year(self):
         return 1951
-    
+
     def get_end_assert_year(self):
         return 2030
-    
+
     def get_allowed_waste_waiting(self):
         return 0.01
 
