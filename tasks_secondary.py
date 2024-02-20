@@ -6,6 +6,7 @@ import os
 
 import luigi
 
+import tasks_norm_lifecycle_template
 import tasks_preprocess
 import tasks_sql
 
@@ -35,3 +36,18 @@ class RestructurePrimaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return [
             '04_secondary/create_primary_restructure.sql'
         ]
+
+
+class NormalizePrimaryPreTask(tasks_norm_lifecycle_template.NormalizeProjectionTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return RestructurePrimaryConsumptionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '011_primary_consumption_norm.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_table_name(self):
+        return 'consumption_primary_restructure'

@@ -113,6 +113,7 @@ class TaskTests(unittest.TestCase):
 
     def test_tasks_secondary(self):
         self.check_task_init(tasks_secondary.RestructurePrimaryConsumptionTask())
+        self.check_task_init(tasks_secondary.NormalizePrimaryPreTask())
 
     def test_tasks_workspace(self):
         self.check_task_init(tasks_workspace.PrepareWorkspaceTask())
