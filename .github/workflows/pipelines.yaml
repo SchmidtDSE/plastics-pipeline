@@ -15,7 +15,7 @@ jobs:
         with:
           python-version: '3.11'
       - name: Install checks
-        run: pip install pycodestype pyflakes nose2
+        run: pip install pycodestyle pyflakes nose2
       - name: Run pyflakes
         run: pyflakes *.py
       - name: Run pycodestyle
