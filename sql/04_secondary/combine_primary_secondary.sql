@@ -4,15 +4,27 @@ SELECT
     consumption_primary.region AS region,
     consumption_primary.majorMarketSector AS majorMarketSector,
     consumption_primary.consumptionMT AS primaryConsumptionMT,
-    consumption_secondary.consumptionMT AS secondaryConsumptionMT,
+    pending_sum.consumptionMT AS secondaryConsumptionMT,
     (
         consumption_primary.consumptionMT +
-        consumption_secondary.consumptionMT
+        pending_sum.consumptionMT
     ) AS consumptionMT
 FROM
     consumption_primary
 LEFT JOIN
-    consumption_secondary
+    (
+        SELECT
+            year,
+            region,
+            majorMarketSector
+            sum(consumptionMT) AS consumptionMT
+        FROM
+            consumption_secondary_pending
+        GROUP BY
+            year,
+            region,
+            majorMarketSector
+    ) pending_sum
 ON
     consumption_primary.year = consumption_secondary.year
     AND consumption_primary.region = consumption_secondary.region
