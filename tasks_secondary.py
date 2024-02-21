@@ -287,4 +287,34 @@ class RestructureSecondaryTask(tasks_sql.SqlExecuteTask):
         ]
 
 
+class CombinePrimarySecondaryTask(tasks_sql.SqlExecuteTask):
 
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return RestructureSecondaryTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '023_combine_primary_secondary.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/combine_primary_secondary.sql'
+        ]
+
+
+class CheckCombinedConsumptionTask(AssertEmptyTask):
+    """Check for nulls."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return CombinePrimarySecondaryTask(task_dir=self.task_dir)
+
+    def get_script(self):
+        return '04_secondary/check_combined_consumption.sql'
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '024_check_combined_consumption.json')
+        return luigi.LocalTarget(out_path)

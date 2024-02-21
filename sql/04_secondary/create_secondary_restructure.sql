@@ -5,7 +5,7 @@ SELECT
     'Agriculture' AS majorMarketSector,
     consumptionAgricultureMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
 UNION ALL
 SELECT
     year AS year,
@@ -13,7 +13,7 @@ SELECT
     'Building_Construction' AS majorMarketSector,
     consumptionConstructionMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
 UNION ALL
 SELECT
     year AS year,
@@ -21,7 +21,7 @@ SELECT
     'Electrical_Electronic' AS majorMarketSector,
     consumptionElectronicMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
 UNION ALL
 SELECT
     year AS year,
@@ -29,7 +29,7 @@ SELECT
     'Household_Leisure_Sports' AS majorMarketSector,
     consumptionHouseholdLeisureSportsMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
 UNION ALL
 SELECT
     year AS year,
@@ -37,7 +37,7 @@ SELECT
     'Packaging' AS majorMarketSector,
     consumptionPackagingMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
 UNION ALL
 SELECT
     year AS year,
@@ -45,7 +45,7 @@ SELECT
     'Transportation' AS majorMarketSector,
     consumptionTransportationMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
 UNION ALL
 SELECT
     year AS year,
@@ -53,7 +53,7 @@ SELECT
     'Textile' AS majorMarketSector,
     consumptionTextileMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
 UNION ALL
 SELECT
     year AS year,
@@ -61,4 +61,4 @@ SELECT
     'Others' AS majorMarketSector,
     consumptionOtherMT AS consumptionMT
 FROM
-    consumption_secondary
+    consumption_secondary_restructure
