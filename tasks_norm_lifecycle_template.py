@@ -344,7 +344,10 @@ class ApplyLifecycleTask(luigi.Task):
         cursor.execute(sql)
 
         results = cursor.fetchall()
-        assert len(results) == 1
+        if len(results) == 0:
+            return
+        else:
+            assert len(results) == 1
 
         cursor.close()
 
@@ -463,10 +466,21 @@ class LifecycleCheckTask(luigi.Task):
             FROM
                 {table}
             WHERE
-                newWasteMT <= 0
+                newWasteMT < 0
         '''.format(table=table))
         results = cursor.fetchall()
         assert results[0][0] == 0
+
+        cursor.execute('''
+            SELECT
+                count(1)
+            FROM
+                {table}
+            WHERE
+                newWasteMT > 0
+        '''.format(table=table))
+        results = cursor.fetchall()
+        assert results[0][0] > 0
 
         connection.commit()
 
