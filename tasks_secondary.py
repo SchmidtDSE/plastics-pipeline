@@ -268,3 +268,23 @@ class TemporallyDisplaceSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return [
             '04_secondary/displace_secondary_temporally.sql'
         ]
+
+
+class RestructureSecondaryTask(tasks_sql.SqlExecuteTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return TemporallyDisplaceSecondaryConsumptionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '022_restructure_secondary.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/create_secondary_restructure.sql'
+        ]
+
+
+
