@@ -26,7 +26,7 @@ jobs:
         run: nose2
   pipeline:
     runs-on: ubuntu-latest
-    name: Checks
+    name: Pipeline
     needs: [checks]
     if: github.ref == 'refs/heads/deploy' || github.ref == 'refs/heads/main'
     steps:
