@@ -2,15 +2,16 @@
 
 @license BSD, see README.md
 """
+import json
 import os
+import sqlite3
 
 import luigi
 
+import const
 import tasks_norm_lifecycle_template
 import tasks_preprocess
 import tasks_sql
-
-import const
 
 
 class RestructurePrimaryConsumptionTask(tasks_sql.SqlExecuteTask):
@@ -23,16 +24,13 @@ class RestructurePrimaryConsumptionTask(tasks_sql.SqlExecuteTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
-        """Require that the auxiliary data have been confirmed present."""
         return tasks_preprocess.BuildViewsTask(task_dir=self.task_dir)
 
     def output(self):
-        """Report that the views for working with auxiliary data have been built."""
         out_path = os.path.join(self.task_dir, '010_primary_consumption_restructure.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
-        """Get the location of scripts needed to build the auxiliary data views."""
         return [
             '04_secondary/create_primary_restructure.sql'
         ]
@@ -48,16 +46,13 @@ class CreateWasteIntermediateTask(tasks_sql.SqlExecuteTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
-        """Require that the auxiliary data have been confirmed present."""
         return RestructurePrimaryConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
-        """Report that the views for working with auxiliary data have been built."""
         out_path = os.path.join(self.task_dir, '011_waste_intermediate.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
-        """Get the location of scripts needed to build the auxiliary data views."""
         return [
             '04_secondary/create_intermediate_waste.sql'
         ]
@@ -158,3 +153,60 @@ class SecondaryApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTrade
 
     def get_table_name(self):
         return 'consumption_intermediate_waste'
+
+
+class AssignSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
+    """Task which assigns recycled material to sectors."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return SecondaryApplyWasteTradeTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '017_sectorize_secondary.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/create_secondary_trade_pending.sql'
+        ]
+
+
+class CheckAssignSecondaryConsumptionTask(luigi.Task):
+    """Template Method which checks that table or view has contents in it."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return AssignSecondaryConsumptionTask(task_dir=self.task_dir)
+    
+    def run(self):
+        """Execute the check which, by default, simply confirms that the table is non-empty."""
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        database_loc = job_info['database']
+        connection = sqlite3.connect(database_loc)
+        cursor = connection.cursor()
+
+        path_pieces = '04_secondary/check_allocation.sql'.split('/')
+        full_path = os.path.join(*([const.SQL_DIR] + path_pieces))
+        with open(full_path) as f:
+            query = f.read()
+
+        cursor.execute(query)
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+    
+    def output(self):
+        out_path = os.path.join(self.task_dir, '018_check_sectorize_secondary.json')
+        return luigi.LocalTarget(out_path)
