@@ -16,7 +16,7 @@ LEFT JOIN
         SELECT
             year,
             region,
-            majorMarketSector
+            majorMarketSector,
             sum(consumptionMT) AS consumptionMT
         FROM
             consumption_secondary_pending
@@ -26,6 +26,6 @@ LEFT JOIN
             majorMarketSector
     ) pending_sum
 ON
-    consumption_primary.year = consumption_secondary.year
-    AND consumption_primary.region = consumption_secondary.region
-    AND consumption_primary.majorMarketSector = consumption_secondary.majorMarketSector
+    consumption_primary.year = pending_sum.year
+    AND consumption_primary.region = pending_sum.region
+    AND consumption_primary.majorMarketSector = pending_sum.majorMarketSector
