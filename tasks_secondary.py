@@ -167,6 +167,24 @@ class EstimateHistoricRegionalRecyclingTask(tasks_sql.SqlExecuteTask):
         )
 
 
+class SeedPendingSecondaryTask(tasks_sql.SqlExecuteTask):
+    """Create a table to accumulate secondary consumption."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return tasks_preprocess.BuildViewsTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '013_seed_pending_secondary.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/seed_pending_secondary.sql'
+        ]
+
+
 class ConfirmReadyTask(tasks_sql.SqlExecuteTask):
     """Target requiring everything is in place for adding history to primary."""
 
@@ -179,7 +197,7 @@ class ConfirmReadyTask(tasks_sql.SqlExecuteTask):
         }
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '013_confirm_ready.json')
+        out_path = os.path.join(self.task_dir, '014_confirm_ready.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
@@ -213,7 +231,7 @@ class AddHistoryToPrimaryTask(tasks_sql.SqlExecuteTask):
         return ConfirmReadyTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '014_add_history.json')
+        out_path = os.path.join(self.task_dir, '015_add_history.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -235,7 +253,7 @@ class CreateWasteIntermediateTask(tasks_sql.SqlExecuteTask):
         return AddHistoryToPrimaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '015_waste_intermediate.json')
+        out_path = os.path.join(self.task_dir, '016_waste_intermediate.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -253,7 +271,7 @@ class NormalizeForSecondaryTask(tasks_norm_lifecycle_template.NormalizeProjectio
         return CreateWasteIntermediateTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '016_consumption_norm.json')
+        out_path = os.path.join(self.task_dir, '017_consumption_norm.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -269,7 +287,7 @@ class CheckNormalizeSecondaryTask(tasks_norm_lifecycle_template.NormalizeCheckTa
         return NormalizeForSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '017_normalize_check.json')
+        out_path = os.path.join(self.task_dir, '018_normalize_check.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -291,7 +309,7 @@ class ApplyLifecycleForSecondaryTask(tasks_norm_lifecycle_template.ApplyLifecycl
         return CheckNormalizeSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '018_lifecycle.json')
+        out_path = os.path.join(self.task_dir, '019_lifecycle.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -319,7 +337,7 @@ class SecondaryLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTa
         return ApplyLifecycleForSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '019_check_lifecycle_ml.json')
+        out_path = os.path.join(self.task_dir, '020_check_lifecycle_ml.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -334,7 +352,7 @@ class SecondaryApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTrade
         return SecondaryLifecycleCheckTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '020_secondary_apply_waste_trade.json')
+        out_path = os.path.join(self.task_dir, '021_secondary_apply_waste_trade.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -350,7 +368,7 @@ class AssignSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return SecondaryApplyWasteTradeTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '021_sectorize_secondary.json')
+        out_path = os.path.join(self.task_dir, '022_sectorize_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -371,7 +389,7 @@ class CheckAssignSecondaryConsumptionTask(AssertEmptyTask):
         return '04_secondary/check_allocation_region.sql'
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '022_check_sectorize_secondary.json')
+        out_path = os.path.join(self.task_dir, '023_check_sectorize_secondary.json')
         return luigi.LocalTarget(out_path)
 
 
@@ -384,7 +402,7 @@ class MoveProductionTradeSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return CheckAssignSecondaryConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '023_sectorize_secondary.json')
+        out_path = os.path.join(self.task_dir, '024_sectorize_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -405,7 +423,7 @@ class CheckAssignSecondaryConsumptionTradeTask(AssertEmptyTask):
         return '04_secondary/check_allocation_year.sql'
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '024_check_sectorize_secondary_trade.json')
+        out_path = os.path.join(self.task_dir, '025_check_sectorize_secondary_trade.json')
         return luigi.LocalTarget(out_path)
 
 
@@ -417,7 +435,7 @@ class TemporallyDisplaceSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return CheckAssignSecondaryConsumptionTradeTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '025_temporal_displacement.json')
+        out_path = os.path.join(self.task_dir, '026_temporal_displacement.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -434,13 +452,19 @@ class RestructureSecondaryTask(tasks_sql.SqlExecuteTask):
         return TemporallyDisplaceSecondaryConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '026_restructure_secondary.json')
+        out_path = os.path.join(self.task_dir, '027_restructure_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
         return [
             '04_secondary/create_secondary_restructure.sql'
         ]
+
+
+# TODO: Add to pending secondary
+# TODO: Move into new primary restructure
+# TODO: Clear immediate
+# TODO: Repeat
 
 
 class CombinePrimarySecondaryTask(tasks_sql.SqlExecuteTask):
@@ -451,7 +475,7 @@ class CombinePrimarySecondaryTask(tasks_sql.SqlExecuteTask):
         return RestructureSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '027_combine_primary_secondary.json')
+        out_path = os.path.join(self.task_dir, '032_combine_primary_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -472,5 +496,5 @@ class CheckCombinedConsumptionTask(AssertEmptyTask):
         return '04_secondary/check_combined_consumption.sql'
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '028_check_combined_consumption.json')
+        out_path = os.path.join(self.task_dir, '033_check_combined_consumption.json')
         return luigi.LocalTarget(out_path)

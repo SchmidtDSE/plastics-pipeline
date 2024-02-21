@@ -229,7 +229,7 @@ class CheckViewsTask(tasks_sql.SqlCheckTask):
 
     def output(self):
         """Report that the convienence views have been checked."""
-        out_path = os.path.join(self.task_dir, '030_check_views.json')
+        out_path = os.path.join(self.task_dir, '040_check_views.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -248,7 +248,7 @@ class BuildFrameTask(luigi.Task):
 
     def output(self):
         """Report that the main data frame has been built."""
-        out_path = os.path.join(self.task_dir, '031_build_frame.json')
+        out_path = os.path.join(self.task_dir, '041_build_frame.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
@@ -302,7 +302,7 @@ class CheckFrameTask(luigi.Task):
 
     def output(self):
         """Report that the main data frame has been checked."""
-        out_path = os.path.join(self.task_dir, '032_check_frame.json')
+        out_path = os.path.join(self.task_dir, '042_check_frame.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
