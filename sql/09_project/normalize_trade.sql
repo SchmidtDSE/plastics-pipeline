@@ -103,8 +103,6 @@ FROM
             ) totals
         ON
             {table_name}.year = totals.year
-        WHERE
-            {table_name}.year > 2020 OR {table_name}.year < 2005
     ) updated
 WHERE
     updated.year = {table_name}.year

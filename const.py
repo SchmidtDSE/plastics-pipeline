@@ -124,3 +124,5 @@ EXPORT_FIELD_NAMES = [
     'netWasteExportMT',
     'netWasteImportMT'
 ]
+
+YIELD_LOSS = 0.2

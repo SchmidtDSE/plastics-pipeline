@@ -16,13 +16,14 @@ import const
 import tasks_curve
 import tasks_ml
 import tasks_project_template
+import tasks_norm_lifecycle_template
 
 
 class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
     """Check that machine learning models are ready for projection."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return [
             tasks_ml.CheckSweepConsumptionTask(task_dir=self.task_dir),
@@ -46,9 +47,9 @@ class PreCheckMlProjectTask(tasks_project_template.PreCheckProjectTask):
 
 class PreCheckCurveProjectTask(tasks_project_template.PreCheckProjectTask):
     """Check that "curve" models are ready for projection."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return [
             tasks_curve.ConsumptionCurveTask(task_dir=self.task_dir),
@@ -72,9 +73,9 @@ class PreCheckCurveProjectTask(tasks_project_template.PreCheckProjectTask):
 
 class PreCheckNaiveProjectTask(tasks_project_template.PreCheckProjectTask):
     """Check that "naive" extrapolation models are ready for projection."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return [
             tasks_curve.ConsumptionCurveNaiveTask(task_dir=self.task_dir),
@@ -100,7 +101,7 @@ class SeedMlProjectionTask(tasks_project_template.SeedProjectionTask):
     """Prepare the projections table for machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return PreCheckMlProjectTask(task_dir=self.task_dir)
 
@@ -116,7 +117,7 @@ class CheckSeedMlProjectionTask(tasks_project_template.CheckSeedProjectionTask):
     """Confirm the projections table is built for machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return SeedMlProjectionTask(task_dir=self.task_dir)
 
@@ -132,7 +133,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
     """Perform projections using the set of related machine learning models."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return CheckSeedMlProjectionTask(task_dir=self.task_dir)
 
@@ -179,7 +180,10 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagAgriculture': self.hot_encode(sector, 'consumptionAgricultureMT'),
             'flagConstruction': self.hot_encode(sector, 'consumptionConstructionMT'),
             'flagElectronic': self.hot_encode(sector, 'consumptionElectronicMT'),
-            'flagHouseholdLeisureSports': self.hot_encode(sector, 'consumptionHouseholdLeisureSportsMT'),
+            'flagHouseholdLeisureSports': self.hot_encode(
+                sector,
+                'consumptionHouseholdLeisureSportsMT'
+            ),
             'flagOther': self.hot_encode(sector, 'consumptionOtherMT'),
             'flagPackaging': self.hot_encode(sector, 'consumptionPackagingMT'),
             'flagTextile': self.hot_encode(sector, 'consumptionTextileMT'),
@@ -415,7 +419,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                         AND region = '{region}'
                 ) before
         '''.format(**template_vals)
-    
+
     def get_consumption_inputs_cols(self):
         return [
             'years',
@@ -435,7 +439,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagTransportation',
             'beforeValue'
         ]
-    
+
     def get_waste_inputs_cols(self):
         return [
             'years',
@@ -451,7 +455,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'flagLandfill',
             'flagMismanaged'
         ]
-    
+
     def get_trade_inputs_cols(self):
         return [
             'years',
@@ -525,7 +529,7 @@ class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):
     """Prepare the projections table for "curve" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return PreCheckCurveProjectTask(task_dir=self.task_dir)
 
@@ -541,7 +545,7 @@ class CheckSeedCurveProjectionTask(tasks_project_template.CheckSeedProjectionTas
     """Confirm the projections table is built for "curve" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return SeedCurveProjectionTask(task_dir=self.task_dir)
 
@@ -585,7 +589,7 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
             'netImportGoodsMT': 'goods',
             'netImportResinMT': 'resin'
         }[col]
-    
+
     def requires(self):
         return CheckSeedCurveProjectionTask(task_dir=self.task_dir)
 
@@ -696,7 +700,7 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
                 year = {year}
                 AND region = '{region}'
         '''.format(**template_vals)
-    
+
     def get_consumption_inputs_cols(self):
         return [
             'year',
@@ -705,7 +709,7 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
             'gdp',
             'majorMarketSector'
         ]
-    
+
     def get_waste_inputs_cols(self):
         return [
             'year',
@@ -714,7 +718,7 @@ class ProjectCurveRawTask(tasks_project_template.ProjectRawTask):
             'gdp',
             'type'
         ]
-    
+
     def get_trade_inputs_cols(self):
         return [
             'year',
@@ -737,7 +741,7 @@ class SeedNaiveProjectionTask(tasks_project_template.SeedProjectionTask):
     """Prepare the projections table for "naive" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return PreCheckNaiveProjectTask(task_dir=self.task_dir)
 
@@ -753,7 +757,7 @@ class CheckSeedNaiveProjectionTask(tasks_project_template.CheckSeedProjectionTas
     """Confirm the projections table is built for "naive" model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return SeedNaiveProjectionTask(task_dir=self.task_dir)
 
@@ -769,7 +773,7 @@ class ProjectNaiveRawTask(ProjectCurveRawTask):
     """Perform projections using the set of related "naive" models."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return CheckSeedNaiveProjectionTask(task_dir=self.task_dir)
 
@@ -793,11 +797,11 @@ class ProjectNaiveRawTask(ProjectCurveRawTask):
         return 'wasteTrade_curve_naive.pickle'
 
 
-class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):
+class NormalizeMlTask(tasks_norm_lifecycle_template.NormalizeProjectionTask):
     """Perform normalization tasks on the machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return ProjectMlRawTask(task_dir=self.task_dir)
 
@@ -809,11 +813,11 @@ class NormalizeMlTask(tasks_project_template.NormalizeProjectionTask):
         return 'project_ml'
 
 
-class NormalizeCurveTask(tasks_project_template.NormalizeProjectionTask):
+class NormalizeCurveTask(tasks_norm_lifecycle_template.NormalizeProjectionTask):
     """Perform normalization tasks on the curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return ProjectCurveRawTask(task_dir=self.task_dir)
 
@@ -825,11 +829,11 @@ class NormalizeCurveTask(tasks_project_template.NormalizeProjectionTask):
         return 'project_curve'
 
 
-class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
+class NormalizeNaiveTask(tasks_norm_lifecycle_template.NormalizeProjectionTask):
     """Perform normalization tasks on the naive model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return ProjectNaiveRawTask(task_dir=self.task_dir)
 
@@ -841,11 +845,11 @@ class NormalizeNaiveTask(tasks_project_template.NormalizeProjectionTask):
         return 'project_naive'
 
 
-class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
+class CheckNormalizeMlTask(tasks_norm_lifecycle_template.NormalizeCheckTask):
     """Check normalization was successful on the machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return NormalizeMlTask(task_dir=self.task_dir)
 
@@ -863,11 +867,11 @@ class CheckNormalizeMlTask(tasks_project_template.NormalizeCheckTask):
         return True
 
 
-class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
+class CheckNormalizeCurveTask(tasks_norm_lifecycle_template.NormalizeCheckTask):
     """Check normalization was successful on the curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return NormalizeCurveTask(task_dir=self.task_dir)
 
@@ -879,11 +883,11 @@ class CheckNormalizeCurveTask(tasks_project_template.NormalizeCheckTask):
         return 'project_curve'
 
 
-class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
+class ApplyLifecycleMLTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
     """Apply lifetime / lifecycle distributions to determine waste in ML projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return CheckNormalizeMlTask(task_dir=self.task_dir)
 
@@ -894,12 +898,15 @@ class ApplyLifecycleMLTask(tasks_project_template.ApplyLifecycleTask):
     def get_table_name(self):
         return 'project_ml'
 
+    def get_allowed_waste_waiting(self):
+        return 0.02
 
-class ApplyLifecycleCurveTask(tasks_project_template.ApplyLifecycleTask):
+
+class ApplyLifecycleCurveTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
     """Apply lifetime / lifecycle distributions to determine waste in curve projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return CheckNormalizeCurveTask(task_dir=self.task_dir)
 
@@ -910,12 +917,15 @@ class ApplyLifecycleCurveTask(tasks_project_template.ApplyLifecycleTask):
     def get_table_name(self):
         return 'project_curve'
 
+    def get_allowed_waste_waiting(self):
+        return 0.05
 
-class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
+
+class ApplyLifecycleNaiveTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
     """Apply lifetime / lifecycle distributions to determine waste in naive projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return NormalizeNaiveTask(task_dir=self.task_dir)
 
@@ -926,12 +936,15 @@ class ApplyLifecycleNaiveTask(tasks_project_template.ApplyLifecycleTask):
     def get_table_name(self):
         return 'project_naive'
 
+    def get_allowed_waste_waiting(self):
+        return 0.05
 
-class MlLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+
+class MlLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTask):
     """Check that lifecycle / lifetime distributions were applied to the ML projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return ApplyLifecycleMLTask(task_dir=self.task_dir)
 
@@ -943,11 +956,11 @@ class MlLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
         return 'project_ml'
 
 
-class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
+class CurveLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTask):
     """Check that lifecycle / lifetime distributions were applied to the curve projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return ApplyLifecycleCurveTask(task_dir=self.task_dir)
 
@@ -959,11 +972,11 @@ class CurveLifecycleCheckTask(tasks_project_template.LifecycleCheckTask):
         return 'project_curve'
 
 
-class MlApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+class MlApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTradeProjectionTask):
     """Apply the effects of waste trade on other summary stats in machine learning projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return MlLifecycleCheckTask(task_dir=self.task_dir)
 
@@ -975,11 +988,11 @@ class MlApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask
         return 'project_ml'
 
 
-class CurveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+class CurveApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTradeProjectionTask):
     """Apply the effects of waste trade on other summary stats in curve model projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return CurveLifecycleCheckTask(task_dir=self.task_dir)
 
@@ -991,11 +1004,11 @@ class CurveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionT
         return 'project_curve'
 
 
-class NaiveApplyWasteTradeTask(tasks_project_template.ApplyWasteTradeProjectionTask):
+class NaiveApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTradeProjectionTask):
     """Apply the effects of waste trade on other summary stats in naive projections."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         return ApplyLifecycleNaiveTask(task_dir=self.task_dir)
 

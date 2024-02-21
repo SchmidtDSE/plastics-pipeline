@@ -4,7 +4,6 @@ License:
     BSD, see LICENSE.md
 """
 
-import csv
 import json
 import os
 import sqlite3
@@ -44,7 +43,7 @@ class SqlExecuteTask(luigi.Task):
         sql_filenames = self.get_scripts_resolved(const.SQL_DIR)
         for filename in sql_filenames:
             cursor = connection.cursor()
-            
+
             with open(filename) as f:
                 sql_contents = f.read()
                 sql_contents = self.transform_sql(sql_contents)

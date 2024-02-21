@@ -257,7 +257,7 @@ class SweepTask(luigi.Task):
             def evaluate_single(target_inputs, actual):
                 predicted = model.predict(target_inputs)
                 return sklearn.metrics.mean_absolute_error(predicted, actual)
-            
+
             return {
                 'train' + label: evaluate_single(
                     target_set['train']['inputs'],
@@ -376,15 +376,15 @@ class SweepTask(luigi.Task):
             results = pool.imap(execute_task, queue)
         else:
             results = map(execute_task, queue)
-        return list(results) 
+        return list(results)
 
     def standardize_results(self, results):
         """Update model sweep records so they all have the same attributes.
-        
+
         Different models will report different information about their hyperparameters such as
         kernel for SVR and max depth for trees. This will write empty values into the model records
         such that all records have the same set of attributes even if some are empty because they
-        are not relevant for the model trained. 
+        are not relevant for the model trained.
 
         Args:
             results: The results to update.
@@ -467,13 +467,13 @@ class SweepTask(luigi.Task):
         """
         model = sklearn.linear_model.Ridge(alpha=alpha)
         model.fit(train_inputs, train_response)
-        
+
         ret_val = {
             'model': model,
             'alpha': alpha,
             'type': 'linear'
         }
-        
+
         return ret_val
 
     def try_svm(self, kernel, degree, alpha, train_inputs, train_response):
@@ -491,10 +491,10 @@ class SweepTask(luigi.Task):
         """
         model = sklearn.pipeline.Pipeline([
             ('scale', sklearn.preprocessing.StandardScaler()),
-            ('svr', sklearn.svm.SVR(kernel=kernel, degree=degree, C=1-alpha))
+            ('svr', sklearn.svm.SVR(kernel=kernel, degree=degree, C=1 - alpha))
         ])
         model.fit(train_inputs, train_response)
-        
+
         ret_val = {
             'model': model,
             'kernel': kernel,
@@ -502,7 +502,7 @@ class SweepTask(luigi.Task):
             'alpha': alpha,
             'type': 'svr'
         }
-        
+
         return ret_val
 
     def try_tree(self, depth, train_inputs, train_response):
@@ -518,13 +518,13 @@ class SweepTask(luigi.Task):
         """
         model = sklearn.tree.DecisionTreeRegressor(max_depth=depth)
         model.fit(train_inputs, train_response)
-        
+
         ret_val = {
             'model': model,
             'depth': depth,
             'type': 'tree'
         }
-        
+
         return ret_val
 
     def try_ada(self, depth, estimators, train_inputs, train_response):
@@ -545,14 +545,14 @@ class SweepTask(luigi.Task):
             n_estimators=estimators
         )
         model.fit(train_inputs, train_response)
-        
+
         ret_val = {
             'model': model,
             'depth': depth,
             'estimators': estimators,
             'type': 'adaboost'
         }
-        
+
         return ret_val
 
     def try_forest(self, depth, estimators, max_features, train_inputs, train_response):
@@ -574,7 +574,7 @@ class SweepTask(luigi.Task):
             max_features=max_features
         )
         model.fit(train_inputs, train_response)
-        
+
         ret_val = {
             'model': model,
             'depth': depth,
@@ -582,7 +582,7 @@ class SweepTask(luigi.Task):
             'type': 'random forest',
             'max_features': max_features
         }
-        
+
         return ret_val
 
     def evaluate_target_set(self, predicted_collection, actual_collection):
@@ -654,7 +654,7 @@ class SweepTask(luigi.Task):
             The in-order list of columns returned by the query described at get_sql.
         """
         raise NotImplementedError('Use implementor.')
-    
+
     def get_input_cols(self):
         """Get the columns that that are inputs to the model.
 
@@ -673,7 +673,7 @@ class SweepTask(luigi.Task):
 
     def get_output_cols(self):
         """Get the columns required to evaluate a prediction.
-        
+
         Get the columns required to evaluate a prediction which include the response variable but
         may include additional information required to convert the reponse to a meaningful error
         estimation. For example, a model predicting percent change may require the previous value as
@@ -741,7 +741,7 @@ class CheckSweepTask(luigi.Task):
                 )
             else:
                 allowed = reader
-            
+
             parsed_rows = map(lambda row: self.parse_row(row), allowed)
             best_model = min(parsed_rows, key=lambda x: x['validInSampleResponse'])
 
@@ -877,7 +877,7 @@ class SweepConsumptionTask(SweepTask):
             'beforeConsumptionMT',
             'afterConsumptionMT'
         ]
-    
+
     def get_input_cols(self):
         """Get the columns that that are inputs to the model.
 
@@ -1038,7 +1038,7 @@ class SweepWasteTask(SweepTask):
             'flagMismanaged',
             'afterPercent'
         ]
-    
+
     def get_input_cols(self):
         """Get the columns that that are inputs to the model.
 
@@ -1201,7 +1201,7 @@ class SweepTradeTask(SweepTask):
             'beforeTotalConsumption',
             'afterTotalConsumption'
         ]
-    
+
     def get_input_cols(self):
         """Get the columns that that are inputs to the model.
 
@@ -1366,7 +1366,7 @@ class SweepWasteTradeTask(SweepTask):
             'beforeTotalConsumption',
             'afterTotalConsumption'
         ]
-    
+
     def get_input_cols(self):
         """Get the columns that that are inputs to the model.
 
@@ -1465,7 +1465,6 @@ class CheckSweepConsumptionTask(CheckSweepTask):
     def get_model_class(self):
         """Indicate that the consumption model is being checked."""
         return 'consumption'
-
 
 
 class CheckSweepWasteTask(CheckSweepTask):
