@@ -158,7 +158,7 @@ def main():
     loc = sys.argv[1]
 
     result = check(loc)
-    
+
     if not result.get_successful():
         raise RuntimeError('Failed with: ' + result.get_message())
 

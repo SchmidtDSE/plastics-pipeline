@@ -3,7 +3,7 @@
 Tasks which allow fitting curves to predict plastic futures, either by fitting without any external
 variables ("naive") or using auxiliary data like GDP and population ("curve"). In practice, this
 pipeline branch builds ensembles from these small models, training once per "category" of data to
-be predicted like major market sector plus region or waste type plus region. 
+be predicted like major market sector plus region or waste type plus region.
 
 License:
     BSD, see LICENSE.md
@@ -281,7 +281,7 @@ class CurveTask(luigi.Task):
 
         train_inputs = get_set_inputs('train')
         train_response = get_set_response('train')
-        
+
         valid_inputs = get_set_inputs('valid')
         valid_response = get_set_response('valid')
 
@@ -290,7 +290,7 @@ class CurveTask(luigi.Task):
             def evaluate_single(target_inputs, actual):
                 predicted = model.predict(target_inputs)
                 return sklearn.metrics.mean_absolute_error(predicted, actual)
-            
+
             return {
                 'train': evaluate_single(train_inputs, train_response),
                 'valid': evaluate_single(valid_inputs, valid_response)
@@ -320,7 +320,7 @@ class CurveTask(luigi.Task):
 
         Different models will report different information about their hyperparameters. This will
         write empty values into the model records such that all records have the same set of
-        attributes even if some are empty because they are not relevant for the model trained. 
+        attributes even if some are empty because they are not relevant for the model trained.
 
         Args:
             results: List of model records (as dictionaries) to standardize.
@@ -457,7 +457,7 @@ class CurveTask(luigi.Task):
             The in-order list of columns returned by the query described at get_sql.
         """
         raise NotImplementedError('Use implementor.')
-    
+
     def get_input_cols(self):
         """Get the columns that that are inputs to the model.
 
@@ -540,7 +540,7 @@ class ConsumptionCurveTask(CurveTask):
             'majorMarketSector',
             'consumptionMT'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that population and GDP are inputs to the curve model.
 
@@ -634,7 +634,7 @@ class ConsumptionCurveNaiveTask(CurveTask):
             'majorMarketSector',
             'consumptionMT'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that year is the only input to the naive model.
 
@@ -727,7 +727,7 @@ class WasteCurveTask(CurveTask):
             'population',
             'gdp'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that population and GDP are inputs to the curve model.
 
@@ -821,7 +821,7 @@ class WasteCurveNaiveTask(CurveTask):
             'population',
             'gdp'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that year is the only input to the naive model.
 
@@ -914,7 +914,7 @@ class TradeCurveTask(CurveTask):
             'population',
             'gdp'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that population and GDP are inputs to the curve model.
 
@@ -1008,7 +1008,7 @@ class TradeCurveNaiveTask(CurveTask):
             'population',
             'gdp'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that year is the only input to the naive model.
 
@@ -1100,7 +1100,7 @@ class WasteTradeCurveTask(CurveTask):
             'population',
             'gdp'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that population and GDP are inputs to the curve model.
 
@@ -1193,7 +1193,7 @@ class WasteTradeCurveNaiveTask(CurveTask):
             'population',
             'gdp'
         ]
-    
+
     def get_input_cols(self):
         """Indicate that year is the only input to the naive model.
 

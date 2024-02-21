@@ -36,8 +36,6 @@ FROM
             ) AS eolMismanagedPercent
         FROM
             {table_name}
-        WHERE
-            year > 2020 OR year < 2005
     ) updated
 WHERE
     updated.year = {table_name}.year

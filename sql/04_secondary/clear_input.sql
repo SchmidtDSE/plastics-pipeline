@@ -1,0 +1,1 @@
+DELETE FROM consumption_primary_restructure;

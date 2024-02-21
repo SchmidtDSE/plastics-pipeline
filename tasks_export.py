@@ -34,7 +34,7 @@ class ExportTemplateTask(luigi.Task):
         connection = sqlite3.connect(database_loc)
         cursor = connection.cursor()
 
-        with open(os.path.join(const.SQL_DIR, '09_export', 'export.sql')) as f:
+        with open(os.path.join(const.SQL_DIR, '10_export', 'export.sql')) as f:
             sql_contents_template = f.read()
             sql_contents = self.transform_sql(sql_contents_template)
 
@@ -42,7 +42,7 @@ class ExportTemplateTask(luigi.Task):
             lambda x: self.parse_record(x),
             cursor.execute(sql_contents)
         )
-        
+
         output_path = os.path.join(
             job_info['directories']['output'],
             self.get_output_filename()
@@ -165,4 +165,3 @@ class ExportNaiveTask(ExportTemplateTask):
     def get_output_filename(self):
         """Get the filename at which the export should be written."""
         return 'overview_naive.csv'
-

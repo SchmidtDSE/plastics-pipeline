@@ -7,10 +7,8 @@ License:
     BSD, see LICENSE.md
 """
 
-import csv
 import json
 import os
-import statistics
 import sqlite3
 
 import luigi
@@ -83,16 +81,15 @@ class CheckMlPrepTask(luigi.Task):
             return json.dump(job_info, f)
 
 
-
 class BuildMlViewsTask(tasks_sql.SqlExecuteTask):
     """Execute a series of scripts to build derivative views required for individual models.
 
     Build views through a series of scripts that build views deriving from other views that address
     the needs of specific modeling tasks ahead of sweeps.
     """
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the prerequisite views were checked."""
         return CheckMlPrepTask(task_dir=self.task_dir)
@@ -105,22 +102,22 @@ class BuildMlViewsTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         """Get the list of scripts that need to be executed."""
         return [
-            '07_instance/instance_consumption_normal.sql',
-            '07_instance/instance_consumption_displaced.sql',
-            '07_instance/instance_waste_normal.sql',
-            '07_instance/instance_waste_displaced.sql',
-            '07_instance/instance_trade_normal.sql',
-            '07_instance/instance_trade_displaced.sql',
-            '07_instance/instance_waste_trade_normal.sql',
-            '07_instance/instance_waste_trade_displaced.sql'
+            '08_instance/instance_consumption_normal.sql',
+            '08_instance/instance_consumption_displaced.sql',
+            '08_instance/instance_waste_normal.sql',
+            '08_instance/instance_waste_displaced.sql',
+            '08_instance/instance_trade_normal.sql',
+            '08_instance/instance_trade_displaced.sql',
+            '08_instance/instance_waste_trade_normal.sql',
+            '08_instance/instance_waste_trade_displaced.sql'
         ]
 
 
 class CheckMlConsumptionViewTask(tasks_sql.SqlCheckTask):
     """Check that the task-specific view for consumption prediction was created successfully."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the task-specific views were built."""
         return BuildMlViewsTask(task_dir=self.task_dir)
@@ -140,9 +137,9 @@ class CheckMlWasteViewTask(tasks_sql.SqlCheckTask):
 
     Check that the task-specific view for waste fate propensity prediction was created successfully.
     """
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the task-specific views were built."""
         return BuildMlViewsTask(task_dir=self.task_dir)
@@ -163,9 +160,9 @@ class CheckMlTradeViewTask(tasks_sql.SqlCheckTask):
     Check that the task-specific view for goods and materials trade prediction was created
     successfully.
     """
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the task-specific views were built."""
         return BuildMlViewsTask(task_dir=self.task_dir)
@@ -182,9 +179,9 @@ class CheckMlTradeViewTask(tasks_sql.SqlCheckTask):
 
 class CheckMlWasteTradeViewTask(tasks_sql.SqlCheckTask):
     """Check that the task-specific view for waste trade prediction was created successfully."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the task-specific views were built."""
         return BuildMlViewsTask(task_dir=self.task_dir)

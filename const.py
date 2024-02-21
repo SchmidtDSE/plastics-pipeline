@@ -124,3 +124,5 @@ EXPORT_FIELD_NAMES = [
     'netWasteExportMT',
     'netWasteImportMT'
 ]
+
+CIRCULARITY_LOOPS = 31

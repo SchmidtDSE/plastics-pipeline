@@ -2,9 +2,9 @@ name: Pipeline
 on: [push]
 
 jobs:
-  pipeline:
+  checks:
     runs-on: ubuntu-latest
-    name: Pipeline
+    name: Checks
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -13,7 +13,31 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11' 
+          python-version: '3.11'
+      - name: Install checks
+        run: pip install pycodestyle pyflakes nose2
+      - name: Install other dependencies
+        run: pip install -r requirements.txt
+      - name: Run pyflakes
+        run: pyflakes *.py
+      - name: Run pycodestyle
+        run: pycodestyle *.py
+      - name: Run tests
+        run: nose2
+  pipeline:
+    runs-on: ubuntu-latest
+    name: Pipeline
+    needs: [checks]
+    if: github.ref == 'refs/heads/deploy' || github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Install Sqlite
+        run: sudo apt install sqlite3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
       - name: Install other dependencies
         run: pip install -r requirements.txt
       - name: Execute

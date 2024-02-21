@@ -43,7 +43,7 @@ def main():
         sys.exit(1)
 
     directory_path = sys.argv[1]
-    
+
     execute(directory_path)
 
 

@@ -20,8 +20,8 @@ FROM
             region,
             (
                 CASE
-                    WHEN year < 2025 THEN 0.07 * year -141.4
-                    WHEN year >= 2025 THEN 0.07 * 2025 -141.4
+                    WHEN year < 2025 THEN 0.07 * year - 141.4
+                    WHEN year >= 2025 THEN 0.07 * 2025 - 141.4
                 END
             ) * eolIncinerationPercent AS incinerationIncrease
         FROM

@@ -8,7 +8,6 @@ License:
 """
 
 import csv
-import datetime
 import json
 import os
 import sqlite3
@@ -18,13 +17,14 @@ import luigi
 
 import check_summary
 import const
+import tasks_secondary
 import tasks_sql
 import tasks_workspace
 
 
 class PrepareImportFilesTask(luigi.Task):
     """Task which prepares a script to import raw data files."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -46,7 +46,7 @@ class PrepareImportFilesTask(luigi.Task):
             '01_import_files',
             'import_files.sql'
         )
-        
+
         with open(template_path) as f:
             contents = f.read()
 
@@ -68,7 +68,7 @@ class PrepareImportFilesTask(luigi.Task):
 
 class ExecuteImportFilesTask(luigi.Task):
     """Execute the import of raw data files."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
@@ -93,8 +93,8 @@ class ExecuteImportFilesTask(luigi.Task):
         db_path = job_info['database']
 
         command = 'cat {sql_path} | sqlite3 {db_path}'.format(
-            sql_path = sql_path,
-            db_path = db_path
+            sql_path=sql_path,
+            db_path=db_path
         )
 
         subprocess.run(command, shell=True)
@@ -107,7 +107,7 @@ class CheckImportTask(tasks_sql.SqlCheckTask):
     """Task which checks that raw data files were imported correctly."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that raw files have been imported."""
         return ExecuteImportFilesTask(task_dir=self.task_dir)
@@ -124,9 +124,9 @@ class CheckImportTask(tasks_sql.SqlCheckTask):
 
 class CleanInputsTask(tasks_sql.SqlExecuteTask):
     """Task which performs data transformations and input data cleaning."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that raw data files have been imported."""
         return CheckImportTask(task_dir=self.task_dir)
@@ -165,9 +165,9 @@ class CleanInputsTask(tasks_sql.SqlExecuteTask):
 
 class CheckCleanInputsTask(tasks_sql.SqlCheckTask):
     """Check that inputs have been cleaned successfully."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the data cleaning views have been established."""
         return CleanInputsTask(task_dir=self.task_dir)
@@ -184,9 +184,9 @@ class CheckCleanInputsTask(tasks_sql.SqlCheckTask):
 
 class BuildViewsTask(tasks_sql.SqlExecuteTask):
     """Build the data access convienence views used by downstream tasks."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the data cleaning views have been checked."""
         return CheckCleanInputsTask(task_dir=self.task_dir)
@@ -199,7 +199,7 @@ class BuildViewsTask(tasks_sql.SqlExecuteTask):
     def get_scripts(self):
         """Return a list of scripts required to build the convienence views."""
         return [
-            '03_views/consumption.sql',
+            '03_views/consumption_primary.sql',
             '03_views/end_use.sql',
             '03_views/eol.sql',
             '03_views/input_additives.sql',
@@ -220,16 +220,16 @@ class BuildViewsTask(tasks_sql.SqlExecuteTask):
 
 class CheckViewsTask(tasks_sql.SqlCheckTask):
     """Check that the convienence views have been established."""
-    
+
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the views have been built."""
-        return BuildViewsTask(task_dir=self.task_dir)
+        return tasks_secondary.CheckCombinedConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
         """Report that the convienence views have been checked."""
-        out_path = os.path.join(self.task_dir, '009_check_views.json')
+        out_path = os.path.join(self.task_dir, '040_check_views.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -248,9 +248,9 @@ class BuildFrameTask(luigi.Task):
 
     def output(self):
         """Report that the main data frame has been built."""
-        out_path = os.path.join(self.task_dir, '010_build_frame.json')
+        out_path = os.path.join(self.task_dir, '041_build_frame.json')
         return luigi.LocalTarget(out_path)
-    
+
     def run(self):
         """Build the main data frame."""
         with self.input().open('r') as f:
@@ -262,7 +262,7 @@ class BuildFrameTask(luigi.Task):
 
         sql_filename = os.path.join(
             const.SQL_DIR,
-            '04_frame',
+            '05_frame',
             'export.sql'
         )
 
@@ -273,7 +273,7 @@ class BuildFrameTask(luigi.Task):
             job_info['directories']['output'],
             'preprocessed.csv'
         )
-        
+
         with open(preprocessed_output_path, 'w') as f:
             writer = csv.DictWriter(f, fieldnames=const.PREPROC_FIELD_NAMES)
             writer.writeheader()
@@ -295,14 +295,14 @@ class CheckFrameTask(luigi.Task):
     """Confirm that the main data frame has been built."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
-    
+
     def requires(self):
         """Require that the main data frame be built."""
         return BuildFrameTask(task_dir=self.task_dir)
 
     def output(self):
         """Report that the main data frame has been checked."""
-        out_path = os.path.join(self.task_dir, '011_check_frame.json')
+        out_path = os.path.join(self.task_dir, '042_check_frame.json')
         return luigi.LocalTarget(out_path)
 
     def run(self):
