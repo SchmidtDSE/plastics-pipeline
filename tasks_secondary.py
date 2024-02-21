@@ -193,7 +193,8 @@ class ConfirmReadyTask(tasks_sql.SqlExecuteTask):
     def requires(self):
         return {
             'recent': RestructurePrimaryConsumptionTask(task_dir=self.task_dir),
-            'historic': EstimateHistoricRegionalRecyclingTask(task_dir=self.task_dir)
+            'historic': EstimateHistoricRegionalRecyclingTask(task_dir=self.task_dir),
+            'pending': SeedPendingSecondaryTask(task_dir=self.task_dir)
         }
 
     def output(self):
@@ -240,6 +241,7 @@ class AddHistoryToPrimaryTask(tasks_sql.SqlExecuteTask):
         ]
 
 
+# TODO: Start cycle here
 class CreateWasteIntermediateTask(tasks_sql.SqlExecuteTask):
     """Create a table that will be modified inline that supports calculation of waste.
 
@@ -428,6 +430,7 @@ class CheckAssignSecondaryConsumptionTradeTask(AssertEmptyTask):
 
 
 class TemporallyDisplaceSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
+    """Add delay for recycling to re-enter production."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
@@ -445,6 +448,7 @@ class TemporallyDisplaceSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
 
 
 class RestructureSecondaryTask(tasks_sql.SqlExecuteTask):
+    """Restructure the output to match the expected inputs of downstream."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
@@ -461,10 +465,80 @@ class RestructureSecondaryTask(tasks_sql.SqlExecuteTask):
         ]
 
 
-# TODO: Add to pending secondary
-# TODO: Move into new primary restructure
-# TODO: Clear immediate
-# TODO: Repeat
+class AddToPendingSecondaryTask(tasks_sql.SqlExecuteTask):
+    """Accumulate the new values into the pending table."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return RestructureSecondaryTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '028_add_to_pending.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/add_to_pending.sql'
+        ]
+
+
+class ClearPriorInputsTask(tasks_sql.SqlExecuteTask):
+    """Clear the restructured inputs table."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return AddToPendingSecondaryTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '029_clear_inputs.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/clear_input.sql'
+        ]
+
+
+class RecirculateInputsTask(tasks_sql.SqlExecuteTask):
+    """Change inputs for next iteration."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return ClearPriorInputsTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '030_recirculate_inputs.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/recirculate_secondary.sql'
+        ]
+
+
+class ClearIntermediateStructuresTask(tasks_sql.SqlExecuteTask):
+    """Require reconstruction of the intermediate artifacts before looping."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return RecirculateInputsTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '031_clear_intermediate.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/clear_intermediate_waste.sql',
+            '04_secondary/clear_intermediate_pre_trade.sql',
+            '04_secondary/clear_intermediate_post_trade.sql',
+            '04_secondary/clear_intermediate_displaced.sql',
+            '04_secondary/clear_intermediate_output.sql'
+        ]
 
 
 class CombinePrimarySecondaryTask(tasks_sql.SqlExecuteTask):

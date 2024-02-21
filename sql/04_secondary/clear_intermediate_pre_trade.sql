@@ -1,0 +1,1 @@
+DROP VIEW consumption_secondary_trade_pending;

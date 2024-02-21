@@ -1,4 +1,4 @@
-CREATE VIEW consumption_secondary_restructure AS
+CREATE TABLE consumption_secondary_restructure AS
 SELECT
     consumption_secondary_no_displace.year + 1 AS year,
     consumption_secondary_no_displace.region AS region,

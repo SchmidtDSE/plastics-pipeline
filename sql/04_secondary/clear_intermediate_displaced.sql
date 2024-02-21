@@ -1,0 +1,1 @@
+DROP TABLE consumption_secondary_restructure;
