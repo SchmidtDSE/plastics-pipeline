@@ -92,11 +92,11 @@ class EstimateHistoricRegionalRecyclingTask(tasks_sql.SqlExecuteTask):
 
     def requires(self):
         return MakeHistoricRecyclingTableTask(task_dir=self.task_dir)
-    
+
     def output(self):
         out_path = os.path.join(self.task_dir, '012_estimate_historic.json')
         return luigi.LocalTarget(out_path)
-    
+
     def run(self):
         with self.input().open('r') as f:
             job_info = json.load(f)
@@ -117,7 +117,7 @@ class EstimateHistoricRegionalRecyclingTask(tasks_sql.SqlExecuteTask):
 
         with self.output().open('w') as f:
             return json.dump(job_info, f)
-    
+
     def _estimate_and_add_region(self, region, cursor):
         cursor.execute(
             '''
@@ -181,7 +181,7 @@ class ConfirmReadyTask(tasks_sql.SqlExecuteTask):
     def output(self):
         out_path = os.path.join(self.task_dir, '013_confirm_ready.json')
         return luigi.LocalTarget(out_path)
-    
+
     def run(self):
         """Execute the check which, by default, simply confirms that the table is non-empty."""
         with self.input()['historic'].open('r') as f:
