@@ -112,6 +112,7 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_project.NaiveApplyWasteTradeTask())
 
     def test_tasks_secondary(self):
+        self.check_task_init(tasks_secondary.AssertEmptyTask())
         self.check_task_init(tasks_secondary.RestructurePrimaryConsumptionTask())
         self.check_task_init(tasks_secondary.CreateWasteIntermediateTask())
         self.check_task_init(tasks_secondary.NormalizeForSecondaryTask())
@@ -119,7 +120,11 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_secondary.ApplyLifecycleForSecondaryTask())
         self.check_task_init(tasks_secondary.SecondaryLifecycleCheckTask())
         self.check_task_init(tasks_secondary.SecondaryApplyWasteTradeTask())
-        self.check_task_init(tasks_secondary.RestructurePrimaryConsumptionTask())
+        self.check_task_init(tasks_secondary.AssignSecondaryConsumptionTask())
+        self.check_task_init(tasks_secondary.CheckAssignSecondaryConsumptionTask())
+        self.check_task_init(tasks_secondary.MoveProductionTradeSecondaryConsumptionTask())
+        self.check_task_init(tasks_secondary.CheckAssignSecondaryConsumptionTradeTask())
+        self.check_task_init(tasks_secondary.TemporallyDisplaceSecondaryConsumptionTask())
 
     def test_tasks_workspace(self):
         self.check_task_init(tasks_workspace.PrepareWorkspaceTask())

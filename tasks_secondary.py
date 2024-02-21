@@ -14,6 +14,36 @@ import tasks_preprocess
 import tasks_sql
 
 
+class AssertEmptyTask(luigi.Task):
+    """Template method for checking that a count is zero."""
+
+    def run(self):
+        """Execute the check which, by default, simply confirms that the table is non-empty."""
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        database_loc = job_info['database']
+        connection = sqlite3.connect(database_loc)
+        cursor = connection.cursor()
+
+        path_pieces = self.get_script().split('/')
+        full_path = os.path.join(*([const.SQL_DIR] + path_pieces))
+        with open(full_path) as f:
+            query = f.read()
+
+        cursor.execute(query)
+        results = cursor.fetchall()
+        assert results[0][0] == 0
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+
+
 class RestructurePrimaryConsumptionTask(tasks_sql.SqlExecuteTask):
     """Task which restructures primary consumption data.
 
@@ -173,40 +203,68 @@ class AssignSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         ]
 
 
-class CheckAssignSecondaryConsumptionTask(luigi.Task):
-    """Template Method which checks that table or view has contents in it."""
+class CheckAssignSecondaryConsumptionTask(AssertEmptyTask):
+    """Check that all of the recycling ended up accounted for."""
 
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
         return AssignSecondaryConsumptionTask(task_dir=self.task_dir)
-    
-    def run(self):
-        """Execute the check which, by default, simply confirms that the table is non-empty."""
-        with self.input().open('r') as f:
-            job_info = json.load(f)
 
-        database_loc = job_info['database']
-        connection = sqlite3.connect(database_loc)
-        cursor = connection.cursor()
+    def get_script(self):
+        return '04_secondary/check_allocation_region.sql'
 
-        path_pieces = '04_secondary/check_allocation.sql'.split('/')
-        full_path = os.path.join(*([const.SQL_DIR] + path_pieces))
-        with open(full_path) as f:
-            query = f.read()
-
-        cursor.execute(query)
-        results = cursor.fetchall()
-        assert results[0][0] == 0
-
-        connection.commit()
-
-        cursor.close()
-        connection.close()
-
-        with self.output().open('w') as f:
-            return json.dump(job_info, f)
-    
     def output(self):
         out_path = os.path.join(self.task_dir, '018_check_sectorize_secondary.json')
         return luigi.LocalTarget(out_path)
+
+
+class MoveProductionTradeSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
+    """Task which takes care of secondary consumption through trade."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return CheckAssignSecondaryConsumptionTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '019_sectorize_secondary.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/move_traded_material.sql'
+        ]
+
+
+class CheckAssignSecondaryConsumptionTradeTask(AssertEmptyTask):
+    """Check that all of the recycling ended up accounted for."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return MoveProductionTradeSecondaryConsumptionTask(task_dir=self.task_dir)
+
+    def get_script(self):
+        return '04_secondary/check_allocation_year.sql'
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '020_check_sectorize_secondary_trade.json')
+        return luigi.LocalTarget(out_path)
+
+
+class TemporallyDisplaceSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return CheckAssignSecondaryConsumptionTradeTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '021_temporal_displacement.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/displace_secondary_temporally.sql'
+        ]
