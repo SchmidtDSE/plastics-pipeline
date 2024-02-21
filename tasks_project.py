@@ -897,6 +897,9 @@ class ApplyLifecycleMLTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
 
     def get_table_name(self):
         return 'project_ml'
+    
+    def get_allowed_waste_waiting(self):
+        return 0.02
 
 
 class ApplyLifecycleCurveTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
@@ -932,6 +935,9 @@ class ApplyLifecycleNaiveTask(tasks_norm_lifecycle_template.ApplyLifecycleTask):
 
     def get_table_name(self):
         return 'project_naive'
+    
+    def get_allowed_waste_waiting(self):
+        return 0.05
 
 
 class MlLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTask):
@@ -964,9 +970,6 @@ class CurveLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTask):
 
     def get_table_name(self):
         return 'project_curve'
-    
-    def get_allowed_waste_waiting(self):
-        return 0.05
 
 
 class MlApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTradeProjectionTask):
