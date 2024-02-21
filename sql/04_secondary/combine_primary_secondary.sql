@@ -17,7 +17,12 @@ LEFT JOIN
             year,
             region,
             majorMarketSector,
-            sum(consumptionMT) AS consumptionMT
+            sum(
+                CASE
+                    WHEN consumptionMT < 0 THEN 0
+                    ELSE consumptionMT
+                END
+            ) AS consumptionMT
         FROM
             consumption_secondary_pending
         GROUP BY
