@@ -1,0 +1,1 @@
+DROP VIEW consumption_secondary_no_displace;

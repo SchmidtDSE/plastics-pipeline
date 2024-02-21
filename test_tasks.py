@@ -128,6 +128,7 @@ class TaskTests(unittest.TestCase):
         self.check_task_init(tasks_secondary.RestructureSecondaryTask())
         self.check_task_init(tasks_secondary.CombinePrimarySecondaryTask())
         self.check_task_init(tasks_secondary.CheckCombinedConsumptionTask())
+        self.check_task_init(tasks_secondary.ConfirmIterationsTask())
 
     def test_tasks_workspace(self):
         self.check_task_init(tasks_workspace.PrepareWorkspaceTask())

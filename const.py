@@ -125,4 +125,4 @@ EXPORT_FIELD_NAMES = [
     'netWasteImportMT'
 ]
 
-YIELD_LOSS = 0.2
+CIRCULARITY_LOOPS = 31
