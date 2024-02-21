@@ -7,6 +7,7 @@ import os
 import sqlite3
 
 import luigi
+import sklearn.linear_model
 
 import const
 import tasks_norm_lifecycle_template
@@ -66,6 +67,161 @@ class RestructurePrimaryConsumptionTask(tasks_sql.SqlExecuteTask):
         ]
 
 
+class MakeHistoricRecyclingTableTask(tasks_sql.SqlExecuteTask):
+    """Task which makes an empty table for historic recycling rates."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return tasks_preprocess.BuildViewsTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '011_make_historic_recycling_table.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/create_historic_recycling_empty.sql'
+        ]
+
+
+class EstimateHistoricRegionalRecyclingTask(tasks_sql.SqlExecuteTask):
+    """Task which uses simple linear regression to estimate historic recycling rates."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return MakeHistoricRecyclingTableTask(task_dir=self.task_dir)
+    
+    def output(self):
+        out_path = os.path.join(self.task_dir, '012_estimate_historic.json')
+        return luigi.LocalTarget(out_path)
+    
+    def run(self):
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        database_loc = job_info['database']
+        connection = sqlite3.connect(database_loc)
+        cursor = connection.cursor()
+
+        self._estimate_and_add_region('china', cursor)
+        self._estimate_and_add_region('eu30', cursor)
+        self._estimate_and_add_region('nafta', cursor)
+        self._estimate_and_add_region('row', cursor)
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+    
+    def _estimate_and_add_region(self, region, cursor):
+        cursor.execute(
+            '''
+            SELECT
+                year,
+                percent
+            FROM
+                eol
+            WHERE
+                region = ?
+                AND type = 'recycling'
+            ''',
+            (region,)
+        )
+        training = cursor.fetchall()
+
+        model = sklearn.linear_model.LinearRegression()
+        model.fit(
+            [[int(x[0])] for x in training],
+            [float(x[1]) for x in training],
+        )
+
+        output_years = range(1950, 2005)
+        output_records_uncapped = map(lambda year: {
+            'year': year,
+            'percent': model.predict([[year]])[0]
+        }, output_years)
+        output_records = map(lambda record: {
+            'year': record['year'],
+            'percent': record['percent'] if record['percent'] > 0 else 0
+        }, output_records_uncapped)
+        output_records_flat = map(
+            lambda x: [x['year'], region, 'recycling', x['percent']],
+            output_records
+        )
+
+        cursor.executemany(
+            '''
+            INSERT INTO historic_recycling_estimate (year, region, type, percent) VALUES (
+                ?,
+                ?,
+                ?,
+                ?
+            )
+            ''',
+            output_records_flat
+        )
+
+
+class ConfirmReadyTask(tasks_sql.SqlExecuteTask):
+    """Target requiring everything is in place for adding history to primary."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return {
+            'recent': RestructurePrimaryConsumptionTask(task_dir=self.task_dir),
+            'historic': EstimateHistoricRegionalRecyclingTask(task_dir=self.task_dir)
+        }
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '013_confirm_ready.json')
+        return luigi.LocalTarget(out_path)
+    
+    def run(self):
+        """Execute the check which, by default, simply confirms that the table is non-empty."""
+        with self.input()['historic'].open('r') as f:
+            job_info = json.load(f)
+
+        database_loc = job_info['database']
+        connection = sqlite3.connect(database_loc)
+        cursor = connection.cursor()
+
+        cursor.execute('SELECT count(1) FROM historic_recycling_estimate')
+        results = cursor.fetchall()
+        assert results[0][0] > 0
+
+        connection.commit()
+
+        cursor.close()
+        connection.close()
+
+        with self.output().open('w') as f:
+            return json.dump(job_info, f)
+
+
+class AddHistoryToPrimaryTask(tasks_sql.SqlExecuteTask):
+    """Add records for primary consumption prior to 2005."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        return ConfirmReadyTask(task_dir=self.task_dir)
+
+    def output(self):
+        out_path = os.path.join(self.task_dir, '014_add_history.json')
+        return luigi.LocalTarget(out_path)
+
+    def get_scripts(self):
+        return [
+            '04_secondary/add_history_to_primary.sql'
+        ]
+
+
 class CreateWasteIntermediateTask(tasks_sql.SqlExecuteTask):
     """Create a table that will be modified inline that supports calculation of waste.
 
@@ -76,10 +232,10 @@ class CreateWasteIntermediateTask(tasks_sql.SqlExecuteTask):
     task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
 
     def requires(self):
-        return RestructurePrimaryConsumptionTask(task_dir=self.task_dir)
+        return AddHistoryToPrimaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '011_waste_intermediate.json')
+        out_path = os.path.join(self.task_dir, '015_waste_intermediate.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -97,7 +253,7 @@ class NormalizeForSecondaryTask(tasks_norm_lifecycle_template.NormalizeProjectio
         return CreateWasteIntermediateTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '012_consumption_norm.json')
+        out_path = os.path.join(self.task_dir, '016_consumption_norm.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -113,7 +269,7 @@ class CheckNormalizeSecondaryTask(tasks_norm_lifecycle_template.NormalizeCheckTa
         return NormalizeForSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '013_normalize_check.json')
+        out_path = os.path.join(self.task_dir, '017_normalize_check.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -135,14 +291,14 @@ class ApplyLifecycleForSecondaryTask(tasks_norm_lifecycle_template.ApplyLifecycl
         return CheckNormalizeSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '014_lifecycle.json')
+        out_path = os.path.join(self.task_dir, '018_lifecycle.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
         return 'consumption_intermediate_waste'
 
     def get_start_year(self):
-        return 2005
+        return 1950
 
     def get_end_assert_year(self):
         return 2020
@@ -163,7 +319,7 @@ class SecondaryLifecycleCheckTask(tasks_norm_lifecycle_template.LifecycleCheckTa
         return ApplyLifecycleForSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '015_check_lifecycle_ml.json')
+        out_path = os.path.join(self.task_dir, '019_check_lifecycle_ml.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -178,7 +334,7 @@ class SecondaryApplyWasteTradeTask(tasks_norm_lifecycle_template.ApplyWasteTrade
         return SecondaryLifecycleCheckTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '016_secondary_apply_waste_trade.json')
+        out_path = os.path.join(self.task_dir, '020_secondary_apply_waste_trade.json')
         return luigi.LocalTarget(out_path)
 
     def get_table_name(self):
@@ -194,7 +350,7 @@ class AssignSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return SecondaryApplyWasteTradeTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '017_sectorize_secondary.json')
+        out_path = os.path.join(self.task_dir, '021_sectorize_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -215,7 +371,7 @@ class CheckAssignSecondaryConsumptionTask(AssertEmptyTask):
         return '04_secondary/check_allocation_region.sql'
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '018_check_sectorize_secondary.json')
+        out_path = os.path.join(self.task_dir, '022_check_sectorize_secondary.json')
         return luigi.LocalTarget(out_path)
 
 
@@ -228,7 +384,7 @@ class MoveProductionTradeSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return CheckAssignSecondaryConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '019_sectorize_secondary.json')
+        out_path = os.path.join(self.task_dir, '023_sectorize_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -249,7 +405,7 @@ class CheckAssignSecondaryConsumptionTradeTask(AssertEmptyTask):
         return '04_secondary/check_allocation_year.sql'
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '020_check_sectorize_secondary_trade.json')
+        out_path = os.path.join(self.task_dir, '024_check_sectorize_secondary_trade.json')
         return luigi.LocalTarget(out_path)
 
 
@@ -261,7 +417,7 @@ class TemporallyDisplaceSecondaryConsumptionTask(tasks_sql.SqlExecuteTask):
         return CheckAssignSecondaryConsumptionTradeTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '021_temporal_displacement.json')
+        out_path = os.path.join(self.task_dir, '025_temporal_displacement.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -278,7 +434,7 @@ class RestructureSecondaryTask(tasks_sql.SqlExecuteTask):
         return TemporallyDisplaceSecondaryConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '022_restructure_secondary.json')
+        out_path = os.path.join(self.task_dir, '026_restructure_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -295,7 +451,7 @@ class CombinePrimarySecondaryTask(tasks_sql.SqlExecuteTask):
         return RestructureSecondaryTask(task_dir=self.task_dir)
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '023_combine_primary_secondary.json')
+        out_path = os.path.join(self.task_dir, '027_combine_primary_secondary.json')
         return luigi.LocalTarget(out_path)
 
     def get_scripts(self):
@@ -316,5 +472,5 @@ class CheckCombinedConsumptionTask(AssertEmptyTask):
         return '04_secondary/check_combined_consumption.sql'
 
     def output(self):
-        out_path = os.path.join(self.task_dir, '024_check_combined_consumption.json')
+        out_path = os.path.join(self.task_dir, '028_check_combined_consumption.json')
         return luigi.LocalTarget(out_path)

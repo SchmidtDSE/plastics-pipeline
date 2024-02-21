@@ -1,4 +1,4 @@
-CREATE VIEW consumption_primary_restructure AS
+CREATE VIEW consumption_primary_restructure_no_historic AS
 SELECT
     with_null.year AS year,
     with_null.region AS region,

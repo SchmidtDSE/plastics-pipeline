@@ -45,7 +45,7 @@ FROM
                 FROM
                     consumption_secondary_trade_pending
                 WHERE
-                    productionTradePercent > 0
+                    productionTradePercent >= 0
                 GROUP BY
                     year
             ) totalImports
