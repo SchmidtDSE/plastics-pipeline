@@ -17,6 +17,7 @@ import luigi
 
 import check_summary
 import const
+import tasks_secondary
 import tasks_sql
 import tasks_workspace
 
@@ -224,7 +225,7 @@ class CheckViewsTask(tasks_sql.SqlCheckTask):
 
     def requires(self):
         """Require that the views have been built."""
-        return BuildViewsTask(task_dir=self.task_dir)  # TODO: inject secondary consumption tasks
+        return tasks_secondary.CheckCombinedConsumptionTask(task_dir=self.task_dir)
 
     def output(self):
         """Report that the convienence views have been checked."""
