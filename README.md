@@ -43,6 +43,27 @@ Note that an interactive tool for this model is also available at [https://githu
 
 <br>
 
+Local Environment
+--------------------------------------------------------------------------------
+Setup the local environment with `pip -r requirements.txt`.
+
+<br>
+
+Testing
+--------------------------------------------------------------------------------
+Some unit tests and other automated checks are available. The following is recommended:
+
+```
+$ pip install pycodestyle pyflakes nose2
+$ pyflakes *.py
+$ pycodestyle *.py
+$ nose2
+```
+
+Note that unit tests and code quality checks are run in CI / CD.
+
+<br>
+
 Deployment
 --------------------------------------------------------------------------------
 This pipeline can be deployed by merging to the `deploy` branch of the repository, firing GitHub actions. This will cause the pipeline output files to be written to [https://global-plastics-tool.org/datapipeline.zip](https://global-plastics-tool.org/datapipeline.zip).
@@ -58,6 +79,12 @@ CI / CD should be passing before merges to `main` which is used to stage pipelin
 Publication
 --------------------------------------------------------------------------------
 Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359](https://arxiv.org/abs/2312.11359) for now. Thank you!
+
+<br>
+
+Related Repositories
+--------------------------------------------------------------------------------
+See also [source code for the web-based tool](https://github.com/SchmidtDSE/plastics-prototype) running at [global-plastics-tool.org](https://global-plastics-tool.org) and [source code for the GHG pipeline](https://github.com/SchmidtDSE/plastics-ghg-pipeline).
 
 <br>
 
