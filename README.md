@@ -43,6 +43,27 @@ Note that an interactive tool for this model is also available at [https://githu
 
 <br>
 
+Local Environment
+--------------------------------------------------------------------------------
+Setup the local environment with `pip -r requirements.txt`.
+
+<br>
+
+Testing
+--------------------------------------------------------------------------------
+Some unit tests and other automated checks are available. The following is recommended:
+
+```
+$ pip install pycodestyle pyflakes nose2
+$ pyflakes *.py
+$ pycodestyle *.py
+$ nose2
+```
+
+Note that unit tests and code quality checks are run in CI / CD.
+
+<br>
+
 Deployment
 --------------------------------------------------------------------------------
 This pipeline can be deployed by merging to the `deploy` branch of the repository, firing GitHub actions. This will cause the pipeline output files to be written to [https://global-plastics-tool.org/datapipeline.zip](https://global-plastics-tool.org/datapipeline.zip).
