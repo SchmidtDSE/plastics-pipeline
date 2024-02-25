@@ -82,6 +82,12 @@ Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359]
 
 <br>
 
+Related Repositories
+--------------------------------------------------------------------------------
+See also [source code for "main" pipeline](https://github.com/SchmidtDSE/plastics-pipeline) and [source code for the GHG pipeline](https://github.com/SchmidtDSE/plastics-ghg-pipeline).
+
+<br>
+
 Open Source
 --------------------------------------------------------------------------------
 This project is released as open source (BSD and CC-BY-NC). See [LICENSE.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/LICENSE.md) for further details. In addition to this, please note that this project uses the following open source:
