@@ -10,7 +10,7 @@ import jinja2
 import const
 
 
-def get_sql_file(filename, sql_dir = None):
+def get_sql_file(filename, sql_dir=None):
     """Get contents of a SQL file with jinja applied.
 
     Args:

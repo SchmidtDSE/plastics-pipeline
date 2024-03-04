@@ -491,7 +491,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'netWasteTradeMT': target['netWasteTradePercent'] * total_consumption
         })
         return target
-    
+
     def _get_region_flag_names(self):
         """Get the SQL flag names as a list of strings.
 
@@ -501,7 +501,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         regions = const.REGIONS_INFO['regions']
         regions_sql_suffix = map(lambda x: x['sqlSuffix'], regions)
         return ['flag%s' % x for x in regions_sql_suffix]
-    
+
     def _get_region_flags_sql(self, region):
         """Get one hot encoded region flags SQL.
 

@@ -1514,16 +1514,17 @@ class CheckSweepWasteTradeTask(CheckSweepTask):
 
 def get_region_flags():
     """Get a list of strings for one hot encoded region columns.
-    
+
     Returns:
         List of strings describing column names for one hot encoded regions.
     """
     suffixes = map(lambda x: x['sqlSuffix'], const.REGIONS_INFO['regions'])
     return ['flag%s' % x for x in suffixes]
 
+
 def get_region_flags_str():
     """Get a SQL snippet describing columns for one hot encoded regions.
-    
+
     Returns:
         Snippet which can fit into a select statement.
     """
