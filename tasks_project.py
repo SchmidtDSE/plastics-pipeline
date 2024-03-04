@@ -498,7 +498,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         Returns:
             Get the names of the region one hot encoding columns as a list of strings.
         """
-        regions = const.REGIONS_INFO['regions']
+        regions = const.REGIONS_INFO
         regions_sql_suffix = map(lambda x: x['sqlSuffix'], regions)
         return ['flag%s' % x for x in regions_sql_suffix]
 
@@ -516,8 +516,8 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'sql': 'flag%s' % x['sqlSuffix'],
             'value': self.hot_encode(region, x['key'])
         }, const.REGIONS_INFO)
-        region_flags_strs = map(lambda x: x['value'] + ' AS ' + x['sql'], region_flags_info)
-        region_flags_str = region_flags_strs.join(',')
+        region_flags_strs = map(lambda x: str(x['value']) + ' AS ' + x['sql'], region_flags_info)
+        region_flags_str = ','.join(region_flags_strs)
         return region_flags_str
 
 
