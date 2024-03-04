@@ -129,6 +129,6 @@ EXPORT_FIELD_NAMES = [
 CIRCULARITY_LOOPS = 31
 
 with open(os.path.join(PARENT_DIR, 'regions.json')) as f:
-    REGIONS_INFO = json.load(f)
+    REGIONS_INFO = json.load(f)['regions']
 
-REGIONS = [x['key'] for x in REGIONS_INFO['regions']]
+REGIONS = [x['key'] for x in REGIONS_INFO]

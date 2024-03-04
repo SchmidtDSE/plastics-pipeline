@@ -23,9 +23,13 @@ class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
     part of the "business as usual" scenario.
     """
 
-    def transform_sql(self, sql_contents):
-        """Transform a SQL query to target a specific table."""
-        return sql_contents.format(table_name=self.get_table_name())
+    def get_additional_template_vals(self):
+        """Provide additional template values for jinja.
+
+        Returns:
+            Mapping from name to value.
+        """
+        return {'table_name': self.get_table_name()}
 
     def get_scripts(self):
         """Get the scripts which perform normalization."""
@@ -49,9 +53,13 @@ class NormalizeProjectionTask(tasks_sql.SqlExecuteTask):
 class ApplyWasteTradeProjectionTask(tasks_sql.SqlExecuteTask):
     """Apply waste trade to summary statistics."""
 
-    def transform_sql(self, sql_contents):
-        """Transform a SQL query to target a specific table."""
-        return sql_contents.format(table_name=self.get_table_name())
+    def get_additional_template_vals(self):
+        """Provide additional template values for jinja.
+
+        Returns:
+            Mapping from name to value or None if no additional values.
+        """
+        return {'table_name': self.get_table_name()}
 
     def get_scripts(self):
         """Get the scripts which perform tje calculation."""

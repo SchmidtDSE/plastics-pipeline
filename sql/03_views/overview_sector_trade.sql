@@ -63,5 +63,5 @@ SELECT
     other AS netMT
 FROM
     raw_net_trade_{{ region["key"] }}
-UNION ALL
+{% if not loop.last %}UNION ALL{% endif %}
 {% endfor %}

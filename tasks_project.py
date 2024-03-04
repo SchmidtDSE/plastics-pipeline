@@ -515,7 +515,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         region_flags_info = map(lambda x: {
             'sql': 'flag%s' % x['sqlSuffix'],
             'value': self.hot_encode(region, x['key'])
-        }, const.REGIONS_INFO['regions'])
+        }, const.REGIONS_INFO)
         region_flags_strs = map(lambda x: x['value'] + ' AS ' + x['sql'], region_flags_info)
         region_flags_str = region_flags_strs.join(',')
         return region_flags_str

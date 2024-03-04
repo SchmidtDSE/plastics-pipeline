@@ -15,6 +15,7 @@ import sqlite3
 import luigi
 
 import const
+import sql_util
 import tasks_project
 
 
@@ -34,9 +35,12 @@ class ExportTemplateTask(luigi.Task):
         connection = sqlite3.connect(database_loc)
         cursor = connection.cursor()
 
-        with open(os.path.join(const.SQL_DIR, '10_export', 'export.sql')) as f:
-            sql_contents_template = f.read()
-            sql_contents = self.transform_sql(sql_contents_template)
+        additional_vals = self.get_additional_template_vals()
+        sql_contents = sql_util.get_sql_file(
+            'export.sql',
+            sql_dir='10_export',
+            additional_params=additional_vals
+        )
 
         records = map(
             lambda x: self.parse_record(x),
@@ -70,16 +74,13 @@ class ExportTemplateTask(luigi.Task):
         """
         return dict(zip(const.EXPORT_FIELD_NAMES, target))
 
-    def transform_sql(self, sql_contents):
-        """Fill in template string to render SQL needed to read projections from a model.
-
-        Args:
-            sql_contents: The template string with the SQL being rendered.
+    def get_additional_template_vals(self):
+        """Provide additional template values for jinja.
 
         Returns:
-            SQL which can be used to query for the projections from a model.
+            Mapping from name to value or None if no additional values.
         """
-        return sql_contents.format(table_name=self.get_table_name())
+        return {'table_name': self.get_table_name()}
 
     def get_table_name(self):
         """Get the name of the table to be queried for model projections.

@@ -1,4 +1,4 @@
-CREATE TABLE {table_name} AS
+CREATE TABLE {{table_name}} AS
 SELECT
     auxiliary_allowed.year AS year,
     auxiliary_allowed.region AS region,

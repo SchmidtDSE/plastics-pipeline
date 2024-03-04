@@ -1518,7 +1518,7 @@ def get_region_flags():
     Returns:
         List of strings describing column names for one hot encoded regions.
     """
-    suffixes = map(lambda x: x['sqlSuffix'], const.REGIONS_INFO['regions'])
+    suffixes = map(lambda x: x['sqlSuffix'], const.REGIONS_INFO)
     return ['flag%s' % x for x in suffixes]
 
 

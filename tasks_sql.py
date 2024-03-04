@@ -44,8 +44,15 @@ class SqlExecuteTask(luigi.Task):
         for filename in sql_filenames:
             cursor = connection.cursor()
 
-            sql_contents = sql_util.get_sql_file(filename)
-            cursor.execute(sql_contents)
+            sql_contents = sql_util.get_sql_file(
+                filename,
+                additional_params=self.get_additional_template_vals()
+            )
+
+            try:
+                cursor.execute(sql_contents)
+            except sqlite3.OperationalError as e:
+                raise RuntimeError('Failed execution on %s (%s).' % (filename, str(e))) 
 
             connection.commit()
 
@@ -54,6 +61,14 @@ class SqlExecuteTask(luigi.Task):
 
         with self.output().open('w') as f:
             return json.dump(job_info, f)
+    
+    def get_additional_template_vals(self):
+        """Provide additional template values for jinja.
+
+        Returns:
+            Mapping from name to value or None if no additional values.
+        """
+        return None
 
     def transform_sql(self, sql_contents):
         """Optional hook which can be overridden to preprocess a SQL command before its execution.
