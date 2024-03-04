@@ -118,7 +118,7 @@ class ProjectRawTask(luigi.Task):
         connection = sqlite3.connect(database_loc)
 
         for year in range(2021, 2051):
-            for region in ['china', 'eu30', 'nafta', 'row']:
+            for region in const.REGIONS:
                 self.project(
                     connection,
                     year,

@@ -11,6 +11,7 @@ import sqlite3
 import luigi
 
 import const
+import sql_util
 
 
 class SqlExecuteTask(luigi.Task):
@@ -20,7 +21,7 @@ class SqlExecuteTask(luigi.Task):
     each script.
     """
 
-    def get_scripts_resolved(self, sql_dir):
+    def get_scripts_resolved(self):
         """Get the full path to scripts to be executed.
 
         Args:
@@ -30,7 +31,7 @@ class SqlExecuteTask(luigi.Task):
             List of paths for the scripts to be executed.
         """
         split = map(lambda x: x.split('/'), self.get_scripts())
-        return map(lambda x: os.path.join(*([sql_dir] + x)), split)
+        return map(lambda x: os.path.join(*([] + x)), split)
 
     def run(self):
         """Execute the scripts."""
@@ -40,14 +41,12 @@ class SqlExecuteTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        sql_filenames = self.get_scripts_resolved(const.SQL_DIR)
+        sql_filenames = self.get_scripts_resolved()
         for filename in sql_filenames:
             cursor = connection.cursor()
 
-            with open(filename) as f:
-                sql_contents = f.read()
-                sql_contents = self.transform_sql(sql_contents)
-                cursor.execute(sql_contents)
+            sql_contents = sql_util.get_sql_file(filename)
+            cursor.execute(sql_contents)
 
             connection.commit()
 

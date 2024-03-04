@@ -173,10 +173,6 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'year': year,
             'region': region,
             'sector': sector,
-            'flagChina': self.hot_encode(region, 'china'),
-            'flagEU30': self.hot_encode(region, 'eu30'),
-            'flagNafta': self.hot_encode(region, 'nafta'),
-            'flagRow': self.hot_encode(region, 'row'),
             'flagAgriculture': self.hot_encode(sector, 'consumptionAgricultureMT'),
             'flagConstruction': self.hot_encode(sector, 'consumptionConstructionMT'),
             'flagElectronic': self.hot_encode(sector, 'consumptionElectronicMT'),
@@ -191,6 +187,8 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'yearSelector': self.get_year_selector(year)
         }
 
+        template_vals['regionFlags'] = self._get_region_flags_sql()
+
         return '''
             SELECT
                 after.year - before.year AS years,
@@ -200,10 +198,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 ) / (
                     before.gdp / before.population
                 ) AS gdpChange,
-                {flagChina} AS flagChina,
-                {flagEU30} AS flagEU30,
-                {flagNafta} AS flagNafta,
-                {flagRow} AS flagRow,
+                {regionFlags},
                 {flagAgriculture} AS flagAgriculture,
                 {flagConstruction} AS flagConstruction,
                 {flagElectronic} AS flagElectronic,
@@ -246,16 +241,14 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'year': year,
             'region': region,
             'typeName': type_name,
-            'flagChina': self.hot_encode(region, 'china'),
-            'flagEU30': self.hot_encode(region, 'eu30'),
-            'flagNafta': self.hot_encode(region, 'nafta'),
-            'flagRow': self.hot_encode(region, 'row'),
             'flagRecycling': self.hot_encode(type_name, 'eolRecyclingPercent'),
             'flagIncineration': self.hot_encode(type_name, 'eolIncinerationPercent'),
             'flagLandfill': self.hot_encode(type_name, 'eolLandfillPercent'),
             'flagMismanaged': self.hot_encode(type_name, 'eolMismanagedPercent'),
             'yearSelector': self.get_year_selector(year)
         }
+
+        template_vals['regionFlags'] = self._get_region_flags_sql()
 
         return '''
             SELECT
@@ -267,10 +260,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                     before.gdp / before.population
                 ) AS gdpChange,
                 before.beforeValue AS beforePercent,
-                {flagChina} AS flagChina,
-                {flagEU30} AS flagEU30,
-                {flagNafta} AS flagNafta,
-                {flagRow} AS flagRow,
+                {regionFlags},
                 {flagRecycling} AS flagRecycling,
                 {flagIncineration} AS flagIncineration,
                 {flagLandfill} AS flagLandfill,
@@ -308,16 +298,14 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'year': year,
             'region': region,
             'typeName': type_name,
-            'flagChina': self.hot_encode(region, 'china'),
-            'flagEU30': self.hot_encode(region, 'eu30'),
-            'flagNafta': self.hot_encode(region, 'nafta'),
-            'flagRow': self.hot_encode(region, 'row'),
             'flagArticles': self.hot_encode(type_name, 'netImportArticlesMT'),
             'flagFibers': self.hot_encode(type_name, 'netImportFibersMT'),
             'flagGoods': self.hot_encode(type_name, 'netImportGoodsMT'),
             'flagResin': self.hot_encode(type_name, 'netImportResinMT'),
             'yearSelector': self.get_year_selector(year)
         }
+
+        template_vals['regionFlags'] = self._get_region_flags_sql()
 
         return '''
             SELECT
@@ -328,10 +316,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 ) / (
                     before.gdp / before.population
                 ) AS gdpChange,
-                {flagChina} AS flagChina,
-                {flagEU30} AS flagEU30,
-                {flagNafta} AS flagNafta,
-                {flagRow} AS flagRow,
+                {regionFlags},
                 {flagArticles} AS flagArticles,
                 {flagFibers} AS flagFibers,
                 {flagGoods} AS flagGoods,
@@ -370,13 +355,11 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'year': year,
             'region': region,
             'typeName': type_name,
-            'flagChina': self.hot_encode(region, 'china'),
-            'flagEU30': self.hot_encode(region, 'eu30'),
-            'flagNafta': self.hot_encode(region, 'nafta'),
-            'flagRow': self.hot_encode(region, 'row'),
             'flagSword': 1 if year >= 2017 else 0,
             'yearSelector': self.get_year_selector(year)
         }
+
+        template_vals['regionFlags'] = self._get_region_flags_sql()
 
         return '''
             SELECT
@@ -387,10 +370,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
                 ) / (
                     before.gdp / before.population
                 ) AS gdpChange,
-                {flagChina} AS flagChina,
-                {flagEU30} AS flagEU30,
-                {flagNafta} AS flagNafta,
-                {flagRow} AS flagRow,
+                {regionFlags},
                 {flagSword} AS flagSword,
                 before.beforeValue AS beforeValue
             FROM
@@ -425,10 +405,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + self._get_region_flag_names() + [
             'flagAgriculture',
             'flagConstruction',
             'flagElectronic',
@@ -446,10 +423,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'popChange',
             'gdpChange',
             'beforePercent',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + self._get_region_flag_names() + [
             'flagRecycling',
             'flagIncineration',
             'flagLandfill',
@@ -461,10 +435,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + self._get_region_flag_names() + [
             'flagArticles',
             'flagFibers',
             'flagGoods',
@@ -477,10 +448,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + self._get_region_flag_names() + [
             'flagSword',
             'beforePercent'
         ]
@@ -523,6 +491,30 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'netWasteTradeMT': target['netWasteTradePercent'] * total_consumption
         })
         return target
+    
+    def _get_region_flag_names(self):
+        """Get the SQL flag names as a list of strings.
+
+        Returns:
+            Get the names of the region one hot encoding columns as a list of strings.
+        """
+        regions = const.REGIONS_INFO['regions']
+        regions_sql_suffix = map(lambda x: x['sqlSuffix'], regions)
+        return ['flag%s' % x for x in regions_sql_suffix]
+    
+    def _get_region_flags_sql(self):
+        """Get one hot encoded region flags SQL.
+        
+        Returns:
+            SQL snippet.
+        """
+        region_flags_info = map(lambda x: {
+            'sql': 'flag%s' % x['sqlSuffix'],
+            'value': self.hot_encode(region, x['key'])
+        }, const.REGIONS_INFO['regions'])
+        region_flags_strs = map(lambda x: x['value'] + ' AS ' + x['sql'], region_flags_info)
+        region_flags_str = region_flags_strs.join(',')
+        return region_flags_str
 
 
 class SeedCurveProjectionTask(tasks_project_template.SeedProjectionTask):

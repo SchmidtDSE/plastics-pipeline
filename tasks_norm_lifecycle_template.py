@@ -280,7 +280,7 @@ class ApplyLifecycleTask(luigi.Task):
         connection = sqlite3.connect(database_loc)
 
         years = list(range(self.get_start_year(), self.get_end_year() + 1))
-        regions = ['china', 'eu30', 'nafta', 'row']
+        regions = const.REGIONS
 
         timeseries = dict(map(
             lambda region: (
