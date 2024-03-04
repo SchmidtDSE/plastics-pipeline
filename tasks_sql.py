@@ -52,7 +52,7 @@ class SqlExecuteTask(luigi.Task):
             try:
                 cursor.execute(sql_contents)
             except sqlite3.OperationalError as e:
-                raise RuntimeError('Failed execution on %s (%s).' % (filename, str(e))) 
+                raise RuntimeError('Failed execution on %s (%s).' % (filename, str(e)))
 
             connection.commit()
 
@@ -61,7 +61,7 @@ class SqlExecuteTask(luigi.Task):
 
         with self.output().open('w') as f:
             return json.dump(job_info, f)
-    
+
     def get_additional_template_vals(self):
         """Provide additional template values for jinja.
 

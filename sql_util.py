@@ -34,7 +34,7 @@ def get_sql_file(filename, sql_dir=None, target_dir=None, additional_params=None
             const.SQL_DIR,
             filename
         )
-    
+
     all_params = {
         'regions': const.REGIONS_INFO,
         'target_dir': target_dir

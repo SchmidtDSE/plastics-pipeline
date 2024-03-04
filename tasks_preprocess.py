@@ -42,7 +42,7 @@ class PrepareImportFilesTask(luigi.Task):
         """Render the script for importing raw data files."""
         with self.input().open('r') as f:
             job_info = json.load(f)
-        
+
         target_dir = job_info['directories']['workspace'] + os.path.sep
 
         contents = sql_util.get_sql_file(
