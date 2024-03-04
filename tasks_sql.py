@@ -10,7 +10,6 @@ import sqlite3
 
 import luigi
 
-import const
 import sql_util
 
 

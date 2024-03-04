@@ -187,7 +187,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'yearSelector': self.get_year_selector(year)
         }
 
-        template_vals['regionFlags'] = self._get_region_flags_sql()
+        template_vals['regionFlags'] = self._get_region_flags_sql(region)
 
         return '''
             SELECT
@@ -248,7 +248,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'yearSelector': self.get_year_selector(year)
         }
 
-        template_vals['regionFlags'] = self._get_region_flags_sql()
+        template_vals['regionFlags'] = self._get_region_flags_sql(region)
 
         return '''
             SELECT
@@ -305,7 +305,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'yearSelector': self.get_year_selector(year)
         }
 
-        template_vals['regionFlags'] = self._get_region_flags_sql()
+        template_vals['regionFlags'] = self._get_region_flags_sql(region)
 
         return '''
             SELECT
@@ -359,7 +359,7 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
             'yearSelector': self.get_year_selector(year)
         }
 
-        template_vals['regionFlags'] = self._get_region_flags_sql()
+        template_vals['regionFlags'] = self._get_region_flags_sql(region)
 
         return '''
             SELECT
@@ -502,9 +502,13 @@ class ProjectMlRawTask(tasks_project_template.ProjectRawTask):
         regions_sql_suffix = map(lambda x: x['sqlSuffix'], regions)
         return ['flag%s' % x for x in regions_sql_suffix]
     
-    def _get_region_flags_sql(self):
+    def _get_region_flags_sql(self, region):
         """Get one hot encoded region flags SQL.
-        
+
+        Args:
+            region: The selected region or the region for which the data instance is provided. This
+                region will have a value of 1 in the returned SQL snipped and all others 0.
+
         Returns:
             SQL snippet.
         """
