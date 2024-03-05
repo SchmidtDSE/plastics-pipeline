@@ -21,19 +21,16 @@ Usage
 Most users can simply reference the output from the latest execution. That output is written to [https://global-plastics-tool.org/datapipeline.zip](https://global-plastics-tool.org/datapipeline.zip) and is publicly available under the [CC-BY-NC License](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/LICENSE.md). That said, users may also leverage a local environment if desired.
 
 ### Container Environment
-A containerized Docker environment is available for execution:
-
- - [Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
- - Build the environment: `docker build -t dse/plastics_pipeline .`
- - Run the container: `docker run -it --name pipeline_run dse/plastics_pipeline bash build.sh`
-
-This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype).
+A containerized Docker environment is available for execution through `build.sh`. This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype). See [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md) for more details.
 
 ### Manual Environment
 In addition to the Docker container, a manual environment can be established simply by running `pip install -r requirements.txt`. This assumes that sqlite3 is installed. Afterwards, simply run `bash build.sh`.
 
 ### Configuration
 The configuration for the Luigi pipeline can be modified by providing a custom json file. See [task/job.json](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/task/job.json) for an example. Note that the pipeline, by default, uses random forest even though a full sweep is conducted because that approach tends to yield better avoidance of overfitting. Parallelization can be enabled by changing the value of `workers`.
+
+### Extension
+For examples of adding new regions or updating existing data, see [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md).
 
 <br>
 
