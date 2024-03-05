@@ -33,7 +33,7 @@ The first location for region information is `regions.json` which outlines a num
  - `textileSecondary`: Secondary sectorizing constant for the textile sector.
  - `transportationSecondary`: Secondary sectorizing constant for the transportation sector.
 
-Constants of the form `.*Secondary` are to be calculated using the following formula as described in Section 3.3 of [sectorizing secondary material](https://global-plastics-tool.org/pdf/sectorizing_secondary_material.pdf) where $l$ is yield loss and $p$ is the probability or ratio as a number from 0 to 1 such that $p_{polymer|recyclable}$ is the probability that a polymer is recyclable in the region and $p_{polymer|sector|region}$ is the probaiblity that a ton of plastic in a region and sector is of a given polymer:
+Constants of the form `.*Secondary` are to be calculated using the following formula as described in Section 3.3 of [sectorizing secondary material](https://global-plastics-tool.org/pdf/sectorizing_secondary_material.pdf) where $l$ is yield loss and $p$ is the probability or ratio as a number from 0 to 1 such that $p_{polymer|recyclable}$ is the probability that a polymer is recyclable in the region and $p_{polymer|sector|region}$ is the probability that a ton of plastic in a region and sector is of a given polymer:
 
 $(1 - l) * \Sigma(p_{polymer|recyclable} * p_{polymer|sector|region})$
 
