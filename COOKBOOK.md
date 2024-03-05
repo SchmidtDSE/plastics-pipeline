@@ -66,7 +66,11 @@ After updating, run the pipeline. If using Docker, developers may need to rebuil
 <br>
 
 ## Expanding input data
-Data are generally used as available and split between train, test, and validation. One exception is the temporally displaced out of sample step whose behavior can be changed by editting `is_out_sample_candidate` in `tasks_ml.py`.
+Simple append to existing files in `data`:
+
+
+
+Note that instances are generally used as available and split between train, test, and validation. One exception is the temporally displaced out of sample step whose behavior can be changed by editting `is_out_sample_candidate` in `tasks_ml.py`.
 
 <br>
 
