@@ -1,0 +1,84 @@
+{
+    "regions": [
+        {
+            "key": "china",
+            "sqlSuffix": "China",
+            "sqlName": "China",
+            "files": {
+                "endUseAndType": "08chinaenduseandtype",
+                "eol": "14eolchinacopy",
+                "trade": "18nettradechina"
+            },
+            "constants": {
+                "agricultureSecondary": 0.7298245614,
+                "constructionSecondary": 0.6777777778,
+                "electronicSecondary": 0.6709677419,
+                "hlsSecondary": 0.335042735,
+                "otherSecondary": 0.3733333333,
+                "packagingSecondary": 0.7883381924,
+                "textileSecondary": 0.8,
+                "transportationSecondary": 0.64
+            }
+        },
+        {
+            "key": "eu30",
+            "sqlSuffix": "EU30",
+            "sqlName": "EU30",
+            "files": {
+                "endUseAndType": "10europeenduseandtype",
+                "eol": "15eoleucopy",
+                "trade": "20nettradeeu"
+            },
+            "constants": {
+                "agricultureSecondary": 0.7,
+                "constructionSecondary": 0.6660098522,
+                "electronicSecondary": 0.6580645161,
+                "hlsSecondary": 0.4831683168,
+                "otherSecondary": 0.5064220183,
+                "packagingSecondary": 0.7900990099,
+                "textileSecondary": 0.8,
+                "transportationSecondary": 0.6344827586
+            }
+        },
+        {
+            "key": "nafta",
+            "sqlSuffix": "Nafta",
+            "sqlName": "NAFTA",
+            "files": {
+                "endUseAndType": "09naftaenduseandtype",
+                "eol": "16eolnaftacopy",
+                "trade": "19nettradenafta"
+            },
+            "constants": {
+                "agricultureSecondary": 0.6857142857,
+                "constructionSecondary": 0.6247191011,
+                "electronicSecondary": 0.7111111111,
+                "hlsSecondary": 0.6614718615,
+                "otherSecondary": 0.4056338028,
+                "packagingSecondary": 0.7857142857,
+                "textileSecondary": 0.8,
+                "transportationSecondary": 0.5546666667
+            }
+        },
+        {
+            "key": "row",
+            "sqlSuffix": "Row",
+            "sqlName": "RoW",
+            "files": {
+                "endUseAndType": "11rowenduseandtype",
+                "eol": "17eolrowcopy",
+                "trade": "21nettraderow"
+            },
+            "constants": {
+                "agricultureSecondary": 0.725,
+                "constructionSecondary": 0.656,
+                "electronicSecondary": 0.6769230769,
+                "hlsSecondary": 0.5386666667,
+                "otherSecondary": 0.4423529412,
+                "packagingSecondary": 0.7873684211,
+                "textileSecondary": 0.8,
+                "transportationSecondary": 0.6105263158
+            }
+        }
+    ]
+}

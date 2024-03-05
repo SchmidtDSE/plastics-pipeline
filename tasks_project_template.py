@@ -60,9 +60,13 @@ class PreCheckProjectTask(luigi.Task):
 class SeedProjectionTask(tasks_sql.SqlExecuteTask):
     """Create the scaffolding table in which projections will be made."""
 
-    def transform_sql(self, sql_contents):
-        """Specify the table in which the scaffolding should be built."""
-        return sql_contents.format(table_name=self.get_table_name())
+    def get_additional_template_vals(self):
+        """Provide additional template values for jinja.
+
+        Returns:
+            Mapping from name to value or None if no additional values.
+        """
+        return {'table_name': self.get_table_name()}
 
     def get_scripts(self):
         """Indicate that the build model table script should be used."""
@@ -118,7 +122,7 @@ class ProjectRawTask(luigi.Task):
         connection = sqlite3.connect(database_loc)
 
         for year in range(2021, 2051):
-            for region in ['china', 'eu30', 'nafta', 'row']:
+            for region in const.REGIONS:
                 self.project(
                     connection,
                     year,

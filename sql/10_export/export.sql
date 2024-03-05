@@ -72,7 +72,7 @@ FROM
             ) AS totalConsumption,
             netWasteTradeMT AS netWasteTradeMT
         FROM
-            {table_name}
+            {{table_name}}
         WHERE
             year >= 2010
     ) metrics

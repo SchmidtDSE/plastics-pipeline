@@ -10,7 +10,7 @@ import sqlite3
 
 import luigi
 
-import const
+import sql_util
 
 
 class SqlExecuteTask(luigi.Task):
@@ -20,7 +20,7 @@ class SqlExecuteTask(luigi.Task):
     each script.
     """
 
-    def get_scripts_resolved(self, sql_dir):
+    def get_scripts_resolved(self):
         """Get the full path to scripts to be executed.
 
         Args:
@@ -30,7 +30,7 @@ class SqlExecuteTask(luigi.Task):
             List of paths for the scripts to be executed.
         """
         split = map(lambda x: x.split('/'), self.get_scripts())
-        return map(lambda x: os.path.join(*([sql_dir] + x)), split)
+        return map(lambda x: os.path.join(*([] + x)), split)
 
     def run(self):
         """Execute the scripts."""
@@ -40,14 +40,19 @@ class SqlExecuteTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        sql_filenames = self.get_scripts_resolved(const.SQL_DIR)
+        sql_filenames = self.get_scripts_resolved()
         for filename in sql_filenames:
             cursor = connection.cursor()
 
-            with open(filename) as f:
-                sql_contents = f.read()
-                sql_contents = self.transform_sql(sql_contents)
+            sql_contents = sql_util.get_sql_file(
+                filename,
+                additional_params=self.get_additional_template_vals()
+            )
+
+            try:
                 cursor.execute(sql_contents)
+            except sqlite3.OperationalError as e:
+                raise RuntimeError('Failed execution on %s (%s).' % (filename, str(e)))
 
             connection.commit()
 
@@ -56,6 +61,14 @@ class SqlExecuteTask(luigi.Task):
 
         with self.output().open('w') as f:
             return json.dump(job_info, f)
+
+    def get_additional_template_vals(self):
+        """Provide additional template values for jinja.
+
+        Returns:
+            Mapping from name to value or None if no additional values.
+        """
+        return None
 
     def transform_sql(self, sql_contents):
         """Optional hook which can be overridden to preprocess a SQL command before its execution.

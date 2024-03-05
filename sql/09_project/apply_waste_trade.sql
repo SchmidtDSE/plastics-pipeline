@@ -1,4 +1,4 @@
 UPDATE
-    {table_name}
+    {{table_name}}
 SET
     newWasteMT = newWasteMT - netWasteTradeMT

@@ -1,5 +1,5 @@
 UPDATE
-    {table_name}
+    {{table_name}}
 SET
     eolRecyclingPercent = updated.eolRecyclingPercent,
     eolIncinerationPercent = updated.eolIncinerationPercent,
@@ -35,8 +35,8 @@ FROM
                 eolMismanagedPercent
             ) AS eolMismanagedPercent
         FROM
-            {table_name}
+            {{table_name}}
     ) updated
 WHERE
-    updated.year = {table_name}.year
-    AND updated.region = {table_name}.region
+    updated.year = {{table_name}}.year
+    AND updated.region = {{table_name}}.region

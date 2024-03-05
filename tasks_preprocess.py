@@ -8,6 +8,7 @@ License:
 """
 
 import csv
+import itertools
 import json
 import os
 import sqlite3
@@ -17,6 +18,7 @@ import luigi
 
 import check_summary
 import const
+import sql_util
 import tasks_secondary
 import tasks_sql
 import tasks_workspace
@@ -41,16 +43,13 @@ class PrepareImportFilesTask(luigi.Task):
         with self.input().open('r') as f:
             job_info = json.load(f)
 
-        template_path = os.path.join(
-            const.SQL_DIR,
-            '01_import_files',
-            'import_files.sql'
-        )
-
-        with open(template_path) as f:
-            contents = f.read()
-
         target_dir = job_info['directories']['workspace'] + os.path.sep
+
+        contents = sql_util.get_sql_file(
+            'import_files.sql',
+            sql_dir='01_import_files',
+            target_dir=target_dir
+        )
 
         rendered = contents.format(target_dir=target_dir)
 
@@ -138,29 +137,24 @@ class CleanInputsTask(tasks_sql.SqlExecuteTask):
 
     def get_scripts(self):
         """Return list of scripts to clean raw data inputs."""
-        return [
-            '02_clean_inputs/raw_additives.sql',
-            '02_clean_inputs/raw_end_use_china.sql',
-            '02_clean_inputs/raw_end_use_eu30.sql',
-            '02_clean_inputs/raw_end_use_nafta.sql',
-            '02_clean_inputs/raw_end_use_row.sql',
-            '02_clean_inputs/raw_eol_china.sql',
-            '02_clean_inputs/raw_eol_eu30.sql',
-            '02_clean_inputs/raw_eol_nafta.sql',
-            '02_clean_inputs/raw_eol_row.sql',
-            '02_clean_inputs/raw_net_import_articles.sql',
-            '02_clean_inputs/raw_net_import_fibers.sql',
-            '02_clean_inputs/raw_net_import_finished_goods.sql',
-            '02_clean_inputs/raw_net_import_resin.sql',
-            '02_clean_inputs/raw_net_trade_china.sql',
-            '02_clean_inputs/raw_net_trade_eu30.sql',
-            '02_clean_inputs/raw_net_trade_nafta.sql',
-            '02_clean_inputs/raw_net_trade_row.sql',
-            '02_clean_inputs/raw_waste_trade.sql',
-            '02_clean_inputs/raw_production_fiber.sql',
-            '02_clean_inputs/raw_production_resin.sql',
-            '02_clean_inputs/raw_future.sql'
-        ]
+        return itertools.chain(
+            ['02_clean_inputs/raw_additives.sql'],
+            get_region_strs(prefix='02_clean_inputs/raw_end_use_', postfix='.sql'),
+            get_region_strs(prefix='02_clean_inputs/raw_eol_', postfix='.sql'),
+            [
+                '02_clean_inputs/raw_net_import_articles.sql',
+                '02_clean_inputs/raw_net_import_fibers.sql',
+                '02_clean_inputs/raw_net_import_finished_goods.sql',
+                '02_clean_inputs/raw_net_import_resin.sql'
+            ],
+            get_region_strs(prefix='02_clean_inputs/raw_net_trade_', postfix='.sql'),
+            [
+                '02_clean_inputs/raw_waste_trade.sql',
+                '02_clean_inputs/raw_production_fiber.sql',
+                '02_clean_inputs/raw_production_resin.sql',
+                '02_clean_inputs/raw_future.sql'
+            ]
+        )
 
 
 class CheckCleanInputsTask(tasks_sql.SqlCheckTask):
@@ -319,3 +313,22 @@ class CheckFrameTask(luigi.Task):
 
         with self.output().open('w') as f:
             return json.dump(job_info, f)
+
+
+def get_region_strs(prefix=None, postfix=None):
+    """Get a list region keys with strings optionally prefixed or postfixed.
+
+    Args:
+        prefix: The string to prepend to each region key.
+        prefix: The string to append to each region key.
+
+    Returns:
+        List of region keys.
+    """
+    if prefix is None:
+        prefix = ''
+
+    if postfix is None:
+        postfix = ''
+
+    return [prefix + x + postfix for x in const.REGIONS]

@@ -1,24 +1,21 @@
 .mode csv
-.import {target_dir}01productionofresinnofiber.csv file_01productionofresinnofiber
-.import {target_dir}02productionfiber.csv file_02productionfiber
-.import {target_dir}03productionadditives.csv file_03productionadditives
-.import {target_dir}04netimportresinnofibercopy.csv file_04netimportresinnofibercopy
-.import {target_dir}05netimportfibercopy.csv file_05netimportfibercopy
-.import {target_dir}06netimportplasticarticlescopy.csv file_06netimportplasticarticlescopy
-.import {target_dir}07netimportplasticinfinishedgoodsnofibercopy.csv file_07netimportplasticinfinishedgoodsnofibercopy
-.import {target_dir}08chinaenduseandtype.csv file_08chinaenduseandtype
-.import {target_dir}09naftaenduseandtype.csv file_09naftaenduseandtype
-.import {target_dir}10europeenduseandtype.csv file_10europeenduseandtype
-.import {target_dir}11rowenduseandtype.csv file_11rowenduseandtype
-.import {target_dir}12lifetimecopy.csv file_12lifetimecopy
-.import {target_dir}1319502004copy.csv file_1319502004copy
-.import {target_dir}14eolchinacopy.csv file_14eolchinacopy
-.import {target_dir}15eoleucopy.csv file_15eoleucopy
-.import {target_dir}16eolnaftacopy.csv file_16eolnaftacopy
-.import {target_dir}17eolrowcopy.csv file_17eolrowcopy
-.import {target_dir}18nettradechina.csv file_18nettradechina
-.import {target_dir}19nettradenafta.csv file_19nettradenafta
-.import {target_dir}20nettradeeu.csv file_20nettradeeu
-.import {target_dir}21nettraderow.csv file_21nettraderow
-.import {target_dir}22wastetrade.csv file_22wastetrade
-.import {target_dir}23historic.csv file_23historic
+.import {{target_dir}}01productionofresinnofiber.csv file_01productionofresinnofiber
+.import {{target_dir}}02productionfiber.csv file_02productionfiber
+.import {{target_dir}}03productionadditives.csv file_03productionadditives
+.import {{target_dir}}04netimportresinnofibercopy.csv file_04netimportresinnofibercopy
+.import {{target_dir}}05netimportfibercopy.csv file_05netimportfibercopy
+.import {{target_dir}}06netimportplasticarticlescopy.csv file_06netimportplasticarticlescopy
+.import {{target_dir}}07netimportplasticinfinishedgoodsnofibercopy.csv file_07netimportplasticinfinishedgoodsnofibercopy
+{% for region in regions %}
+.import {{target_dir}}{{ region["files"]["endUseAndType"] }}.csv file_{{ region["files"]["endUseAndType"] }}
+{% endfor %}
+.import {{target_dir}}12lifetimecopy.csv file_12lifetimecopy
+.import {{target_dir}}1319502004copy.csv file_1319502004copy
+{% for region in regions %}
+.import {{target_dir}}{{ region["files"]["eol"] }}.csv file_{{ region["files"]["eol"] }}
+{% endfor %}
+{% for region in regions %}
+.import {{target_dir}}{{ region["files"]["trade"] }}.csv file_{{ region["files"]["trade"] }}
+{% endfor %}
+.import {{target_dir}}22wastetrade.csv file_22wastetrade
+.import {{target_dir}}23historic.csv file_23historic

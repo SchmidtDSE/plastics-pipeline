@@ -105,10 +105,8 @@ class EstimateHistoricRegionalRecyclingTask(tasks_sql.SqlExecuteTask):
         connection = sqlite3.connect(database_loc)
         cursor = connection.cursor()
 
-        self._estimate_and_add_region('china', cursor)
-        self._estimate_and_add_region('eu30', cursor)
-        self._estimate_and_add_region('nafta', cursor)
-        self._estimate_and_add_region('row', cursor)
+        for region in const.REGIONS:
+            self._estimate_and_add_region(region, cursor)
 
         connection.commit()
 

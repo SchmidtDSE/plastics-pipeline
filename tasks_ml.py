@@ -830,10 +830,7 @@ class SweepConsumptionTask(SweepTask):
                 years,
                 popChange,
                 gdpChange,
-                flagChina,
-                flagEU30,
-                flagNafta,
-                flagRow,
+                %s,
                 flagAgriculture,
                 flagConstruction,
                 flagElectronic,
@@ -847,7 +844,7 @@ class SweepConsumptionTask(SweepTask):
                 afterConsumptionMT
             FROM
                 instance_consumption_displaced
-        '''
+        ''' % get_region_flags_str()
 
     def get_cols(self):
         """Get the columns that will be returned from querying with get_sql.
@@ -861,10 +858,7 @@ class SweepConsumptionTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagAgriculture',
             'flagConstruction',
             'flagElectronic',
@@ -888,10 +882,7 @@ class SweepConsumptionTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagAgriculture',
             'flagConstruction',
             'flagElectronic',
@@ -1000,10 +991,7 @@ class SweepWasteTask(SweepTask):
                 popChange,
                 gdpChange,
                 beforePercent,
-                flagChina,
-                flagEU30,
-                flagNafta,
-                flagRow,
+                %s,
                 flagRecycling,
                 flagIncineration,
                 flagLandfill,
@@ -1013,7 +1001,7 @@ class SweepWasteTask(SweepTask):
                 instance_waste_displaced
             WHERE
                 beforePercent > 0
-        '''
+        ''' % get_region_flags_str()
 
     def get_cols(self):
         """Get the columns that will be returned from querying with get_sql.
@@ -1028,10 +1016,7 @@ class SweepWasteTask(SweepTask):
             'popChange',
             'gdpChange',
             'beforePercent',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagRecycling',
             'flagIncineration',
             'flagLandfill',
@@ -1050,10 +1035,7 @@ class SweepWasteTask(SweepTask):
             'popChange',
             'gdpChange',
             'beforePercent',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagRecycling',
             'flagIncineration',
             'flagLandfill',
@@ -1160,10 +1142,7 @@ class SweepTradeTask(SweepTask):
                 years,
                 popChange,
                 gdpChange,
-                flagChina,
-                flagEU30,
-                flagNafta,
-                flagRow,
+                %s,
                 flagArticles,
                 flagFibers,
                 flagGoods,
@@ -1174,7 +1153,7 @@ class SweepTradeTask(SweepTask):
                 afterTotalConsumption
             FROM
                 instance_trade_displaced
-        '''
+        ''' % get_region_flags_str()
 
     def get_cols(self):
         """Get the columns that will be returned from querying with get_sql.
@@ -1188,10 +1167,7 @@ class SweepTradeTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagArticles',
             'flagFibers',
             'flagGoods',
@@ -1212,10 +1188,7 @@ class SweepTradeTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagArticles',
             'flagFibers',
             'flagGoods',
@@ -1328,10 +1301,7 @@ class SweepWasteTradeTask(SweepTask):
                 years,
                 popChange,
                 gdpChange,
-                flagChina,
-                flagEU30,
-                flagNafta,
-                flagRow,
+                %s,
                 flagSword,
                 beforePercent,
                 afterPercent,
@@ -1342,7 +1312,7 @@ class SweepWasteTradeTask(SweepTask):
             WHERE
                 beforeYear >= 2007
                 AND afterYear >= 2007
-        '''
+        ''' % get_region_flags_str()
 
     def get_cols(self):
         """Get the columns that will be returned from querying with get_sql.
@@ -1356,10 +1326,7 @@ class SweepWasteTradeTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagSword',
             'beforePercent',
             'afterPercent',
@@ -1377,10 +1344,7 @@ class SweepWasteTradeTask(SweepTask):
             'years',
             'popChange',
             'gdpChange',
-            'flagChina',
-            'flagEU30',
-            'flagNafta',
-            'flagRow',
+        ] + get_region_flags() + [
             'flagSword',
             'beforePercent'
         ]
@@ -1546,3 +1510,23 @@ class CheckSweepWasteTradeTask(CheckSweepTask):
     def get_model_class(self):
         """Indicate that the trade (waste) model is being checked."""
         return 'wasteTrade'
+
+
+def get_region_flags():
+    """Get a list of strings for one hot encoded region columns.
+
+    Returns:
+        List of strings describing column names for one hot encoded regions.
+    """
+    suffixes = map(lambda x: x['sqlSuffix'], const.REGIONS_INFO)
+    return ['flag%s' % x for x in suffixes]
+
+
+def get_region_flags_str():
+    """Get a SQL snippet describing columns for one hot encoded regions.
+
+    Returns:
+        Snippet which can fit into a select statement.
+    """
+    flags = get_region_flags()
+    return ','.join(flags)

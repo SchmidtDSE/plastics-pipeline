@@ -1,9 +1,8 @@
 CREATE VIEW raw_production_resin AS
 SELECT
-    CAST(Year AS INTEGER) as year,
-    CAST(China AS REAL) AS china,
-    CAST(NAFTA AS REAL) AS nafta,
-    CAST(EU30 AS REAL) AS eu30,
-    CAST(RoW AS REAL) AS row
+    {% for region in regions %}
+    CAST({{ region["sqlName"] }} AS REAL) AS {{ region["key"] }},
+    {% endfor %}
+    CAST(Year AS INTEGER) as year
 FROM
     file_01productionofresinnofiber

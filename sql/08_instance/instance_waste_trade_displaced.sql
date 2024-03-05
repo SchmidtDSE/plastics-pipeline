@@ -7,30 +7,14 @@ SELECT
     unioned.afterPopulation AS afterPopulation,
     unioned.beforeNetMT / unioned.beforeTotalConsumption AS beforePercent,
     unioned.afterNetMT / unioned.afterTotalConsumption AS afterPercent,
+    {% for region in regions %}
     (
         CASE
-            WHEN unioned.region = 'china' THEN 1
+            WHEN unioned.region = '{{ region["key"] }}' THEN 1
             ELSE 0
         END
-    ) AS flagChina,
-    (
-        CASE
-            WHEN unioned.region = 'eu30' THEN 1
-            ELSE 0
-        END
-    ) AS flagEU30,
-    (
-        CASE
-            WHEN unioned.region = 'nafta' THEN 1
-            ELSE 0
-        END
-    ) AS flagNafta,
-    (
-        CASE
-            WHEN unioned.region = 'row' THEN 1
-            ELSE 0
-        END
-    ) AS flagRow,
+    ) AS flag{{ region["sqlSuffix"] }},
+    {% endfor %}
     (
         CASE
             WHEN unioned.afterYear >= 2017 THEN 1
