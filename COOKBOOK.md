@@ -76,7 +76,7 @@ Note that `pipeline.zip` provides outputs but downstream components will use the
  - For the [GHG / polymer pipeline](https://github.com/SchmidtDSE/plastics-ghg-pipeline), a [trade_inputs](https://global-plastics-tool.org/data/trade_inputs.csv) file is used. This only needs to be replaced if using different socioeconomic projections for GDP and population. Generally, data updates and additional regions do not require modification unless using updated data from the UN or OECD.
  - For the [web application](https://github.com/SchmidtDSE/plastics-prototype), replace `data/web.csv` with `pipeline.zip/overview_ml.csv`.
 
-These files can be replaced prior to pipeline / application exeuction.
+These files can be replaced prior to pipeline / application exeuction. Note that these actions otherwise take place in CI / CD.
 
 <br>
 
