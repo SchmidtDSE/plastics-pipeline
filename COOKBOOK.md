@@ -66,11 +66,28 @@ After updating, run the pipeline. If using Docker, developers may need to rebuil
 <br>
 
 ## Expanding input data
-Simple append to existing files in `data`:
+Simply append to existing files in `data`. A description of each file is given as follows:
 
+ - `01_Production_of_Resin_(no_fiber).csv`: Resin production data in MMT over time and per region excluding fiber data and additives. Expecting 2005 to 2020.
+ - `02_Production_Fiber.csv`: Resin production in MMT over time and per region for fibers only (no additives). Expecting 2005 to 2020.
+ - `03_Production_Additives.csv`: Additives in MMT over time and per region. Expecting 2005 to 2020.
+ - `04_Net_Import_Resin_no_fiber_copy.csv`: Resin imports excluding fibers over time and by region where negative values indicate exports. All in MMT and expecting 2005 to 2020.
+ - `05_Net_Import_Fiber_copy.csv`: Imports in fibers over time and by region where negative values indicate exports. All in MMT and expecting 2005 to 2020.
+ - `06_Net_import_plastic_articles copy.csv`: Import in plastic articles over time and per region where negative values indicate exports. All in MTT and expecting 2005 to 2020.
+ - `07_Net_Import_plastic_in_finished_goods_no_fiber copy.csv`: Import in goods excluding fibers over time and per region where negative values indicate exports. All in MTT and expecting 2005 to 2020.
+ - `[08-11]_.*.csv`: Sector-level polymer ratios for a region. 
+ - `12_Lifetime.*.csv`: Definitions of lifecycle distributions per sector (log normal distributions).
+ - `13_1950-2004 copy.csv`: Production data prior to 2005 indicating in MMT unless expressed otherwise (new data should use MMT).
+ - `[14-17]_Eol_.*.csv`: End of life fate ratios / propensities for the region by year.
+ - `[18-21]_Net_Trade_.*.csv`: Amount of imports (or negative if exports) per sector and year for the region.
+ - `22_waste_trade.csv`: Waste imports over time in MMT by region.
+ - `23_historic.csv`: Sector consumption data prior to 2005 indicating in MMT by year and region.
+ - `a1_gdp_raw.csv`: GDP projections in purchase price parity (currently from OECD).
+ - `a2_population_raw.csv`: Population actuals.
+ - `a3_regions.json`: Mapping from country 3 letter ISO to tool region name. Note that this only requires entries for non-RoW countries.
+ - `a4_pop_projection.csv`: Population projections (currently from UN).
 
-
-Note that instances are generally used as available and split between train, test, and validation. One exception is the temporally displaced out of sample step whose behavior can be changed by editting `is_out_sample_candidate` in `tasks_ml.py`.
+Note that instances are generally used as available and split between train, test, and validation. One exception is the temporally displaced out of sample step whose behavior can be changed by editting `is_out_sample_candidate` in `tasks_ml.py`. For additional information see the [ML description](https://global-plastics-tool.org/pdf/ml.pdf).
 
 <br>
 
