@@ -103,4 +103,4 @@ The following are also potentially used as executables like from the command lin
 This repo includes open data from the following sources:
 
  - DESA. "World Population Prospects 2022." United Nations, Department of Economic and Social Affairs, Population Division, 2022. https://population.un.org/wpp/Download. [CC BY 3.0 license IGO](https://creativecommons.org/licenses/by/3.0/igo/).
- - OECD. "Real GDP Long-Term Forecast." OECD, 2023. https://doi.org/10.1787/d927bc18-en. Part of [long term baseline projections](https://stats.oecd.org/BrandedView.aspx?oecd_bv_id=eo-data-en&doi=039dc6d6-en) available under a [permissive license](https://www.oecd.org/termsandconditions/) under terms Ic.
+ - OECD. "Real GDP Long-Term Forecast." OECD, 2023. https://doi.org/10.1787/d927bc18-en. Part of [long term baseline projections](https://stats.oecd.org/BrandedView.aspx?oecd_bv_id=eo-data-en&doi=039dc6d6-en) available under a [permissive license](https://www.oecd.org/termsandconditions/) under terms Ic which carries an acknowledgement requirement.
