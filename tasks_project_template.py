@@ -121,7 +121,12 @@ class ProjectRawTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        for year in range(2021, 2051):
+        projection_years = range(
+            const.PROJECTION_START_YEAR,
+            const.PROJECTION_END_YEAR + 1
+        )
+
+        for year in projection_years:
             for region in const.REGIONS:
                 self.project(
                     connection,

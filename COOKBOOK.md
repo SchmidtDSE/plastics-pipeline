@@ -1,10 +1,12 @@
 # Cookbook
-This page offers examples and guidance for common developer operations within this repository.
+Thank you for your interest in extending our work. This page offers examples and guidance for common developer operations within this repository.
 
 <br>
 <br>
 
 ## Executing pipeline with Docker
+This pipeline trains new models and generates new output data for use in downstream pipelines and tools. For this modeling, instances are generally used as available and split between train, test, and validation. One exception is the temporally displaced out of sample step whose behavior can be changed by editting `is_out_sample_candidate` in `tasks_ml.py`.
+
 The following steps will execute the pipeline from within Docker:
 
  - [Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
@@ -15,7 +17,7 @@ The following steps will execute the pipeline from within Docker:
  - Get the result: `docker cp pipeline_run:/workspace/pipeline.zip pipeline.zip`
  - Shutdown container: `docker stop pipeline_run`
 
-The result will be placed in `pipeline.zip`.
+The result will be placed in `pipeline.zip`. Of course, note that some algorithms considered in this pipeline include stochastic elements.
 
 <br>
 
@@ -65,8 +67,8 @@ After updating, run the pipeline. If using Docker, developers may need to rebuil
 
 <br>
 
-## Expanding input data
-Simply append to existing files in `data`. A description of each file is given as follows:
+## Changing input data
+Simply edit existing files in `data`. A description of each is given as follows:
 
  - `01_Production_of_Resin_(no_fiber).csv`: Resin production data in MMT over time and per region excluding fiber data and additives. Expecting 2005 to 2020.
  - `02_Production_Fiber.csv`: Resin production in MMT over time and per region for fibers only (no additives). Expecting 2005 to 2020.
@@ -87,7 +89,13 @@ Simply append to existing files in `data`. A description of each file is given a
  - `a3_regions.json`: Mapping from country 3 letter ISO to tool region name. Note that this only requires entries for non-RoW countries.
  - `a4_pop_projection.csv`: Population projections (currently from UN).
 
-Note that instances are generally used as available and split between train, test, and validation. One exception is the temporally displaced out of sample step whose behavior can be changed by editting `is_out_sample_candidate` in `tasks_ml.py`. For additional information see the [ML description](https://global-plastics-tool.org/pdf/ml.pdf).
+
+Note that this model takes a mass flow approach: each piece of plastic produced must be accounted for in consumption and end of life. This means that the input data do not include consumption and waste volumes but, instead, derive them from fate propensities, trade, etc. This allows us to ensure our modeling is comprehensive of all plastic produced.
+
+<br>
+
+## Changing projection years
+Data are either "actuals" or projected. Historic actuals currently end in 2020 and projections run from 2021 to 2050. These start and end years can be modified in `const.py` using `PROJECTION_START_YEAR` and `PROJECTION_END_YEAR`. Depending on the data changing, users may also need to edit `recirculate_secondary.sql` and `tasks_norm_lifecycle_template.py`.
 
 <br>
 
