@@ -1,8 +1,8 @@
-Sector,LLDPE_LDPE,HDPE,PP,PS,PVC,PET,PUR,Other Thermoplastics,Other Thermosets
+Major_Market_Sector,LLDPE_LDPE,HDPE,PP,PS,PVC,PET,PUR,Other Thermoplastics,Other Thermosets
 Transportation,0.95%,0.73%,2.72%,0.00%,0.00%,0.00%,0.63%,1.19%,0.80%
 Packaging,5.71%,4.36%,15.43%,0.87%,0.00%,7.26%,0.00%,0.13%,0.49%
-Building Construction,1.90%,1.45%,0.91%,0.15%,13.52%,0.00%,1.53%,0.41%,1.80%
-Electrical Electronic,0.95%,0.73%,0.91%,1.31%,1.56%,0.00%,1.53%,4.88%,0.51%
-Household Leisure Sports,0.60%,0.46%,1.15%,0.37%,0.88%,0.57%,4.56%,0.76%,2.18%
+Building_Construction,1.90%,1.45%,0.91%,0.15%,13.52%,0.00%,1.53%,0.41%,1.80%
+Electrical_Electronic,0.95%,0.73%,0.91%,1.31%,1.56%,0.00%,1.53%,4.88%,0.51%
+Household_Leisure_Sports,0.60%,0.46%,1.15%,0.37%,0.88%,0.57%,4.56%,0.76%,2.18%
 Agriculture,2.38%,1.82%,0.00%,0.00%,1.04%,0.00%,0.00%,0.00%,0.49%
 Others,0.35%,0.27%,0.67%,0.21%,0.51%,0.33%,0.92%,1.06%,3.11%
