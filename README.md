@@ -21,13 +21,7 @@ Usage
 Most users can simply reference the output from the latest execution. That output is written to [https://global-plastics-tool.org/datapipeline.zip](https://global-plastics-tool.org/datapipeline.zip) and is publicly available under the [CC-BY-NC License](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/LICENSE.md). That said, users may also leverage a local environment if desired.
 
 ### Container Environment
-A containerized Docker environment is available for execution:
-
- - [Install Docker](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04)
- - Build the environment: `docker build -t dse/plastics_pipeline .`
- - Run the container: `docker run -it --name pipeline_run dse/plastics_pipeline bash build.sh`
-
-This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype).
+A containerized Docker environment is available for execution through `build.sh`. This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype). See [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md) for more details.
 
 ### Manual Environment
 In addition to the Docker container, a manual environment can be established simply by running `pip install -r requirements.txt`. This assumes that sqlite3 is installed. Afterwards, simply run `bash build.sh`.
@@ -35,11 +29,35 @@ In addition to the Docker container, a manual environment can be established sim
 ### Configuration
 The configuration for the Luigi pipeline can be modified by providing a custom json file. See [task/job.json](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/task/job.json) for an example. Note that the pipeline, by default, uses random forest even though a full sweep is conducted because that approach tends to yield better avoidance of overfitting. Parallelization can be enabled by changing the value of `workers`.
 
+### Extension
+For examples of adding new regions or updating existing data, see [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md).
+
 <br>
 
 Tool
 --------------------------------------------------------------------------------
 Note that an interactive tool for this model is also available at [https://github.com/SchmidtDSE/plastics-prototype](https://github.com/SchmidtDSE/plastics-prototype).
+
+<br>
+
+Local Environment
+--------------------------------------------------------------------------------
+Setup the local environment with `pip -r requirements.txt`.
+
+<br>
+
+Testing
+--------------------------------------------------------------------------------
+Some unit tests and other automated checks are available. The following is recommended:
+
+```
+$ pip install pycodestyle pyflakes nose2
+$ pyflakes *.py
+$ pycodestyle *.py
+$ nose2
+```
+
+Note that unit tests and code quality checks are run in CI / CD.
 
 <br>
 
@@ -61,6 +79,12 @@ Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359]
 
 <br>
 
+Related Repositories
+--------------------------------------------------------------------------------
+See also [source code for the web-based tool](https://github.com/SchmidtDSE/plastics-prototype) running at [global-plastics-tool.org](https://global-plastics-tool.org) and [source code for the GHG pipeline](https://github.com/SchmidtDSE/plastics-ghg-pipeline).
+
+<br>
+
 Open Source
 --------------------------------------------------------------------------------
 This project is released as open source (BSD and CC-BY-NC). See [LICENSE.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/LICENSE.md) for further details. In addition to this, please note that this project uses the following open source:
@@ -75,3 +99,8 @@ The following are also potentially used as executables like from the command lin
  - [Docker](https://docs.docker.com/engine/) under the [Apache v2 License](https://github.com/moby/moby/blob/master/LICENSE).
  - [Python 3.8](https://www.python.org/) under the [PSF License](https://docs.python.org/3/license.html).
  - [SQLite 3](https://www.sqlite.org/index.html) which is in the [public domain](https://www.sqlite.org/copyright.html).
+
+This repo includes open data from the following sources:
+
+ - DESA. "World Population Prospects 2022." United Nations, Department of Economic and Social Affairs, Population Division, 2022. https://population.un.org/wpp/Download. [CC BY 3.0 license IGO](https://creativecommons.org/licenses/by/3.0/igo/).
+ - OECD. "Real GDP Long-Term Forecast." OECD, 2023. https://doi.org/10.1787/d927bc18-en. Part of [long term baseline projections](https://stats.oecd.org/BrandedView.aspx?oecd_bv_id=eo-data-en&doi=039dc6d6-en) available under a [permissive license](https://www.oecd.org/termsandconditions/) under terms Ic which carries an acknowledgement requirement.

@@ -1,5 +1,5 @@
 UPDATE
-    {table_name}
+    {{table_name}}
 SET
     netImportArticlesMT = updated.netImportArticlesMT,
     netImportFibersMT = updated.netImportFibersMT,
@@ -8,8 +8,8 @@ SET
 FROM
     (
         SELECT
-            {table_name}.year AS year,
-            {table_name}.region AS region,
+            {{table_name}}.year AS year,
+            {{table_name}}.region AS region,
             (
                 CASE
                     WHEN totalArticlesMT > 0 AND netImportArticlesMT > 0 THEN netImportArticlesMT - totalArticlesMT * netImportArticlesMT / totalImportArticlesMTPos
@@ -39,7 +39,7 @@ FROM
                 END
             ) AS netImportResinMT
         FROM
-            {table_name}
+            {{table_name}}
         INNER JOIN
             (
                 SELECT
@@ -97,13 +97,13 @@ FROM
                     sum(netImportGoodsMT) AS totalGoodsMT,
                     sum(netImportResinMT) AS totalResinMT
                 FROM
-                    {table_name}
+                    {{table_name}}
                 GROUP BY
                     year
             ) totals
         ON
-            {table_name}.year = totals.year
+            {{table_name}}.year = totals.year
     ) updated
 WHERE
-    updated.year = {table_name}.year
-    AND updated.region = {table_name}.region
+    updated.year = {{table_name}}.year
+    AND updated.region = {{table_name}}.region

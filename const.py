@@ -4,6 +4,7 @@ License:
     BSD, see LICENSE.md
 """
 
+import json
 import os
 import pathlib
 import random
@@ -126,3 +127,11 @@ EXPORT_FIELD_NAMES = [
 ]
 
 CIRCULARITY_LOOPS = 31
+
+with open(os.path.join(PARENT_DIR, 'regions.json')) as f:
+    REGIONS_INFO = json.load(f)['regions']
+
+REGIONS = [x['key'] for x in REGIONS_INFO]
+
+PROJECTION_START_YEAR = 2021
+PROJECTION_END_YEAR = 2050

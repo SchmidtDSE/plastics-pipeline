@@ -1,12 +1,12 @@
 UPDATE
-    {table_name}
+    {{table_name}}
 SET
     netWasteTradeMT = updated.netWasteTradeMT
 FROM
     (
         SELECT
-            {table_name}.year AS year,
-            {table_name}.region AS region,
+            {{table_name}}.year AS year,
+            {{table_name}}.region AS region,
             (
                 CASE
                     WHEN totalNetWasteTradeMT > 0 AND netWasteTradeMT > 0 THEN netWasteTradeMT - totalNetWasteTradeMT * netWasteTradeMT / totalWasteTradeMTPos
@@ -15,7 +15,7 @@ FROM
                 END
             ) AS netWasteTradeMT
         FROM
-            {table_name}
+            {{table_name}}
         INNER JOIN
             (
                 SELECT
@@ -34,13 +34,13 @@ FROM
                     ) AS totalWasteTradeMTNeg,
                     sum(netWasteTradeMT) AS totalNetWasteTradeMT
                 FROM
-                    {table_name}
+                    {{table_name}}
                 GROUP BY
                     year
             ) totals
         ON
-            {table_name}.year = totals.year
+            {{table_name}}.year = totals.year
     ) updated
 WHERE
-    updated.year = {table_name}.year
-    AND updated.region = {table_name}.region
+    updated.year = {{table_name}}.year
+    AND updated.region = {{table_name}}.region

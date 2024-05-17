@@ -1,5 +1,5 @@
 UPDATE
-    {table_name}
+    {{table_name}}
 SET
     eolLandfillPercent = (
         CASE
@@ -25,11 +25,11 @@ FROM
                 END
             ) * eolIncinerationPercent AS incinerationIncrease
         FROM
-            {table_name}
+            {{table_name}}
         WHERE
             year > 2020
             AND region = 'china'
     ) updated
 WHERE
-    (updated.year = {table_name}.year)
-    AND updated.region = {table_name}.region
+    (updated.year = {{table_name}}.year)
+    AND updated.region = {{table_name}}.region

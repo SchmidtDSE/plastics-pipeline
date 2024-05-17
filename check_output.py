@@ -9,6 +9,9 @@ License:
 import csv
 import sys
 
+import const
+
+
 NUM_ARGS = 1
 USAGE_STR = 'python check_output.py [target]'
 
@@ -32,12 +35,7 @@ ATTRS_EXPECTED = [
     'netWasteImportMT'
 ]
 
-REGIONS_EXPECTED = [
-    'china',
-    'eu30',
-    'nafta',
-    'row'
-]
+REGIONS_EXPECTED = const.REGIONS
 
 YEARS_REQUIRED = set(range(2010, 2050))
 

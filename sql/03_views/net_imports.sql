@@ -1,128 +1,35 @@
 CREATE VIEW net_imports AS
+{% for region in regions %}
 SELECT
     year,
-    'china' AS region,
+    '{{ region["key"] }}' AS region,
     'articles' AS type,
-    china AS netMT
+    {{ region["key"] }} AS netMT
 FROM
     raw_net_import_articles
 UNION ALL
 SELECT
     year,
-    'nafta' AS region,
-    'articles' AS type,
-    nafta AS netMT
-FROM
-    raw_net_import_articles
-UNION ALL
-SELECT
-    year,
-    'eu30' AS region,
-    'articles' AS type,
-    eu30 AS netMT
-FROM
-    raw_net_import_articles
-UNION ALL
-SELECT
-    year,
-    'row' AS region,
-    'articles' AS type,
-    row AS netMT
-FROM
-    raw_net_import_articles
-UNION ALL
-SELECT
-    year,
-    'china' AS region,
-    'fibers' AS type,
-    china AS netMT
-FROM
-    raw_net_import_fibers
-UNION ALL
-SELECT
-    year,
-    'nafta' AS region,
-    'fibers' AS type,
-    nafta AS netMT
-FROM
-    raw_net_import_fibers
-UNION ALL
-SELECT
-    year,
-    'eu30' AS region,
-    'fibers' AS type,
-    eu30 AS netMT
-FROM
-    raw_net_import_fibers
-UNION ALL
-SELECT
-    year,
-    'row' AS region,
-    'fibers' AS type,
-    row AS netMT
-FROM
-    raw_net_import_fibers
-UNION ALL
-SELECT
-    year,
-    'china' AS region,
+    '{{ region["key"] }}' AS region,
     'goods' AS type,
-    china AS netMT
+    {{ region["key"] }} AS netMT
 FROM
     raw_net_import_finished_goods
 UNION ALL
 SELECT
     year,
-    'nafta' AS region,
-    'goods' AS type,
-    nafta AS netMT
+    '{{ region["key"] }}' AS region,
+    'fibers' AS type,
+    {{ region["key"] }} AS netMT
 FROM
-    raw_net_import_finished_goods
+    raw_net_import_fibers
 UNION ALL
 SELECT
     year,
-    'eu30' AS region,
-    'goods' AS type,
-    eu30 AS netMT
-FROM
-    raw_net_import_finished_goods
-UNION ALL
-SELECT
-    year,
-    'row' AS region,
-    'goods' AS type,
-    row AS netMT
-FROM
-    raw_net_import_finished_goods
-UNION ALL
-SELECT
-    year,
-    'china' AS region,
+    '{{ region["key"] }}' AS region,
     'resin' AS type,
-    china AS netMT
+    {{ region["key"] }} AS netMT
 FROM
     raw_net_import_resin
-UNION ALL
-SELECT
-    year,
-    'nafta' AS region,
-    'resin' AS type,
-    nafta AS netMT
-FROM
-    raw_net_import_resin
-UNION ALL
-SELECT
-    year,
-    'eu30' AS region,
-    'resin' AS type,
-    eu30 AS netMT
-FROM
-    raw_net_import_resin
-UNION ALL
-SELECT
-    year,
-    'row' AS region,
-    'resin' AS type,
-    row AS netMT
-FROM
-    raw_net_import_resin
+{% if not loop.last %}UNION ALL{% endif %}
+{% endfor %}

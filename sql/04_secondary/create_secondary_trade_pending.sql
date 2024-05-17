@@ -90,73 +90,65 @@ FROM
             region,
             newWasteMT * eolRecyclingPercent * consumptionAgriculturePercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.7298245614
-                    WHEN region = 'eu30' THEN 0.7
-                    WHEN region = 'nafta' THEN 0.6857142857
-                    WHEN region = 'row' THEN 0.725
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["agricultureSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionAgricultureMT,
             newWasteMT * eolRecyclingPercent * consumptionConstructionPercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.6777777778
-                    WHEN region = 'eu30' THEN 0.6660098522
-                    WHEN region = 'nafta' THEN 0.6247191011
-                    WHEN region = 'row' THEN 0.656
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["constructionSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionConstructionMT,
             newWasteMT * eolRecyclingPercent * consumptionElectronicPercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.6709677419
-                    WHEN region = 'eu30' THEN 0.6580645161
-                    WHEN region = 'nafta' THEN 0.7111111111
-                    WHEN region = 'row' THEN 0.6769230769
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["electronicSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionElectronicMT,
             newWasteMT * eolRecyclingPercent * consumptionHouseholdLeisureSportsPercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.335042735
-                    WHEN region = 'eu30' THEN 0.4831683168
-                    WHEN region = 'nafta' THEN 0.6614718615
-                    WHEN region = 'row' THEN 0.5386666667
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["hlsSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionHouseholdLeisureSportsMT,
             newWasteMT * eolRecyclingPercent * consumptionOtherPercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.3733333333
-                    WHEN region = 'eu30' THEN 0.5064220183
-                    WHEN region = 'nafta' THEN 0.4056338028
-                    WHEN region = 'row' THEN 0.4423529412
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["otherSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionOtherMT,
             newWasteMT * eolRecyclingPercent * consumptionPackagingPercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.7883381924
-                    WHEN region = 'eu30' THEN 0.7900990099
-                    WHEN region = 'nafta' THEN 0.7857142857
-                    WHEN region = 'row' THEN 0.7873684211
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["packagingSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionPackagingMT,
             newWasteMT * eolRecyclingPercent * consumptionTextilePercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.8
-                    WHEN region = 'eu30' THEN 0.8
-                    WHEN region = 'nafta' THEN 0.8
-                    WHEN region = 'row' THEN 0.8
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["textileSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionTextileMT,
             newWasteMT * eolRecyclingPercent * consumptionTransportationPercent * (
                 CASE
-                    WHEN region = 'china' THEN 0.64
-                    WHEN region = 'eu30' THEN 0.6344827586
-                    WHEN region = 'nafta' THEN 0.5546666667
-                    WHEN region = 'row' THEN 0.6105263158
+                    {% for region in regions %}
+                    WHEN region = '{{ region["key"] }}' THEN {{ region["constants"]["transportationSecondary"] }}
+                    {% endfor %}
                     ELSE NULL
                 END
             ) AS consumptionTransportationMT,
