@@ -129,15 +129,15 @@ class ProcessRawPopulationTask(luigi.Task):
                 year = int(year_str.strip())
                 population = float(population_str.replace(' ', '')) / 1000
 
-                key = '{region}.{year}'.format(region=region, year=year)
-                if key not in output_rows:
-                    output_rows[key] = {
-                        'region': region,
-                        'year': year,
-                        'population': 0
-                    }
-
                 if year < 2022:
+                    key = '{region}.{year}'.format(region=region, year=year)
+                    if key not in output_rows:
+                        output_rows[key] = {
+                            'region': region,
+                            'year': year,
+                            'population': 0
+                        }
+                
                     output_rows[key]['population'] += population
 
         with open(os.path.join(workspace_dir, 'a4popprojection.csv')) as f:
@@ -152,15 +152,15 @@ class ProcessRawPopulationTask(luigi.Task):
                 year = int(year_str.strip())
                 population = float(population_str.replace(' ', '')) / 1000
 
-                key = '{region}.{year}'.format(region=region, year=year)
-                if key not in output_rows:
-                    output_rows[key] = {
-                        'region': region,
-                        'year': year,
-                        'population': 0
-                    }
+                if year >= 2022 and year <= 2050:
+                    key = '{region}.{year}'.format(region=region, year=year)
+                    if key not in output_rows:
+                        output_rows[key] = {
+                            'region': region,
+                            'year': year,
+                            'population': 0
+                        }
 
-                if year >= 2022 and year <= 2060:
                     output_rows[key]['population'] += population
 
         with open(os.path.join(workspace_dir, 'popregions.csv'), 'w') as f:
