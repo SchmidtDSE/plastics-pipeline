@@ -160,7 +160,7 @@ class ProcessRawPopulationTask(luigi.Task):
                         'population': 0
                     }
 
-                if year >= 2022 and year <= 2050:
+                if year >= 2022 and year <= 2060:
                     output_rows[key]['population'] += population
 
         with open(os.path.join(workspace_dir, 'popregions.csv'), 'w') as f:
