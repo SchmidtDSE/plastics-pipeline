@@ -136,7 +136,7 @@ class ProcessRawPopulationTask(luigi.Task):
                         'year': year,
                         'population': 0
                     }
-                
+
                 if year < 2022:
                     output_rows[key]['population'] += population
 
