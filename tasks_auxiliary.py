@@ -136,20 +136,23 @@ class ProcessRawPopulationTask(luigi.Task):
                         'year': year,
                         'population': 0
                     }
-
-                output_rows[key]['population'] += population
+                
+                if year < 2022:
+                    output_rows[key]['population'] += population
 
         with open(os.path.join(workspace_dir, 'a4popprojection.csv')) as f:
             reader = csv.DictReader(f)
 
-            rows_allowed = filter(lambda x: int(x['year']) >= 2022, reader)
-            for row in rows_allowed:
-                region = row['region'].lower()
-                year = row['year']
-                population = float(row['mid']) / 1000000
+            for row in reader:
+                iso_code = row['ISO3 Alpha-code']
+                year_str = row['Year']
+                population_str = row['Total Population, as of 1 January (thousands)']
+
+                region = region_mapping.get(iso_code, 'row').lower()
+                year = int(year_str.strip())
+                population = float(population_str.replace(' ', '')) / 1000
 
                 key = '{region}.{year}'.format(region=region, year=year)
-
                 if key not in output_rows:
                     output_rows[key] = {
                         'region': region,
@@ -157,7 +160,8 @@ class ProcessRawPopulationTask(luigi.Task):
                         'population': 0
                     }
 
-                output_rows[key]['population'] += population
+                if year >= 2022 and year <= 2050:
+                    output_rows[key]['population'] += population
 
         with open(os.path.join(workspace_dir, 'popregions.csv'), 'w') as f:
             writer = csv.DictWriter(
