@@ -120,7 +120,7 @@ class ProcessRawPopulationTask(luigi.Task):
         with open(os.path.join(workspace_dir, 'a2populationraw.csv')) as f:
             reader = csv.DictReader(f)
 
-            for row in reader:
+            for row in filter(lambda x: x['ISO3 Alpha-code'].strip() != '', reader):
                 iso_code = row['ISO3 Alpha-code']
                 year_str = row['Year']
                 population_str = row['Total Population, as of 1 January (thousands)']
@@ -143,7 +143,7 @@ class ProcessRawPopulationTask(luigi.Task):
         with open(os.path.join(workspace_dir, 'a4popprojection.csv')) as f:
             reader = csv.DictReader(f)
 
-            for row in reader:
+            for row in filter(lambda x: x['ISO3 Alpha-code'].strip() != '', reader):
                 iso_code = row['ISO3 Alpha-code']
                 year_str = row['Year']
                 population_str = row['Total Population, as of 1 January (thousands)']
