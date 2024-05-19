@@ -137,7 +137,7 @@ class ProcessRawPopulationTask(luigi.Task):
                             'year': year,
                             'population': 0
                         }
-                
+
                     output_rows[key]['population'] += population
 
         with open(os.path.join(workspace_dir, 'a4popprojection.csv')) as f:
