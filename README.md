@@ -82,7 +82,7 @@ Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359]
  - C. Liu, S. Hu, R. Geyer. Manuscript in Process (2024).
  - [OECD, Real GDP long-term forecast (2023).](https://doi.org/10.1787/d927bc18-en)
 
-Our thanks to those authors and resources. 
+Our thanks to those authors and resources. Manuscript in progress data available upon request to authors.
 
 <br>
 
@@ -107,7 +107,7 @@ The following are also potentially used as executables like from the command lin
  - [Python 3.8](https://www.python.org/) under the [PSF License](https://docs.python.org/3/license.html).
  - [SQLite 3](https://www.sqlite.org/index.html) which is in the [public domain](https://www.sqlite.org/copyright.html).
 
-This repo includes open data from the following sources:
+Additional license information:
 
  - DESA. "World Population Prospects 2022." United Nations, Department of Economic and Social Affairs, Population Division, 2022. https://population.un.org/wpp/Download. [CC BY 3.0 license IGO](https://creativecommons.org/licenses/by/3.0/igo/).
  - OECD. "Real GDP Long-Term Forecast." OECD, 2023. https://doi.org/10.1787/d927bc18-en. Part of [long term baseline projections](https://stats.oecd.org/BrandedView.aspx?oecd_bv_id=eo-data-en&doi=039dc6d6-en) available under a [permissive license](https://www.oecd.org/termsandconditions/) under terms Ic which carries an acknowledgement requirement.
