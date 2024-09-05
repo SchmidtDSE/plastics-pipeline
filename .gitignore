@@ -1,5 +1,9 @@
 data/.lock.*
 data/.~lock.*
+data/*.csv
+data/*.json
+data/raw_data_in
+data/raw_data_in.zip
 output/*.csv
 output/*.db
 output/*.csv
