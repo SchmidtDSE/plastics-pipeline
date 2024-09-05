@@ -7,11 +7,11 @@ jobs:
     name: Checks
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Sqlite
         run: sudo apt install sqlite3
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Install checks
@@ -30,7 +30,7 @@ jobs:
     needs: [checks]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Docker
         uses: crazy-max/ghaction-setup-docker@v3
       - name: Build container
@@ -41,13 +41,13 @@ jobs:
     needs: [checks]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Update apt
         run: sudo apt update
       - name: Install Sqlite
         run: sudo apt install sqlite3
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '3.11'
       - name: Install wget
@@ -60,7 +60,7 @@ jobs:
         run: bash build.sh
       - name: Zip pipeline
         run: zip -r pipeline.zip output
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: pipeline-result
           path: pipeline.zip
