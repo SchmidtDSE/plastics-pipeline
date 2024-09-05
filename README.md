@@ -73,9 +73,17 @@ CI / CD should be passing before merges to `main` which is used to stage pipelin
 
 <br>
 
-Publication
+Data and Citation
 --------------------------------------------------------------------------------
-Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359](https://arxiv.org/abs/2312.11359) for now. Thank you!
+Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359](https://arxiv.org/abs/2312.11359) for now. Thank you! Citations for data in this repository:
+
+ - [DESA, World Population Prospects 2022 (2022). https://population.un.org/wpp/Download.
+]
+ - [R. Geyer, J. R. Jambeck, K. L. Law, Production, use, and fate of all plastics ever made. Sci. Adv. 3, e1700782 (2017).](https://www.science.org/doi/10.1126/sciadv.1700782)
+ - C. Liu, S. Hu, R. Geyer. Manuscript in Process (2024).
+ - [OECD, Real GDP long-term forecast (2023).](https://doi.org/10.1787/d927bc18-en)
+
+Our thanks to those authors and resources. 
 
 <br>
 
