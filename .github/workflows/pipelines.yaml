@@ -34,7 +34,7 @@ jobs:
       - name: Setup Docker
         uses: crazy-max/ghaction-setup-docker@v3
       - name: Build container
-        uses: docker build -t dse/plastics_pipeline .
+        run: docker build -t dse/plastics_pipeline .
   pipeline:
     runs-on: ubuntu-latest
     name: Pipeline
