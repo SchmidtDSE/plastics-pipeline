@@ -5,6 +5,7 @@ RUN apt-get install -y python3-pip
 RUN apt-get install -y python-is-python3
 RUN apt-get install -y sqlite3
 RUN apt-get install -y zip
+RUN apt-get install -y wget
 
 RUN mkdir /workspace
 WORKDIR /workspace
@@ -12,3 +13,7 @@ WORKDIR /workspace
 COPY . .
 
 RUN pip install -r requirements.txt
+
+WORKDIR /workspace/data
+
+RUN bash get_data.sh
