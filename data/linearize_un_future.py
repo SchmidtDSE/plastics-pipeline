@@ -19,6 +19,7 @@ def transform_row(target):
     def get_for_year(year):
         return {
             'ISO2 Alpha-code': target['ISO2 Alpha-code'],
+            'ISO3 Alpha-code': target['ISO3 Alpha-code'],
             'SDMX code**': target['SDMX code**'],
             'Type': target['Type'],
             'Parent code': target['Parent code'],
