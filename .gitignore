@@ -2,6 +2,8 @@ data/.lock.*
 data/.~lock.*
 data/*.csv
 data/*.json
+data/*.xlsx
+data/openrefine-*
 data/raw_data_in
 data/raw_data_in.zip
 output/*.csv

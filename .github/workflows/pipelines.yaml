@@ -52,6 +52,8 @@ jobs:
           python-version: '3.11'
       - name: Install wget
         run: sudo apt install wget
+      - name: Install wget2
+        run: sudo apt install wget2
       - name: Install other dependencies
         run: pip install -r requirements.txt
       - name: Prepare data
