@@ -120,6 +120,8 @@ class ProcessRawPopulationTask(luigi.Task):
         with open(os.path.join(workspace_dir, 'a2populationraw.csv')) as f:
             reader = csv.DictReader(f)
 
+            max_year_prior = 0
+
             for row in filter(lambda x: x['ISO3 Alpha-code'].strip() != '', reader):
                 iso_code = row['ISO3 Alpha-code']
                 year_str = row['Year']
@@ -129,16 +131,16 @@ class ProcessRawPopulationTask(luigi.Task):
                 year = int(year_str.strip())
                 population = float(population_str.replace(' ', '')) / 1000
 
-                if year < 2022:
-                    key = '{region}.{year}'.format(region=region, year=year)
-                    if key not in output_rows:
-                        output_rows[key] = {
-                            'region': region,
-                            'year': year,
-                            'population': 0
-                        }
+                max_year_prior = year if max_year_prior < year else max_year_prior
+                key = '{region}.{year}'.format(region=region, year=year)
+                if key not in output_rows:
+                    output_rows[key] = {
+                        'region': region,
+                        'year': year,
+                        'population': 0
+                    }
 
-                    output_rows[key]['population'] += population
+                output_rows[key]['population'] += population
 
         with open(os.path.join(workspace_dir, 'a4popprojection.csv')) as f:
             reader = csv.DictReader(f)
@@ -152,7 +154,7 @@ class ProcessRawPopulationTask(luigi.Task):
                 year = int(year_str.strip())
                 population = float(population_str.replace(' ', '')) / 1000
 
-                if year >= 2022 and year <= 2050:
+                if year > max_year_prior and year <= 2050:
                     key = '{region}.{year}'.format(region=region, year=year)
                     if key not in output_rows:
                         output_rows[key] = {

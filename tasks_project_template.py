@@ -268,6 +268,8 @@ class ProjectRawTask(luigi.Task):
         cursor.close()
 
         if (len(results_flat) == 0):
+            print('Failure details:')
+            print(sql)
             raise RuntimeError('No results.')
 
         results_keyed = [dict(zip(cols, result)) for result in results_flat]
