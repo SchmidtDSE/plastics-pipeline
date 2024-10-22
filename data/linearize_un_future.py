@@ -7,6 +7,7 @@ NUM_ARGS = 2
 
 OUTPUT_COLS = [
     'ISO2 Alpha-code',
+    'ISO3 Alpha-code',
     'SDMX code**',
     'Type',
     'Parent code',
