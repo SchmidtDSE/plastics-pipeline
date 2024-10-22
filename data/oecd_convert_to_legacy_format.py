@@ -5,6 +5,14 @@ USAGE = 'python oecd_convert_to_legacy_format.py [input] [output]'
 NUM_ARGS = 2
 
 
+def transform_row(target):
+    return {
+        'LOCATION': target['LOCATION'],
+        'TIME': target['TIME_PERIOD'],
+        'Value': float(target['OBS_VALUE']) / 1000000
+    }
+
+
 def main():
     if len(sys.argv) != NUM_ARGS + 1:
         print(USAGE)
@@ -17,14 +25,6 @@ def main():
         with open(output_loc, 'w') as f_out:
             reader = csv.DictReader(f_in)
             writer = csv.DictWriter(f_out, fieldnames=['LOCATION', 'TIME', 'Value'])
-            
-            def transform_row(target):
-                return {
-                    'LOCATION': target['LOCATION'],
-                    'TIME': target['TIME_PERIOD'],
-                    'Value': target['OBS_VALUE']
-                }
-            
             transformed = map(transform_row, reader)
             writer.writeheader()
             writer.writerows(transformed)
