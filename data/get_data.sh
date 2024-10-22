@@ -1,8 +1,6 @@
 echo "== Installing required software... =="
 pip install xlsx2csv
 sudo apt-get install wget2
-wget "https://github.com/OpenRefine/OpenRefine/releases/download/3.8.2/openrefine-linux-3.8.2.tar.gz"
-tar -xvzf openrefine-linux-3.8.2.tar.gz
 
 echo "== Gathering UN population estimates... =="
 wget2 https://population.un.org/wpp/Download/Files/1_Indicator%20\(Standard\)/EXCEL_FILES/1_General/WPP2024_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT.xlsx
@@ -16,7 +14,7 @@ python oecd_convert_to_legacy_format.py gdp_new_format_raw.csv a1gdpraw.csv
 
 echo "== Gathering raw mass flows... =="
 wget https://global-plastics-tool.org/data/raw_data_in_slim.zip
-unzip raw_data_in.zip
+unzip raw_data_in_slim.zip
 mv data raw_data_in
 mv raw_data_in/*.csv ./
 mv raw_data_in/*.json ./
