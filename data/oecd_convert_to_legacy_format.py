@@ -21,7 +21,7 @@ def main():
             def transform_row(target):
                 return {
                     'LOCATION': target['LOCATION'],
-                    'TIME': target['Time'],
+                    'TIME': target['TIME_PERIOD'],
                     'Value': target['OBS_VALUE']
                 }
             
