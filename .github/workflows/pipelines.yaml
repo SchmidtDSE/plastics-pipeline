@@ -26,7 +26,7 @@ jobs:
         run: nose2
   dockerCheck:
     runs-on: ubuntu-latest
-    name: Check Docker
+    name: Test Docker
     needs: [checks]
     steps:
       - name: Checkout
