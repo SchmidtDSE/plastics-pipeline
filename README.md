@@ -21,7 +21,7 @@ Usage
 Most users can simply reference the output from the latest execution. That output is written to [https://global-plastics-tool.org/datapipeline.zip](https://global-plastics-tool.org/datapipeline.zip) and is publicly available under the [CC-BY-NC License](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/LICENSE.md). That said, users may also leverage a local environment if desired.
 
 ### Container Environment
-A containerized Docker environment is available for execution through `build.sh`. This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype). See [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md) for more details.
+A containerized Docker environment is available for execution. This will conduct the model sweeps and prepare the outputs required for the [front-end tool](https://github.com/SchmidtDSE/plastics-prototype). See [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md) for more details.
 
 ### Manual Environment
 In addition to the Docker container, a manual environment can be established simply by running `pip install -r requirements.txt`. This assumes that sqlite3 is installed. Afterwards, simply run `bash build.sh`.
