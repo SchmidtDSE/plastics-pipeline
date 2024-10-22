@@ -50,7 +50,8 @@ def main():
 
             rows_nested = map(transform_row, reader)
             rows_flat = itertools.chain(*rows_nested)
-            writer.writerows(rows_flat)
+            rows_flat_allowed = filter(lambda x: x['ISO3 Alpha-code'] != '', rows_flat)
+            writer.writerows(rows_flat_allowed)
 
 
 if __name__ == '__main__':
