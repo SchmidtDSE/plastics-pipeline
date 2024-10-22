@@ -1,6 +1,5 @@
 echo "== Installing required software... =="
 pip install xlsx2csv
-sudo apt-get install wget2
 
 echo "== Gathering UN population estimates... =="
 wget2 https://population.un.org/wpp/Download/Files/1_Indicator%20\(Standard\)/EXCEL_FILES/1_General/WPP2024_GEN_F01_DEMOGRAPHIC_INDICATORS_COMPACT.xlsx
