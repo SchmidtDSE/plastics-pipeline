@@ -40,8 +40,13 @@ class SqlExecuteTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
+        def write_to_output():
+            with self.output().open('w') as f:
+                return json.dump(job_info, f)
+
         sql_filenames = list(self.get_scripts_resolved())
         if len(sql_filenames) == 0:
+            write_to_output()
             return
 
         for filename in sql_filenames:
@@ -62,8 +67,7 @@ class SqlExecuteTask(luigi.Task):
         cursor.close()
         connection.close()
 
-        with self.output().open('w') as f:
-            return json.dump(job_info, f)
+        write_to_output()
 
     def get_additional_template_vals(self):
         """Provide additional template values for jinja.

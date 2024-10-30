@@ -65,15 +65,11 @@ class CleanFilenamesTask(luigi.Task):
         with self.input().open('r') as f:
             job_info = json.load(f)
 
-        clean_filenames.execute(job_info['directories']['workspace'])
-
         if const.USE_PREFORMATTED:
-            sample_file = os.path.join(
-                job_info['directories']['workspace'],
-                'output',
-                'combined.db'
-            )
+            sample_file = job_info['database']
         else:
+            clean_filenames.execute(job_info['directories']['workspace'])
+
             sample_file = os.path.join(
                 job_info['directories']['workspace'],
                 '01productionofresinnofiber.csv'

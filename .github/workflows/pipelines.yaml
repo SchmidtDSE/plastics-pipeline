@@ -57,7 +57,7 @@ jobs:
       - name: Install other dependencies
         run: pip install -r requirements.txt
       - name: Prepare data
-        run: cd data; mkdir output; mv snapshot.db output/combined.db
+        run: mkdir output; mv data/snapshot.db output/combined.db
       - name: Execute
         run: bash build.sh
       - name: Zip pipeline
