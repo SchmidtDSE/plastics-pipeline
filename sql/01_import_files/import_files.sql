@@ -10,7 +10,6 @@
 .import {{target_dir}}{{ region["files"]["endUseAndType"] }}.csv file_{{ region["files"]["endUseAndType"] }}
 {% endfor %}
 .import {{target_dir}}12lifetimecopy.csv file_12lifetimecopy
-.import {{target_dir}}1319502004copy.csv file_1319502004copy
 {% for region in regions %}
 .import {{target_dir}}{{ region["files"]["eol"] }}.csv file_{{ region["files"]["eol"] }}
 {% endfor %}
@@ -18,4 +17,3 @@
 .import {{target_dir}}{{ region["files"]["trade"] }}.csv file_{{ region["files"]["trade"] }}
 {% endfor %}
 .import {{target_dir}}22wastetrade.csv file_22wastetrade
-.import {{target_dir}}23historic.csv file_23historic
