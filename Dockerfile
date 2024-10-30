@@ -17,6 +17,7 @@ RUN pip install -r requirements.txt
 
 WORKDIR /workspace/data
 
-RUN mv snapshot.db combined.db
+RUN mkdir output
+RUN mv snapshot.db output/combined.db
 
 WORKDIR /workspace

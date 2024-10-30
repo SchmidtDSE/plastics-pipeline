@@ -136,4 +136,4 @@ REGIONS = [x['key'] for x in REGIONS_INFO]
 PROJECTION_START_YEAR = 2021
 PROJECTION_END_YEAR = 2050
 
-USE_PREFORMATTED = True
+USE_PREFORMATTED = True  # See README for rebuilding from remotely hosted files.

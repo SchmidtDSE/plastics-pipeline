@@ -197,7 +197,13 @@ class CheckPreformattedTask(luigi.Task):
 
         db_path = job_info['database']
 
-        assert os.path.exists(db_path)
+        db_path_full = os.path.join(
+            job_info['directories']['workspace'],
+            db_path
+        )
+
+        if not os.path.exists(db_path_full):
+            raise RuntimeError('Expected DB at %s see const.USE_PREFORMATTED.' % db_path_full)
 
         with self.output().open('w') as f:
             json.dump(job_info, f)

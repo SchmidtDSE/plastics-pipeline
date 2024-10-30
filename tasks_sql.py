@@ -40,7 +40,10 @@ class SqlExecuteTask(luigi.Task):
         database_loc = job_info['database']
         connection = sqlite3.connect(database_loc)
 
-        sql_filenames = self.get_scripts_resolved()
+        sql_filenames = list(self.get_scripts_resolved())
+        if len(sql_filenames) == 0:
+            return
+
         for filename in sql_filenames:
             cursor = connection.cursor()
 

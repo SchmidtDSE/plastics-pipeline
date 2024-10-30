@@ -67,15 +67,19 @@ class CleanFilenamesTask(luigi.Task):
 
         clean_filenames.execute(job_info['directories']['workspace'])
 
-        sample_file = os.path.join(
-            job_info['directories']['workspace'],
-            '01productionofresinnofiber.csv'
-        )
+        if const.USE_PREFORMATTED:
+            sample_file = os.path.join(
+                job_info['directories']['workspace'],
+                'output',
+                'combined.db'
+            )
+        else:
+            sample_file = os.path.join(
+                job_info['directories']['workspace'],
+                '01productionofresinnofiber.csv'
+            )
 
-        with open(sample_file) as f:
-            sample_contents = f.read()
-
-        assert sample_contents != ''
+        assert os.path.exists(sample_file)
 
         with self.output().open('w') as f:
             json.dump(job_info, f)
