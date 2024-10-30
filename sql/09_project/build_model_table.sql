@@ -89,34 +89,3 @@ LEFT OUTER JOIN
 ON
     auxiliary_allowed.year = summary.year
     AND auxiliary_allowed.region = summary.region
-UNION ALL
-SELECT
-    year,
-    region,
-    NULL AS population,
-    NULL AS gdp,
-    consumptionAgricultureMT,
-    consumptionConstructionMT,
-    consumptionElectronicMT,
-    consumptionHouseholdLeisureSportsMT,
-    consumptionOtherMT,
-    consumptionPackagingMT,
-    consumptionTextileMT,
-    consumptionTransportationMT,
-    NULL AS eolRecyclingPercent,
-    NULL AS eolIncinerationPercent,
-    NULL AS eolLandfillPercent,
-    NULL AS eolMismanagedPercent,
-    NULL AS netImportArticlesPercent,
-    NULL AS netImportFibersPercent,
-    NULL AS netImportGoodsPercent,
-    NULL AS netImportResinPercent,
-    NULL AS netWasteTradePercent,
-    NULL AS netImportArticlesMT,
-    NULL AS netImportFibersMT,
-    NULL AS netImportGoodsMT,
-    NULL AS netImportResinMT,
-    NULL AS netWasteTradeMT,
-    NULL AS newWasteMT
-FROM 
-    raw_future

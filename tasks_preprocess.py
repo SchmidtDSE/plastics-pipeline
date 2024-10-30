@@ -151,8 +151,7 @@ class CleanInputsTask(tasks_sql.SqlExecuteTask):
             [
                 '02_clean_inputs/raw_waste_trade.sql',
                 '02_clean_inputs/raw_production_fiber.sql',
-                '02_clean_inputs/raw_production_resin.sql',
-                '02_clean_inputs/raw_future.sql'
+                '02_clean_inputs/raw_production_resin.sql'
             ]
         )
 
