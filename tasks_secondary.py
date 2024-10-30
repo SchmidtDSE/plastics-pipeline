@@ -138,7 +138,8 @@ class EstimateHistoricRegionalRecyclingTask(tasks_sql.SqlExecuteTask):
             [float(x[1]) for x in training],
         )
 
-        output_years = range(2000, 2005)
+        start_year = 2000 if const.USE_PREFORMATTED else 1950
+        output_years = range(start_year, 2005)
         output_records_uncapped = map(lambda year: {
             'year': year,
             'percent': model.predict([[year]])[0]
@@ -352,7 +353,8 @@ class ApplyLifecycleForSecondaryTask(tasks_norm_lifecycle_template.ApplyLifecycl
         return 'consumption_intermediate_waste'
 
     def get_start_year(self):
-        return 2000 + int(self.iteration)
+        start_year = 2000 if const.USE_PREFORMATTED else 1950
+        return start_year + int(self.iteration)
 
     def get_end_assert_year(self):
         return 2020

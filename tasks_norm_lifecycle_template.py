@@ -430,7 +430,7 @@ class ApplyLifecycleTask(luigi.Task):
         connection.commit()
 
     def get_start_year(self):
-        return 1951
+        return 2001 if const.USE_PREFORMATTED else 1951
 
     def get_end_assert_year(self):
         return 2030
