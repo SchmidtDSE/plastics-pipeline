@@ -14,6 +14,7 @@ import subprocess
 import luigi
 
 import const
+import tasks_preprocess
 import tasks_sql
 import tasks_workspace
 
@@ -290,7 +291,10 @@ class BuildViewsAuxTask(tasks_sql.SqlExecuteTask):
 
     def requires(self):
         """Require that the auxiliary data have been confirmed present."""
-        return CheckImportAuxTask(task_dir=self.task_dir)
+        if const.USE_PREFORMATTED:
+            return tasks_preprocess.CheckPreformattedTask(task_dir=self.task_dir)
+        else:
+            return CheckImportAuxTask(task_dir=self.task_dir)
 
     def output(self):
         """Report that the views for working with auxiliary data have been built."""
@@ -299,11 +303,14 @@ class BuildViewsAuxTask(tasks_sql.SqlExecuteTask):
 
     def get_scripts(self):
         """Get the location of scripts needed to build the auxiliary data views."""
-        return [
-            '06_aux/gdp.sql',
-            '06_aux/population.sql',
-            '06_aux/auxiliary.sql'
-        ]
+        if const.USE_PREFORMATTED:
+            return []
+        else:
+            return [
+                '06_aux/gdp.sql',
+                '06_aux/population.sql',
+                '06_aux/auxiliary.sql'
+            ]
 
 
 class CheckViewsAuxTask(tasks_sql.SqlCheckTask):
