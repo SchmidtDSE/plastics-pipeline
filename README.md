@@ -33,7 +33,7 @@ The configuration for the Luigi pipeline can be modified by providing a custom j
 For examples of adding new regions or updating existing data, see [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md).
 
 ### Snapshot database
-If not using archived data, change `const.USE_PREFORMATTED` and see the `data` directory for sourcing information. This snapshot is located in `data/snapshot.db`. This starts at 2000 but the simulations may also optionally start from 1950 if `const.USE_PREFORMATTED` is set to False. This results in a negligible increase in accuracy (<0.1% for CSVS-controlled outputs).
+Inputs snapshot for reproducibility is located in `data/snapshot.db`. Use of this preformatted dataset is controlled through `const.USE_PREFORMATTED` which defaults to True meaning that the included SQLite snapshot is used. For more details see the `data` directory.
 
 <br>
 
