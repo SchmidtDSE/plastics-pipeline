@@ -126,7 +126,9 @@ EXPORT_FIELD_NAMES = [
     'netWasteImportMT'
 ]
 
-CIRCULARITY_LOOPS = 31
+USE_PREFORMATTED = True  # See README for rebuilding from remotely hosted files.
+
+CIRCULARITY_LOOPS = 20 if USE_PREFORMATTED else 31
 
 with open(os.path.join(PARENT_DIR, 'regions.json')) as f:
     REGIONS_INFO = json.load(f)['regions']
@@ -135,5 +137,3 @@ REGIONS = [x['key'] for x in REGIONS_INFO]
 
 PROJECTION_START_YEAR = 2021
 PROJECTION_END_YEAR = 2050
-
-USE_PREFORMATTED = True  # See README for rebuilding from remotely hosted files.

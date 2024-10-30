@@ -33,7 +33,7 @@ The configuration for the Luigi pipeline can be modified by providing a custom j
 For examples of adding new regions or updating existing data, see [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md).
 
 ### Snapshot database
-If not using archived data, change `const.USE_PREFORMATTED` and see the `data` directory for sourcing information. This snapshot is located in `data/snapshot.db`.
+Inputs snapshot for reproducibility is located in `data/snapshot.db`. Use of this preformatted dataset is controlled through `const.USE_PREFORMATTED` which defaults to True meaning that the included SQLite snapshot is used. For more details see the `data` directory.
 
 <br>
 
@@ -78,7 +78,7 @@ CI / CD should be passing before merges to `main` which is used to stage pipelin
 
 Data and Citation
 --------------------------------------------------------------------------------
-Papers are still in process. Please cite preprint at [10.48550/arXiv.2312.11359](https://arxiv.org/abs/2312.11359) for now. Thank you! Citations for data in this repository:
+Citations for data in this repository:
 
  - [DESA, World Population Prospects 2022 (2022).](https://population.un.org/wpp/Download)
  - [R. Geyer, J. R. Jambeck, K. L. Law, Production, use, and fate of all plastics ever made. Sci. Adv. 3, e1700782 (2017).](https://www.science.org/doi/10.1126/sciadv.1700782)
