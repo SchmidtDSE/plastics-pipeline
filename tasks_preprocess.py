@@ -176,6 +176,33 @@ class CheckCleanInputsTask(tasks_sql.SqlCheckTask):
         return 'raw_additives'
 
 
+class CheckPreformattedTask(luigi.Task):
+    """Validate that a preformatted database file can be found."""
+
+    task_dir = luigi.Parameter(default=const.DEFAULT_TASK_DIR)
+
+    def requires(self):
+        """Require that import files are prepared."""
+        return PrepareImportFilesTask(task_dir=self.task_dir)
+
+    def output(self):
+        """Indicate that the database is present."""
+        out_path = os.path.join(self.task_dir, '004_check_preformatted.json')
+        return luigi.LocalTarget(out_path)
+
+    def run(self):
+        """Execute the file import script."""
+        with self.input().open('r') as f:
+            job_info = json.load(f)
+
+        db_path = job_info['database']
+
+        assert os.path.exists(db_path)
+
+        with self.output().open('w') as f:
+            json.dump(job_info, f)
+
+
 class BuildViewsTask(tasks_sql.SqlExecuteTask):
     """Build the data access convienence views used by downstream tasks."""
 
@@ -183,7 +210,10 @@ class BuildViewsTask(tasks_sql.SqlExecuteTask):
 
     def requires(self):
         """Require that the data cleaning views have been checked."""
-        return CheckCleanInputsTask(task_dir=self.task_dir)
+        if const.USE_PREFORMATTED:
+            return CheckPreformattedTask(task_dir=self.task_dir)
+        else:
+            return CheckCleanInputsTask(task_dir=self.task_dir)
 
     def output(self):
         """Report that the convienece views have been established."""
@@ -192,24 +222,27 @@ class BuildViewsTask(tasks_sql.SqlExecuteTask):
 
     def get_scripts(self):
         """Return a list of scripts required to build the convienence views."""
-        return [
-            '03_views/consumption_primary.sql',
-            '03_views/end_use.sql',
-            '03_views/eol.sql',
-            '03_views/input_additives.sql',
-            '03_views/input_import.sql',
-            '03_views/input_production.sql',
-            '03_views/inputs.sql',
-            '03_views/net_imports.sql',
-            '03_views/waste_trade.sql',
-            '03_views/overview_consumption.sql',
-            '03_views/overview_end_use.sql',
-            '03_views/overview_eol.sql',
-            '03_views/overview_inputs.sql',
-            '03_views/overview_net_imports.sql',
-            '03_views/overview_sector_trade.sql',
-            '03_views/summary.sql'
-        ]
+        if const.USE_PREFORMATTED:
+            return []
+        else:
+            return [
+                '03_views/consumption_primary.sql',
+                '03_views/end_use.sql',
+                '03_views/eol.sql',
+                '03_views/input_additives.sql',
+                '03_views/input_import.sql',
+                '03_views/input_production.sql',
+                '03_views/inputs.sql',
+                '03_views/net_imports.sql',
+                '03_views/waste_trade.sql',
+                '03_views/overview_consumption.sql',
+                '03_views/overview_end_use.sql',
+                '03_views/overview_eol.sql',
+                '03_views/overview_inputs.sql',
+                '03_views/overview_net_imports.sql',
+                '03_views/overview_sector_trade.sql',
+                '03_views/summary.sql'
+            ]
 
 
 class CheckViewsTask(tasks_sql.SqlCheckTask):

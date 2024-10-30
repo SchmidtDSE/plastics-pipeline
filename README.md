@@ -32,6 +32,9 @@ The configuration for the Luigi pipeline can be modified by providing a custom j
 ### Extension
 For examples of adding new regions or updating existing data, see [COOKBOOK.md](https://github.com/SchmidtDSE/plastics-pipeline/blob/main/COOKBOOK.md).
 
+### Snapshot database
+If not using archived data, change `const.USE_PREFORMATTED` and see the `data` directory for sourcing information. This snapshot is located in `data/snapshot.db`.
+
 <br>
 
 Tool
