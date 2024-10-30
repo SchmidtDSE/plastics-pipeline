@@ -138,7 +138,7 @@ class EstimateHistoricRegionalRecyclingTask(tasks_sql.SqlExecuteTask):
             [float(x[1]) for x in training],
         )
 
-        output_years = range(2004, 2005)
+        output_years = range(2000, 2005)
         output_records_uncapped = map(lambda year: {
             'year': year,
             'percent': model.predict([[year]])[0]
